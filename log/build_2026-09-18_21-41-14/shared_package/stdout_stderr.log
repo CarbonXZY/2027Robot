@@ -1,0 +1,11 @@
+[35m[1mConsolidate compiler generated dependencies of target shared_package[0m
+[100%] Built target shared_package
+-- Install configuration: ""
+-- Up-to-date: /home/carbon/Program_Projects/Control_Frame/install/shared_package/lib/libshared_package.so
+-- Up-to-date: /home/carbon/Program_Projects/Control_Frame/install/shared_package/include/Send_Interface.hpp
+[31mCMake Error at cmake_install.cmake:65 (file):
+  file INSTALL cannot find
+  "/home/carbon/Program_Projects/Control_Frame/src/shared_package/Middleware/alg_crc.h":
+  No such file or directory.
+
+[0m
