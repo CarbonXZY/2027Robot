@@ -1,0 +1,339 @@
+[0.000000] (-) TimerEvent: {}
+[0.000182] (shared_package) JobQueued: {'identifier': 'shared_package', 'dependencies': OrderedDict()}
+[0.000268] (chassis) JobQueued: {'identifier': 'chassis', 'dependencies': OrderedDict([('shared_package', '/home/carbon/Program_Projects/Control_Frame/install/shared_package')])}
+[0.000347] (shared_package) JobStarted: {'identifier': 'shared_package'}
+[0.043794] (shared_package) JobProgress: {'identifier': 'shared_package', 'progress': 'cmake'}
+[0.045304] (shared_package) Command: {'cmd': ['/usr/bin/cmake', '/home/carbon/Program_Projects/Control_Frame/src/shared_package', '-DCMAKE_INSTALL_PREFIX=/home/carbon/Program_Projects/Control_Frame/install/shared_package'], 'cwd': '/home/carbon/Program_Projects/Control_Frame/build/shared_package', 'env': OrderedDict([('LESSOPEN', '| /usr/bin/lesspipe %s'), ('HTTPS_PROXY', 'http://127.0.0.1:7897/'), ('no_proxy', 'localhost,127.0.0.1,192.168.0.0/16,10.0.0.0/8,172.16.0.0/12,::1'), ('AI_AGENT', 'claude-code_2-1-273_agent'), ('LANGUAGE', 'zh_CN:en'), ('USER', 'carbon'), ('CLAUDE_CODE_ENTRYPOINT', 'cli'), ('LC_TIME', 'zh_CN.UTF-8'), ('GIT_EDITOR', 'true'), ('all_proxy', 'socks://127.0.0.1:7897/'), ('XDG_SESSION_TYPE', 'wayland'), ('CLAUDE_CODE_SESSION_ATTENDED', '1'), ('SHLVL', '1'), ('LD_LIBRARY_PATH', '/opt/ros/humble/opt/rviz_ogre_vendor/lib:/opt/ros/humble/lib/x86_64-linux-gnu:/opt/ros/humble/lib'), ('CLAUDE_CODE_MESSAGING_TOKEN', 'a0921a77f905ccaee80e154d243fca87'), ('HOME', '/home/carbon'), ('OLDPWD', '/home/carbon/Program_Projects/Control_Frame/src'), ('DESKTOP_SESSION', 'ubuntu'), ('NO_PROXY', 'localhost,127.0.0.1,192.168.0.0/16,10.0.0.0/8,172.16.0.0/12,::1'), ('ROS_PYTHON_VERSION', '3'), ('GNOME_SHELL_SESSION_MODE', 'ubuntu'), ('GTK_MODULES', 'gail:atk-bridge'), ('CLAUDE_CODE_CHILD_SESSION', '1'), ('LC_MONETARY', 'zh_CN.UTF-8'), ('DBUS_STARTER_BUS_TYPE', 'session'), ('SYSTEMD_EXEC_PID', '1237'), ('DBUS_SESSION_BUS_ADDRESS', 'unix:path=/run/user/1000/bus,guid=da3da993a341e44656fef5d16aaabfed'), ('COLORTERM', 'truecolor'), ('WAYLAND_DISPLAY', 'wayland-0'), ('https_proxy', 'http://127.0.0.1:7897/'), ('ROS_DISTRO', 'humble'), ('GTK_IM_MODULE', 'ibus'), ('LOGNAME', 'carbon'), ('ALL_PROXY', 'socks://127.0.0.1:7897/'), ('http_proxy', 'http://127.0.0.1:7897/'), ('_', '/usr/bin/colcon'), ('ROS_VERSION', '2'), ('XDG_SESSION_CLASS', 'user'), ('USERNAME', 'carbon'), ('ANTHROPIC_BASE_URL', 'https://api.deepseek.com/anthropic'), ('TERM', 'xterm-256color'), ('GNOME_DESKTOP_SESSION_ID', 'this-is-deprecated'), ('ROS_LOCALHOST_ONLY', '0'), ('PATH', '/home/carbon/.local/bin:/opt/ros/humble/bin:/home/carbon/.local/bin:/usr/local/sbin:/usr/local/bin:/usr/sbin:/usr/bin:/sbin:/bin:/usr/games:/usr/local/games:/snap/bin:/snap/bin'), ('SESSION_MANAGER', 'local/carbon:@/tmp/.ICE-unix/1237,unix/carbon:/tmp/.ICE-unix/1237'), ('PAPERSIZE', 'a4'), ('COREPACK_ENABLE_AUTO_PIN', '0'), ('XDG_MENU_PREFIX', 'gnome-'), ('LC_ADDRESS', 'zh_CN.UTF-8'), ('GNOME_TERMINAL_SCREEN', '/org/gnome/Terminal/screen/dac95d9f_669b_4814_8416_148d014dfe22'), ('GNOME_SETUP_DISPLAY', ':1'), ('XDG_RUNTIME_DIR', '/run/user/1000'), ('CLAUDE_EFFORT', 'high'), ('DISPLAY', ':0'), ('CLAUDE_PID', '3919'), ('NoDefaultCurrentDirectoryInExePath', '1'), ('LANG', 'zh_CN.UTF-8'), ('XDG_CURRENT_DESKTOP', 'ubuntu:GNOME'), ('LC_TELEPHONE', 'zh_CN.UTF-8'), ('XMODIFIERS', '@im=ibus'), ('XDG_SESSION_DESKTOP', 'ubuntu'), ('XAUTHORITY', '/run/user/1000/.mutter-Xwaylandauth.TVFGV3'), ('LS_COLORS', 'rs=0:di=01;34:ln=01;36:mh=00:pi=40;33:so=01;35:do=01;35:bd=40;33;01:cd=40;33;01:or=40;31;01:mi=00:su=37;41:sg=30;43:ca=30;41:tw=30;42:ow=34;42:st=37;44:ex=01;32:*.tar=01;31:*.tgz=01;31:*.arc=01;31:*.arj=01;31:*.taz=01;31:*.lha=01;31:*.lz4=01;31:*.lzh=01;31:*.lzma=01;31:*.tlz=01;31:*.txz=01;31:*.tzo=01;31:*.t7z=01;31:*.zip=01;31:*.z=01;31:*.dz=01;31:*.gz=01;31:*.lrz=01;31:*.lz=01;31:*.lzo=01;31:*.xz=01;31:*.zst=01;31:*.tzst=01;31:*.bz2=01;31:*.bz=01;31:*.tbz=01;31:*.tbz2=01;31:*.tz=01;31:*.deb=01;31:*.rpm=01;31:*.jar=01;31:*.war=01;31:*.ear=01;31:*.sar=01;31:*.rar=01;31:*.alz=01;31:*.ace=01;31:*.zoo=01;31:*.cpio=01;31:*.7z=01;31:*.rz=01;31:*.cab=01;31:*.wim=01;31:*.swm=01;31:*.dwm=01;31:*.esd=01;31:*.jpg=01;35:*.jpeg=01;35:*.mjpg=01;35:*.mjpeg=01;35:*.gif=01;35:*.bmp=01;35:*.pbm=01;35:*.pgm=01;35:*.ppm=01;35:*.tga=01;35:*.xbm=01;35:*.xpm=01;35:*.tif=01;35:*.tiff=01;35:*.png=01;35:*.svg=01;35:*.svgz=01;35:*.mng=01;35:*.pcx=01;35:*.mov=01;35:*.mpg=01;35:*.mpeg=01;35:*.m2v=01;35:*.mkv=01;35:*.webm=01;35:*.webp=01;35:*.ogm=01;35:*.mp4=01;35:*.m4v=01;35:*.mp4v=01;35:*.vob=01;35:*.qt=01;35:*.nuv=01;35:*.wmv=01;35:*.asf=01;35:*.rm=01;35:*.rmvb=01;35:*.flc=01;35:*.avi=01;35:*.fli=01;35:*.flv=01;35:*.gl=01;35:*.dl=01;35:*.xcf=01;35:*.xwd=01;35:*.yuv=01;35:*.cgm=01;35:*.emf=01;35:*.ogv=01;35:*.ogx=01;35:*.aac=00;36:*.au=00;36:*.flac=00;36:*.m4a=00;36:*.mid=00;36:*.midi=00;36:*.mka=00;36:*.mp3=00;36:*.mpc=00;36:*.ogg=00;36:*.ra=00;36:*.wav=00;36:*.oga=00;36:*.opus=00;36:*.spx=00;36:*.xspf=00;36:'), ('GNOME_TERMINAL_SERVICE', ':1.130'), ('SSH_AGENT_LAUNCHER', 'gnome-keyring'), ('SSH_AUTH_SOCK', '/run/user/1000/keyring/ssh'), ('AMENT_PREFIX_PATH', '/opt/ros/humble'), ('SHELL', '/bin/bash'), ('LC_NAME', 'zh_CN.UTF-8'), ('ANTHROPIC_AUTH_TOKEN', 'sk-d8dd0182949a4feab5fd89a4566f7e68'), ('QT_ACCESSIBILITY', '1'), ('GDMSESSION', 'ubuntu'), ('CLAUDE_CODE_SESSION_ID', '68c96283-759b-43ae-a08e-db0ca9d5d1b5'), ('LESSCLOSE', '/usr/bin/lesspipe %s %s'), ('CLAUDECODE', '1'), ('LC_MEASUREMENT', 'zh_CN.UTF-8'), ('LC_IDENTIFICATION', 'zh_CN.UTF-8'), ('QT_IM_MODULE', 'ibus'), ('PWD', '/home/carbon/Program_Projects/Control_Frame/build/shared_package'), ('XDG_CONFIG_DIRS', '/etc/xdg/xdg-ubuntu:/etc/xdg'), ('DBUS_STARTER_ADDRESS', 'unix:path=/run/user/1000/bus,guid=da3da993a341e44656fef5d16aaabfed'), ('XDG_DATA_DIRS', '/usr/share/ubuntu:/usr/local/share/:/usr/share/:/var/lib/snapd/desktop'), ('CLAUDE_CODE_EXECPATH', '/home/carbon/.local/share/claude/versions/2.1.273'), ('PYTHONPATH', '/opt/ros/humble/lib/python3.10/site-packages:/opt/ros/humble/local/lib/python3.10/dist-packages'), ('HTTP_PROXY', 'http://127.0.0.1:7897/'), ('LC_NUMERIC', 'zh_CN.UTF-8'), ('LC_PAPER', 'zh_CN.UTF-8'), ('COLCON', '1'), ('VTE_VERSION', '6800'), ('CLAUDE_CODE_MESSAGING_SOCKET', '/run/user/1000/cc-socks/3919.sock'), ('CMAKE_PREFIX_PATH', '/opt/ros/humble')]), 'shell': False}
+[0.089885] (-) TimerEvent: {}
+[0.190217] (-) TimerEvent: {}
+[0.291877] (-) TimerEvent: {}
+[0.395997] (-) TimerEvent: {}
+[0.500895] (-) TimerEvent: {}
+[0.547099] (shared_package) StdoutLine: {'line': b'-- The C compiler identification is GNU 11.4.0\n'}
+[0.601160] (-) TimerEvent: {}
+[0.701860] (-) TimerEvent: {}
+[0.803202] (-) TimerEvent: {}
+[0.904148] (-) TimerEvent: {}
+[0.915960] (shared_package) StdoutLine: {'line': b'-- The CXX compiler identification is GNU 11.4.0\n'}
+[0.975926] (shared_package) StdoutLine: {'line': b'-- Detecting C compiler ABI info\n'}
+[1.004389] (-) TimerEvent: {}
+[1.104909] (-) TimerEvent: {}
+[1.206929] (-) TimerEvent: {}
+[1.307356] (-) TimerEvent: {}
+[1.408984] (-) TimerEvent: {}
+[1.510201] (-) TimerEvent: {}
+[1.588488] (shared_package) StdoutLine: {'line': b'-- Detecting C compiler ABI info - done\n'}
+[1.609528] (shared_package) StdoutLine: {'line': b'-- Check for working C compiler: /usr/bin/cc - skipped\n'}
+[1.611775] (-) TimerEvent: {}
+[1.613748] (shared_package) StdoutLine: {'line': b'-- Detecting C compile features\n'}
+[1.623322] (shared_package) StdoutLine: {'line': b'-- Detecting C compile features - done\n'}
+[1.638327] (shared_package) StdoutLine: {'line': b'-- Detecting CXX compiler ABI info\n'}
+[1.714197] (-) TimerEvent: {}
+[1.814632] (-) TimerEvent: {}
+[1.916272] (-) TimerEvent: {}
+[2.024304] (-) TimerEvent: {}
+[2.125099] (-) TimerEvent: {}
+[2.225539] (-) TimerEvent: {}
+[2.297115] (shared_package) StdoutLine: {'line': b'-- Detecting CXX compiler ABI info - done\n'}
+[2.316790] (shared_package) StdoutLine: {'line': b'-- Check for working CXX compiler: /usr/bin/c++ - skipped\n'}
+[2.319407] (shared_package) StdoutLine: {'line': b'-- Detecting CXX compile features\n'}
+[2.322254] (shared_package) StdoutLine: {'line': b'-- Detecting CXX compile features - done\n'}
+[2.326148] (-) TimerEvent: {}
+[2.394263] (shared_package) StdoutLine: {'line': b'-- Found ament_cmake: 1.3.14 (/opt/ros/humble/share/ament_cmake/cmake)\n'}
+[2.427567] (-) TimerEvent: {}
+[2.529068] (-) TimerEvent: {}
+[2.630767] (-) TimerEvent: {}
+[2.731879] (-) TimerEvent: {}
+[2.832281] (-) TimerEvent: {}
+[2.876302] (shared_package) StdoutLine: {'line': b'-- Found Python3: /usr/bin/python3 (found version "3.10.12") found components: Interpreter \n'}
+[2.934929] (-) TimerEvent: {}
+[3.035383] (-) TimerEvent: {}
+[3.135878] (-) TimerEvent: {}
+[3.145495] (shared_package) StdoutLine: {'line': b'-- Found ament_lint_auto: 0.12.15 (/opt/ros/humble/share/ament_lint_auto/cmake)\n'}
+[3.237176] (-) TimerEvent: {}
+[3.289881] (shared_package) StdoutLine: {'line': b"-- Added test 'cppcheck' to perform static code analysis on C / C++ code\n"}
+[3.290379] (shared_package) StdoutLine: {'line': b'-- Configured cppcheck include dirs: $<BUILD_INTERFACE:/home/carbon/Program_Projects/Control_Frame/src/shared_package/Middleware>;$<BUILD_INTERFACE:/home/carbon/Program_Projects/Control_Frame/src/shared_package/device>\n'}
+[3.290605] (shared_package) StdoutLine: {'line': b'-- Configured cppcheck exclude dirs and/or files: \n'}
+[3.297578] (shared_package) StdoutLine: {'line': b"-- Added test 'lint_cmake' to check CMake code style\n"}
+[3.307155] (shared_package) StdoutLine: {'line': b"-- Added test 'uncrustify' to check C / C++ code style\n"}
+[3.307436] (shared_package) StdoutLine: {'line': b'-- Configured uncrustify additional arguments: \n'}
+[3.310203] (shared_package) StdoutLine: {'line': b"-- Added test 'xmllint' to check XML markup files\n"}
+[3.316546] (shared_package) StdoutLine: {'line': b'-- Configuring done\n'}
+[3.337949] (-) TimerEvent: {}
+[3.339331] (shared_package) StdoutLine: {'line': b'-- Generating done\n'}
+[3.342222] (shared_package) StdoutLine: {'line': b'-- Build files have been written to: /home/carbon/Program_Projects/Control_Frame/build/shared_package\n'}
+[3.351706] (shared_package) CommandEnded: {'returncode': 0}
+[3.351990] (shared_package) JobProgress: {'identifier': 'shared_package', 'progress': 'build'}
+[3.352019] (shared_package) Command: {'cmd': ['/usr/bin/cmake', '--build', '/home/carbon/Program_Projects/Control_Frame/build/shared_package', '--', '-j2', '-l2'], 'cwd': '/home/carbon/Program_Projects/Control_Frame/build/shared_package', 'env': OrderedDict([('LESSOPEN', '| /usr/bin/lesspipe %s'), ('HTTPS_PROXY', 'http://127.0.0.1:7897/'), ('no_proxy', 'localhost,127.0.0.1,192.168.0.0/16,10.0.0.0/8,172.16.0.0/12,::1'), ('AI_AGENT', 'claude-code_2-1-273_agent'), ('LANGUAGE', 'zh_CN:en'), ('USER', 'carbon'), ('CLAUDE_CODE_ENTRYPOINT', 'cli'), ('LC_TIME', 'zh_CN.UTF-8'), ('GIT_EDITOR', 'true'), ('all_proxy', 'socks://127.0.0.1:7897/'), ('XDG_SESSION_TYPE', 'wayland'), ('CLAUDE_CODE_SESSION_ATTENDED', '1'), ('SHLVL', '1'), ('LD_LIBRARY_PATH', '/opt/ros/humble/opt/rviz_ogre_vendor/lib:/opt/ros/humble/lib/x86_64-linux-gnu:/opt/ros/humble/lib'), ('CLAUDE_CODE_MESSAGING_TOKEN', 'a0921a77f905ccaee80e154d243fca87'), ('HOME', '/home/carbon'), ('OLDPWD', '/home/carbon/Program_Projects/Control_Frame/src'), ('DESKTOP_SESSION', 'ubuntu'), ('NO_PROXY', 'localhost,127.0.0.1,192.168.0.0/16,10.0.0.0/8,172.16.0.0/12,::1'), ('ROS_PYTHON_VERSION', '3'), ('GNOME_SHELL_SESSION_MODE', 'ubuntu'), ('GTK_MODULES', 'gail:atk-bridge'), ('CLAUDE_CODE_CHILD_SESSION', '1'), ('LC_MONETARY', 'zh_CN.UTF-8'), ('DBUS_STARTER_BUS_TYPE', 'session'), ('SYSTEMD_EXEC_PID', '1237'), ('DBUS_SESSION_BUS_ADDRESS', 'unix:path=/run/user/1000/bus,guid=da3da993a341e44656fef5d16aaabfed'), ('COLORTERM', 'truecolor'), ('WAYLAND_DISPLAY', 'wayland-0'), ('https_proxy', 'http://127.0.0.1:7897/'), ('ROS_DISTRO', 'humble'), ('GTK_IM_MODULE', 'ibus'), ('LOGNAME', 'carbon'), ('ALL_PROXY', 'socks://127.0.0.1:7897/'), ('http_proxy', 'http://127.0.0.1:7897/'), ('_', '/usr/bin/colcon'), ('ROS_VERSION', '2'), ('XDG_SESSION_CLASS', 'user'), ('USERNAME', 'carbon'), ('ANTHROPIC_BASE_URL', 'https://api.deepseek.com/anthropic'), ('TERM', 'xterm-256color'), ('GNOME_DESKTOP_SESSION_ID', 'this-is-deprecated'), ('ROS_LOCALHOST_ONLY', '0'), ('PATH', '/home/carbon/.local/bin:/opt/ros/humble/bin:/home/carbon/.local/bin:/usr/local/sbin:/usr/local/bin:/usr/sbin:/usr/bin:/sbin:/bin:/usr/games:/usr/local/games:/snap/bin:/snap/bin'), ('SESSION_MANAGER', 'local/carbon:@/tmp/.ICE-unix/1237,unix/carbon:/tmp/.ICE-unix/1237'), ('PAPERSIZE', 'a4'), ('COREPACK_ENABLE_AUTO_PIN', '0'), ('XDG_MENU_PREFIX', 'gnome-'), ('LC_ADDRESS', 'zh_CN.UTF-8'), ('GNOME_TERMINAL_SCREEN', '/org/gnome/Terminal/screen/dac95d9f_669b_4814_8416_148d014dfe22'), ('GNOME_SETUP_DISPLAY', ':1'), ('XDG_RUNTIME_DIR', '/run/user/1000'), ('CLAUDE_EFFORT', 'high'), ('DISPLAY', ':0'), ('CLAUDE_PID', '3919'), ('NoDefaultCurrentDirectoryInExePath', '1'), ('LANG', 'zh_CN.UTF-8'), ('XDG_CURRENT_DESKTOP', 'ubuntu:GNOME'), ('LC_TELEPHONE', 'zh_CN.UTF-8'), ('XMODIFIERS', '@im=ibus'), ('XDG_SESSION_DESKTOP', 'ubuntu'), ('XAUTHORITY', '/run/user/1000/.mutter-Xwaylandauth.TVFGV3'), ('LS_COLORS', 'rs=0:di=01;34:ln=01;36:mh=00:pi=40;33:so=01;35:do=01;35:bd=40;33;01:cd=40;33;01:or=40;31;01:mi=00:su=37;41:sg=30;43:ca=30;41:tw=30;42:ow=34;42:st=37;44:ex=01;32:*.tar=01;31:*.tgz=01;31:*.arc=01;31:*.arj=01;31:*.taz=01;31:*.lha=01;31:*.lz4=01;31:*.lzh=01;31:*.lzma=01;31:*.tlz=01;31:*.txz=01;31:*.tzo=01;31:*.t7z=01;31:*.zip=01;31:*.z=01;31:*.dz=01;31:*.gz=01;31:*.lrz=01;31:*.lz=01;31:*.lzo=01;31:*.xz=01;31:*.zst=01;31:*.tzst=01;31:*.bz2=01;31:*.bz=01;31:*.tbz=01;31:*.tbz2=01;31:*.tz=01;31:*.deb=01;31:*.rpm=01;31:*.jar=01;31:*.war=01;31:*.ear=01;31:*.sar=01;31:*.rar=01;31:*.alz=01;31:*.ace=01;31:*.zoo=01;31:*.cpio=01;31:*.7z=01;31:*.rz=01;31:*.cab=01;31:*.wim=01;31:*.swm=01;31:*.dwm=01;31:*.esd=01;31:*.jpg=01;35:*.jpeg=01;35:*.mjpg=01;35:*.mjpeg=01;35:*.gif=01;35:*.bmp=01;35:*.pbm=01;35:*.pgm=01;35:*.ppm=01;35:*.tga=01;35:*.xbm=01;35:*.xpm=01;35:*.tif=01;35:*.tiff=01;35:*.png=01;35:*.svg=01;35:*.svgz=01;35:*.mng=01;35:*.pcx=01;35:*.mov=01;35:*.mpg=01;35:*.mpeg=01;35:*.m2v=01;35:*.mkv=01;35:*.webm=01;35:*.webp=01;35:*.ogm=01;35:*.mp4=01;35:*.m4v=01;35:*.mp4v=01;35:*.vob=01;35:*.qt=01;35:*.nuv=01;35:*.wmv=01;35:*.asf=01;35:*.rm=01;35:*.rmvb=01;35:*.flc=01;35:*.avi=01;35:*.fli=01;35:*.flv=01;35:*.gl=01;35:*.dl=01;35:*.xcf=01;35:*.xwd=01;35:*.yuv=01;35:*.cgm=01;35:*.emf=01;35:*.ogv=01;35:*.ogx=01;35:*.aac=00;36:*.au=00;36:*.flac=00;36:*.m4a=00;36:*.mid=00;36:*.midi=00;36:*.mka=00;36:*.mp3=00;36:*.mpc=00;36:*.ogg=00;36:*.ra=00;36:*.wav=00;36:*.oga=00;36:*.opus=00;36:*.spx=00;36:*.xspf=00;36:'), ('GNOME_TERMINAL_SERVICE', ':1.130'), ('SSH_AGENT_LAUNCHER', 'gnome-keyring'), ('SSH_AUTH_SOCK', '/run/user/1000/keyring/ssh'), ('AMENT_PREFIX_PATH', '/opt/ros/humble'), ('SHELL', '/bin/bash'), ('LC_NAME', 'zh_CN.UTF-8'), ('ANTHROPIC_AUTH_TOKEN', 'sk-d8dd0182949a4feab5fd89a4566f7e68'), ('QT_ACCESSIBILITY', '1'), ('GDMSESSION', 'ubuntu'), ('CLAUDE_CODE_SESSION_ID', '68c96283-759b-43ae-a08e-db0ca9d5d1b5'), ('LESSCLOSE', '/usr/bin/lesspipe %s %s'), ('CLAUDECODE', '1'), ('LC_MEASUREMENT', 'zh_CN.UTF-8'), ('LC_IDENTIFICATION', 'zh_CN.UTF-8'), ('QT_IM_MODULE', 'ibus'), ('PWD', '/home/carbon/Program_Projects/Control_Frame/build/shared_package'), ('XDG_CONFIG_DIRS', '/etc/xdg/xdg-ubuntu:/etc/xdg'), ('DBUS_STARTER_ADDRESS', 'unix:path=/run/user/1000/bus,guid=da3da993a341e44656fef5d16aaabfed'), ('XDG_DATA_DIRS', '/usr/share/ubuntu:/usr/local/share/:/usr/share/:/var/lib/snapd/desktop'), ('CLAUDE_CODE_EXECPATH', '/home/carbon/.local/share/claude/versions/2.1.273'), ('PYTHONPATH', '/opt/ros/humble/lib/python3.10/site-packages:/opt/ros/humble/local/lib/python3.10/dist-packages'), ('HTTP_PROXY', 'http://127.0.0.1:7897/'), ('LC_NUMERIC', 'zh_CN.UTF-8'), ('LC_PAPER', 'zh_CN.UTF-8'), ('COLCON', '1'), ('VTE_VERSION', '6800'), ('CLAUDE_CODE_MESSAGING_SOCKET', '/run/user/1000/cc-socks/3919.sock'), ('CMAKE_PREFIX_PATH', '/opt/ros/humble')]), 'shell': False}
+[3.438206] (-) TimerEvent: {}
+[3.539916] (-) TimerEvent: {}
+[3.558889] (shared_package) StdoutLine: {'line': b'[ 50%] Building CXX object CMakeFiles/shared_package.dir/Middleware/Send_Interface.cpp.o\n'}
+[3.640163] (-) TimerEvent: {}
+[3.740958] (-) TimerEvent: {}
+[3.844885] (-) TimerEvent: {}
+[3.946119] (-) TimerEvent: {}
+[4.046570] (-) TimerEvent: {}
+[4.147058] (-) TimerEvent: {}
+[4.248915] (-) TimerEvent: {}
+[4.298234] (shared_package) StdoutLine: {'line': b'[100%] Linking CXX shared library libshared_package.so\n'}
+[4.349199] (-) TimerEvent: {}
+[4.450008] (-) TimerEvent: {}
+[4.557294] (-) TimerEvent: {}
+[4.659086] (-) TimerEvent: {}
+[4.733383] (shared_package) StdoutLine: {'line': b'[100%] Built target shared_package\n'}
+[4.760266] (-) TimerEvent: {}
+[4.819364] (shared_package) CommandEnded: {'returncode': 0}
+[4.828277] (shared_package) JobProgress: {'identifier': 'shared_package', 'progress': 'install'}
+[4.862041] (-) TimerEvent: {}
+[4.880456] (shared_package) Command: {'cmd': ['/usr/bin/cmake', '--install', '/home/carbon/Program_Projects/Control_Frame/build/shared_package'], 'cwd': '/home/carbon/Program_Projects/Control_Frame/build/shared_package', 'env': OrderedDict([('LESSOPEN', '| /usr/bin/lesspipe %s'), ('HTTPS_PROXY', 'http://127.0.0.1:7897/'), ('no_proxy', 'localhost,127.0.0.1,192.168.0.0/16,10.0.0.0/8,172.16.0.0/12,::1'), ('AI_AGENT', 'claude-code_2-1-273_agent'), ('LANGUAGE', 'zh_CN:en'), ('USER', 'carbon'), ('CLAUDE_CODE_ENTRYPOINT', 'cli'), ('LC_TIME', 'zh_CN.UTF-8'), ('GIT_EDITOR', 'true'), ('all_proxy', 'socks://127.0.0.1:7897/'), ('XDG_SESSION_TYPE', 'wayland'), ('CLAUDE_CODE_SESSION_ATTENDED', '1'), ('SHLVL', '1'), ('LD_LIBRARY_PATH', '/opt/ros/humble/opt/rviz_ogre_vendor/lib:/opt/ros/humble/lib/x86_64-linux-gnu:/opt/ros/humble/lib'), ('CLAUDE_CODE_MESSAGING_TOKEN', 'a0921a77f905ccaee80e154d243fca87'), ('HOME', '/home/carbon'), ('OLDPWD', '/home/carbon/Program_Projects/Control_Frame/src'), ('DESKTOP_SESSION', 'ubuntu'), ('NO_PROXY', 'localhost,127.0.0.1,192.168.0.0/16,10.0.0.0/8,172.16.0.0/12,::1'), ('ROS_PYTHON_VERSION', '3'), ('GNOME_SHELL_SESSION_MODE', 'ubuntu'), ('GTK_MODULES', 'gail:atk-bridge'), ('CLAUDE_CODE_CHILD_SESSION', '1'), ('LC_MONETARY', 'zh_CN.UTF-8'), ('DBUS_STARTER_BUS_TYPE', 'session'), ('SYSTEMD_EXEC_PID', '1237'), ('DBUS_SESSION_BUS_ADDRESS', 'unix:path=/run/user/1000/bus,guid=da3da993a341e44656fef5d16aaabfed'), ('COLORTERM', 'truecolor'), ('WAYLAND_DISPLAY', 'wayland-0'), ('https_proxy', 'http://127.0.0.1:7897/'), ('ROS_DISTRO', 'humble'), ('GTK_IM_MODULE', 'ibus'), ('LOGNAME', 'carbon'), ('ALL_PROXY', 'socks://127.0.0.1:7897/'), ('http_proxy', 'http://127.0.0.1:7897/'), ('_', '/usr/bin/colcon'), ('ROS_VERSION', '2'), ('XDG_SESSION_CLASS', 'user'), ('USERNAME', 'carbon'), ('ANTHROPIC_BASE_URL', 'https://api.deepseek.com/anthropic'), ('TERM', 'xterm-256color'), ('GNOME_DESKTOP_SESSION_ID', 'this-is-deprecated'), ('ROS_LOCALHOST_ONLY', '0'), ('PATH', '/home/carbon/.local/bin:/opt/ros/humble/bin:/home/carbon/.local/bin:/usr/local/sbin:/usr/local/bin:/usr/sbin:/usr/bin:/sbin:/bin:/usr/games:/usr/local/games:/snap/bin:/snap/bin'), ('SESSION_MANAGER', 'local/carbon:@/tmp/.ICE-unix/1237,unix/carbon:/tmp/.ICE-unix/1237'), ('PAPERSIZE', 'a4'), ('COREPACK_ENABLE_AUTO_PIN', '0'), ('XDG_MENU_PREFIX', 'gnome-'), ('LC_ADDRESS', 'zh_CN.UTF-8'), ('GNOME_TERMINAL_SCREEN', '/org/gnome/Terminal/screen/dac95d9f_669b_4814_8416_148d014dfe22'), ('GNOME_SETUP_DISPLAY', ':1'), ('XDG_RUNTIME_DIR', '/run/user/1000'), ('CLAUDE_EFFORT', 'high'), ('DISPLAY', ':0'), ('CLAUDE_PID', '3919'), ('NoDefaultCurrentDirectoryInExePath', '1'), ('LANG', 'zh_CN.UTF-8'), ('XDG_CURRENT_DESKTOP', 'ubuntu:GNOME'), ('LC_TELEPHONE', 'zh_CN.UTF-8'), ('XMODIFIERS', '@im=ibus'), ('XDG_SESSION_DESKTOP', 'ubuntu'), ('XAUTHORITY', '/run/user/1000/.mutter-Xwaylandauth.TVFGV3'), ('LS_COLORS', 'rs=0:di=01;34:ln=01;36:mh=00:pi=40;33:so=01;35:do=01;35:bd=40;33;01:cd=40;33;01:or=40;31;01:mi=00:su=37;41:sg=30;43:ca=30;41:tw=30;42:ow=34;42:st=37;44:ex=01;32:*.tar=01;31:*.tgz=01;31:*.arc=01;31:*.arj=01;31:*.taz=01;31:*.lha=01;31:*.lz4=01;31:*.lzh=01;31:*.lzma=01;31:*.tlz=01;31:*.txz=01;31:*.tzo=01;31:*.t7z=01;31:*.zip=01;31:*.z=01;31:*.dz=01;31:*.gz=01;31:*.lrz=01;31:*.lz=01;31:*.lzo=01;31:*.xz=01;31:*.zst=01;31:*.tzst=01;31:*.bz2=01;31:*.bz=01;31:*.tbz=01;31:*.tbz2=01;31:*.tz=01;31:*.deb=01;31:*.rpm=01;31:*.jar=01;31:*.war=01;31:*.ear=01;31:*.sar=01;31:*.rar=01;31:*.alz=01;31:*.ace=01;31:*.zoo=01;31:*.cpio=01;31:*.7z=01;31:*.rz=01;31:*.cab=01;31:*.wim=01;31:*.swm=01;31:*.dwm=01;31:*.esd=01;31:*.jpg=01;35:*.jpeg=01;35:*.mjpg=01;35:*.mjpeg=01;35:*.gif=01;35:*.bmp=01;35:*.pbm=01;35:*.pgm=01;35:*.ppm=01;35:*.tga=01;35:*.xbm=01;35:*.xpm=01;35:*.tif=01;35:*.tiff=01;35:*.png=01;35:*.svg=01;35:*.svgz=01;35:*.mng=01;35:*.pcx=01;35:*.mov=01;35:*.mpg=01;35:*.mpeg=01;35:*.m2v=01;35:*.mkv=01;35:*.webm=01;35:*.webp=01;35:*.ogm=01;35:*.mp4=01;35:*.m4v=01;35:*.mp4v=01;35:*.vob=01;35:*.qt=01;35:*.nuv=01;35:*.wmv=01;35:*.asf=01;35:*.rm=01;35:*.rmvb=01;35:*.flc=01;35:*.avi=01;35:*.fli=01;35:*.flv=01;35:*.gl=01;35:*.dl=01;35:*.xcf=01;35:*.xwd=01;35:*.yuv=01;35:*.cgm=01;35:*.emf=01;35:*.ogv=01;35:*.ogx=01;35:*.aac=00;36:*.au=00;36:*.flac=00;36:*.m4a=00;36:*.mid=00;36:*.midi=00;36:*.mka=00;36:*.mp3=00;36:*.mpc=00;36:*.ogg=00;36:*.ra=00;36:*.wav=00;36:*.oga=00;36:*.opus=00;36:*.spx=00;36:*.xspf=00;36:'), ('GNOME_TERMINAL_SERVICE', ':1.130'), ('SSH_AGENT_LAUNCHER', 'gnome-keyring'), ('SSH_AUTH_SOCK', '/run/user/1000/keyring/ssh'), ('AMENT_PREFIX_PATH', '/opt/ros/humble'), ('SHELL', '/bin/bash'), ('LC_NAME', 'zh_CN.UTF-8'), ('ANTHROPIC_AUTH_TOKEN', 'sk-d8dd0182949a4feab5fd89a4566f7e68'), ('QT_ACCESSIBILITY', '1'), ('GDMSESSION', 'ubuntu'), ('CLAUDE_CODE_SESSION_ID', '68c96283-759b-43ae-a08e-db0ca9d5d1b5'), ('LESSCLOSE', '/usr/bin/lesspipe %s %s'), ('CLAUDECODE', '1'), ('LC_MEASUREMENT', 'zh_CN.UTF-8'), ('LC_IDENTIFICATION', 'zh_CN.UTF-8'), ('QT_IM_MODULE', 'ibus'), ('PWD', '/home/carbon/Program_Projects/Control_Frame/build/shared_package'), ('XDG_CONFIG_DIRS', '/etc/xdg/xdg-ubuntu:/etc/xdg'), ('DBUS_STARTER_ADDRESS', 'unix:path=/run/user/1000/bus,guid=da3da993a341e44656fef5d16aaabfed'), ('XDG_DATA_DIRS', '/usr/share/ubuntu:/usr/local/share/:/usr/share/:/var/lib/snapd/desktop'), ('CLAUDE_CODE_EXECPATH', '/home/carbon/.local/share/claude/versions/2.1.273'), ('PYTHONPATH', '/opt/ros/humble/lib/python3.10/site-packages:/opt/ros/humble/local/lib/python3.10/dist-packages'), ('HTTP_PROXY', 'http://127.0.0.1:7897/'), ('LC_NUMERIC', 'zh_CN.UTF-8'), ('LC_PAPER', 'zh_CN.UTF-8'), ('COLCON', '1'), ('VTE_VERSION', '6800'), ('CLAUDE_CODE_MESSAGING_SOCKET', '/run/user/1000/cc-socks/3919.sock'), ('CMAKE_PREFIX_PATH', '/opt/ros/humble')]), 'shell': False}
+[4.915971] (shared_package) StdoutLine: {'line': b'-- Install configuration: ""\n'}
+[4.918319] (shared_package) StdoutLine: {'line': b'-- Installing: /home/carbon/Program_Projects/Control_Frame/install/shared_package/lib/libshared_package.so\n'}
+[4.923471] (shared_package) StdoutLine: {'line': b'-- Installing: /home/carbon/Program_Projects/Control_Frame/install/shared_package/include/Send_Interface.hpp\n'}
+[4.923758] (shared_package) StdoutLine: {'line': b'-- Installing: /home/carbon/Program_Projects/Control_Frame/install/shared_package/include/alg_crc.h\n'}
+[4.923943] (shared_package) StdoutLine: {'line': b'-- Installing: /home/carbon/Program_Projects/Control_Frame/install/shared_package/include/motor_base.hpp\n'}
+[4.932637] (shared_package) StdoutLine: {'line': b'-- Installing: /home/carbon/Program_Projects/Control_Frame/install/shared_package/share/shared_package/environment/library_path.sh\n'}
+[4.933767] (shared_package) StdoutLine: {'line': b'-- Installing: /home/carbon/Program_Projects/Control_Frame/install/shared_package/share/shared_package/environment/library_path.dsv\n'}
+[4.937084] (shared_package) StdoutLine: {'line': b'-- Installing: /home/carbon/Program_Projects/Control_Frame/install/shared_package/share/ament_index/resource_index/package_run_dependencies/shared_package\n'}
+[4.937325] (shared_package) StdoutLine: {'line': b'-- Installing: /home/carbon/Program_Projects/Control_Frame/install/shared_package/share/ament_index/resource_index/parent_prefix_path/shared_package\n'}
+[4.937515] (shared_package) StdoutLine: {'line': b'-- Installing: /home/carbon/Program_Projects/Control_Frame/install/shared_package/share/shared_package/environment/ament_prefix_path.sh\n'}
+[4.939781] (shared_package) StdoutLine: {'line': b'-- Installing: /home/carbon/Program_Projects/Control_Frame/install/shared_package/share/shared_package/environment/ament_prefix_path.dsv\n'}
+[4.941329] (shared_package) StdoutLine: {'line': b'-- Installing: /home/carbon/Program_Projects/Control_Frame/install/shared_package/share/shared_package/environment/path.sh\n'}
+[4.941569] (shared_package) StdoutLine: {'line': b'-- Installing: /home/carbon/Program_Projects/Control_Frame/install/shared_package/share/shared_package/environment/path.dsv\n'}
+[4.941835] (shared_package) StdoutLine: {'line': b'-- Installing: /home/carbon/Program_Projects/Control_Frame/install/shared_package/share/shared_package/local_setup.bash\n'}
+[4.944951] (shared_package) StdoutLine: {'line': b'-- Installing: /home/carbon/Program_Projects/Control_Frame/install/shared_package/share/shared_package/local_setup.sh\n'}
+[4.945299] (shared_package) StdoutLine: {'line': b'-- Installing: /home/carbon/Program_Projects/Control_Frame/install/shared_package/share/shared_package/local_setup.zsh\n'}
+[4.947192] (shared_package) StdoutLine: {'line': b'-- Installing: /home/carbon/Program_Projects/Control_Frame/install/shared_package/share/shared_package/local_setup.dsv\n'}
+[4.950797] (shared_package) StdoutLine: {'line': b'-- Installing: /home/carbon/Program_Projects/Control_Frame/install/shared_package/share/shared_package/package.dsv\n'}
+[4.952781] (shared_package) StdoutLine: {'line': b'-- Installing: /home/carbon/Program_Projects/Control_Frame/install/shared_package/share/ament_index/resource_index/packages/shared_package\n'}
+[4.954802] (shared_package) StdoutLine: {'line': b'-- Installing: /home/carbon/Program_Projects/Control_Frame/install/shared_package/share/shared_package/cmake/export_shared_packageExport.cmake\n'}
+[4.960793] (shared_package) StdoutLine: {'line': b'-- Installing: /home/carbon/Program_Projects/Control_Frame/install/shared_package/share/shared_package/cmake/export_shared_packageExport-noconfig.cmake\n'}
+[4.961827] (shared_package) StdoutLine: {'line': b'-- Installing: /home/carbon/Program_Projects/Control_Frame/install/shared_package/share/shared_package/cmake/ament_cmake_export_targets-extras.cmake\n'}
+[4.962034] (shared_package) StdoutLine: {'line': b'-- Installing: /home/carbon/Program_Projects/Control_Frame/install/shared_package/share/shared_package/cmake/shared_packageConfig.cmake\n'}
+[4.962211] (-) TimerEvent: {}
+[4.972800] (shared_package) StdoutLine: {'line': b'-- Installing: /home/carbon/Program_Projects/Control_Frame/install/shared_package/share/shared_package/cmake/shared_packageConfig-version.cmake\n'}
+[4.977155] (shared_package) StdoutLine: {'line': b'-- Installing: /home/carbon/Program_Projects/Control_Frame/install/shared_package/share/shared_package/package.xml\n'}
+[4.984119] (shared_package) CommandEnded: {'returncode': 0}
+[5.062773] (-) TimerEvent: {}
+[5.081127] (shared_package) JobEnded: {'identifier': 'shared_package', 'rc': 0}
+[5.082790] (chassis) JobStarted: {'identifier': 'chassis'}
+[5.163206] (-) TimerEvent: {}
+[5.172046] (chassis) JobProgress: {'identifier': 'chassis', 'progress': 'cmake'}
+[5.172185] (chassis) JobProgress: {'identifier': 'chassis', 'progress': 'build'}
+[5.174478] (chassis) Command: {'cmd': ['/usr/bin/cmake', '--build', '/home/carbon/Program_Projects/Control_Frame/build/chassis', '--', '-j2', '-l2'], 'cwd': '/home/carbon/Program_Projects/Control_Frame/build/chassis', 'env': OrderedDict([('LESSOPEN', '| /usr/bin/lesspipe %s'), ('HTTPS_PROXY', 'http://127.0.0.1:7897/'), ('no_proxy', 'localhost,127.0.0.1,192.168.0.0/16,10.0.0.0/8,172.16.0.0/12,::1'), ('AI_AGENT', 'claude-code_2-1-273_agent'), ('LANGUAGE', 'zh_CN:en'), ('USER', 'carbon'), ('CLAUDE_CODE_ENTRYPOINT', 'cli'), ('LC_TIME', 'zh_CN.UTF-8'), ('GIT_EDITOR', 'true'), ('all_proxy', 'socks://127.0.0.1:7897/'), ('XDG_SESSION_TYPE', 'wayland'), ('CLAUDE_CODE_SESSION_ATTENDED', '1'), ('SHLVL', '1'), ('LD_LIBRARY_PATH', '/home/carbon/Program_Projects/Control_Frame/install/shared_package/lib:/opt/ros/humble/opt/rviz_ogre_vendor/lib:/opt/ros/humble/lib/x86_64-linux-gnu:/opt/ros/humble/lib'), ('CLAUDE_CODE_MESSAGING_TOKEN', 'a0921a77f905ccaee80e154d243fca87'), ('HOME', '/home/carbon'), ('OLDPWD', '/home/carbon/Program_Projects/Control_Frame/src'), ('DESKTOP_SESSION', 'ubuntu'), ('NO_PROXY', 'localhost,127.0.0.1,192.168.0.0/16,10.0.0.0/8,172.16.0.0/12,::1'), ('ROS_PYTHON_VERSION', '3'), ('GNOME_SHELL_SESSION_MODE', 'ubuntu'), ('GTK_MODULES', 'gail:atk-bridge'), ('CLAUDE_CODE_CHILD_SESSION', '1'), ('LC_MONETARY', 'zh_CN.UTF-8'), ('DBUS_STARTER_BUS_TYPE', 'session'), ('SYSTEMD_EXEC_PID', '1237'), ('DBUS_SESSION_BUS_ADDRESS', 'unix:path=/run/user/1000/bus,guid=da3da993a341e44656fef5d16aaabfed'), ('COLORTERM', 'truecolor'), ('WAYLAND_DISPLAY', 'wayland-0'), ('https_proxy', 'http://127.0.0.1:7897/'), ('ROS_DISTRO', 'humble'), ('GTK_IM_MODULE', 'ibus'), ('LOGNAME', 'carbon'), ('ALL_PROXY', 'socks://127.0.0.1:7897/'), ('http_proxy', 'http://127.0.0.1:7897/'), ('_', '/usr/bin/colcon'), ('ROS_VERSION', '2'), ('XDG_SESSION_CLASS', 'user'), ('USERNAME', 'carbon'), ('ANTHROPIC_BASE_URL', 'https://api.deepseek.com/anthropic'), ('TERM', 'xterm-256color'), ('GNOME_DESKTOP_SESSION_ID', 'this-is-deprecated'), ('ROS_LOCALHOST_ONLY', '0'), ('PATH', '/home/carbon/.local/bin:/opt/ros/humble/bin:/home/carbon/.local/bin:/usr/local/sbin:/usr/local/bin:/usr/sbin:/usr/bin:/sbin:/bin:/usr/games:/usr/local/games:/snap/bin:/snap/bin'), ('SESSION_MANAGER', 'local/carbon:@/tmp/.ICE-unix/1237,unix/carbon:/tmp/.ICE-unix/1237'), ('PAPERSIZE', 'a4'), ('COREPACK_ENABLE_AUTO_PIN', '0'), ('XDG_MENU_PREFIX', 'gnome-'), ('LC_ADDRESS', 'zh_CN.UTF-8'), ('GNOME_TERMINAL_SCREEN', '/org/gnome/Terminal/screen/dac95d9f_669b_4814_8416_148d014dfe22'), ('GNOME_SETUP_DISPLAY', ':1'), ('XDG_RUNTIME_DIR', '/run/user/1000'), ('CLAUDE_EFFORT', 'high'), ('DISPLAY', ':0'), ('CLAUDE_PID', '3919'), ('NoDefaultCurrentDirectoryInExePath', '1'), ('LANG', 'zh_CN.UTF-8'), ('XDG_CURRENT_DESKTOP', 'ubuntu:GNOME'), ('LC_TELEPHONE', 'zh_CN.UTF-8'), ('XMODIFIERS', '@im=ibus'), ('XDG_SESSION_DESKTOP', 'ubuntu'), ('XAUTHORITY', '/run/user/1000/.mutter-Xwaylandauth.TVFGV3'), ('LS_COLORS', 'rs=0:di=01;34:ln=01;36:mh=00:pi=40;33:so=01;35:do=01;35:bd=40;33;01:cd=40;33;01:or=40;31;01:mi=00:su=37;41:sg=30;43:ca=30;41:tw=30;42:ow=34;42:st=37;44:ex=01;32:*.tar=01;31:*.tgz=01;31:*.arc=01;31:*.arj=01;31:*.taz=01;31:*.lha=01;31:*.lz4=01;31:*.lzh=01;31:*.lzma=01;31:*.tlz=01;31:*.txz=01;31:*.tzo=01;31:*.t7z=01;31:*.zip=01;31:*.z=01;31:*.dz=01;31:*.gz=01;31:*.lrz=01;31:*.lz=01;31:*.lzo=01;31:*.xz=01;31:*.zst=01;31:*.tzst=01;31:*.bz2=01;31:*.bz=01;31:*.tbz=01;31:*.tbz2=01;31:*.tz=01;31:*.deb=01;31:*.rpm=01;31:*.jar=01;31:*.war=01;31:*.ear=01;31:*.sar=01;31:*.rar=01;31:*.alz=01;31:*.ace=01;31:*.zoo=01;31:*.cpio=01;31:*.7z=01;31:*.rz=01;31:*.cab=01;31:*.wim=01;31:*.swm=01;31:*.dwm=01;31:*.esd=01;31:*.jpg=01;35:*.jpeg=01;35:*.mjpg=01;35:*.mjpeg=01;35:*.gif=01;35:*.bmp=01;35:*.pbm=01;35:*.pgm=01;35:*.ppm=01;35:*.tga=01;35:*.xbm=01;35:*.xpm=01;35:*.tif=01;35:*.tiff=01;35:*.png=01;35:*.svg=01;35:*.svgz=01;35:*.mng=01;35:*.pcx=01;35:*.mov=01;35:*.mpg=01;35:*.mpeg=01;35:*.m2v=01;35:*.mkv=01;35:*.webm=01;35:*.webp=01;35:*.ogm=01;35:*.mp4=01;35:*.m4v=01;35:*.mp4v=01;35:*.vob=01;35:*.qt=01;35:*.nuv=01;35:*.wmv=01;35:*.asf=01;35:*.rm=01;35:*.rmvb=01;35:*.flc=01;35:*.avi=01;35:*.fli=01;35:*.flv=01;35:*.gl=01;35:*.dl=01;35:*.xcf=01;35:*.xwd=01;35:*.yuv=01;35:*.cgm=01;35:*.emf=01;35:*.ogv=01;35:*.ogx=01;35:*.aac=00;36:*.au=00;36:*.flac=00;36:*.m4a=00;36:*.mid=00;36:*.midi=00;36:*.mka=00;36:*.mp3=00;36:*.mpc=00;36:*.ogg=00;36:*.ra=00;36:*.wav=00;36:*.oga=00;36:*.opus=00;36:*.spx=00;36:*.xspf=00;36:'), ('GNOME_TERMINAL_SERVICE', ':1.130'), ('SSH_AGENT_LAUNCHER', 'gnome-keyring'), ('SSH_AUTH_SOCK', '/run/user/1000/keyring/ssh'), ('AMENT_PREFIX_PATH', '/home/carbon/Program_Projects/Control_Frame/install/shared_package:/opt/ros/humble'), ('SHELL', '/bin/bash'), ('LC_NAME', 'zh_CN.UTF-8'), ('ANTHROPIC_AUTH_TOKEN', 'sk-d8dd0182949a4feab5fd89a4566f7e68'), ('QT_ACCESSIBILITY', '1'), ('GDMSESSION', 'ubuntu'), ('CLAUDE_CODE_SESSION_ID', '68c96283-759b-43ae-a08e-db0ca9d5d1b5'), ('LESSCLOSE', '/usr/bin/lesspipe %s %s'), ('CLAUDECODE', '1'), ('LC_MEASUREMENT', 'zh_CN.UTF-8'), ('LC_IDENTIFICATION', 'zh_CN.UTF-8'), ('QT_IM_MODULE', 'ibus'), ('PWD', '/home/carbon/Program_Projects/Control_Frame/build/chassis'), ('XDG_CONFIG_DIRS', '/etc/xdg/xdg-ubuntu:/etc/xdg'), ('DBUS_STARTER_ADDRESS', 'unix:path=/run/user/1000/bus,guid=da3da993a341e44656fef5d16aaabfed'), ('XDG_DATA_DIRS', '/usr/share/ubuntu:/usr/local/share/:/usr/share/:/var/lib/snapd/desktop'), ('CLAUDE_CODE_EXECPATH', '/home/carbon/.local/share/claude/versions/2.1.273'), ('PYTHONPATH', '/opt/ros/humble/lib/python3.10/site-packages:/opt/ros/humble/local/lib/python3.10/dist-packages'), ('HTTP_PROXY', 'http://127.0.0.1:7897/'), ('LC_NUMERIC', 'zh_CN.UTF-8'), ('LC_PAPER', 'zh_CN.UTF-8'), ('COLCON', '1'), ('VTE_VERSION', '6800'), ('CLAUDE_CODE_MESSAGING_SOCKET', '/run/user/1000/cc-socks/3919.sock'), ('CMAKE_PREFIX_PATH', '/home/carbon/Program_Projects/Control_Frame/install/shared_package:/opt/ros/humble')]), 'shell': False}
+[5.264622] (-) TimerEvent: {}
+[5.376464] (-) TimerEvent: {}
+[5.477454] (-) TimerEvent: {}
+[5.506623] (chassis) StdoutLine: {'line': b'-- Found ament_cmake: 1.3.14 (/opt/ros/humble/share/ament_cmake/cmake)\n'}
+[5.578411] (-) TimerEvent: {}
+[5.682899] (-) TimerEvent: {}
+[5.784481] (-) TimerEvent: {}
+[5.885959] (-) TimerEvent: {}
+[5.993053] (-) TimerEvent: {}
+[6.069827] (chassis) StdoutLine: {'line': b'-- Found rclcpp: 16.0.19 (/opt/ros/humble/share/rclcpp/cmake)\n'}
+[6.093313] (-) TimerEvent: {}
+[6.194870] (-) TimerEvent: {}
+[6.302643] (-) TimerEvent: {}
+[6.311787] (chassis) StdoutLine: {'line': b'-- Found rosidl_generator_c: 3.1.9 (/opt/ros/humble/share/rosidl_generator_c/cmake)\n'}
+[6.333602] (chassis) StdoutLine: {'line': b'-- Found rosidl_adapter: 3.1.9 (/opt/ros/humble/share/rosidl_adapter/cmake)\n'}
+[6.381933] (chassis) StdoutLine: {'line': b'-- Found rosidl_generator_cpp: 3.1.9 (/opt/ros/humble/share/rosidl_generator_cpp/cmake)\n'}
+[6.409969] (-) TimerEvent: {}
+[6.471610] (chassis) StdoutLine: {'line': b'-- Using all available rosidl_typesupport_c: rosidl_typesupport_fastrtps_c;rosidl_typesupport_introspection_c\n'}
+[6.511244] (-) TimerEvent: {}
+[6.571957] (chassis) StdoutLine: {'line': b'-- Using all available rosidl_typesupport_cpp: rosidl_typesupport_fastrtps_cpp;rosidl_typesupport_introspection_cpp\n'}
+[6.611655] (-) TimerEvent: {}
+[6.712411] (-) TimerEvent: {}
+[6.754344] (chassis) StdoutLine: {'line': b'-- Found rmw_implementation_cmake: 6.1.2 (/opt/ros/humble/share/rmw_implementation_cmake/cmake)\n'}
+[6.769825] (chassis) StdoutLine: {'line': b'-- Found rmw_fastrtps_cpp: 6.2.10 (/opt/ros/humble/share/rmw_fastrtps_cpp/cmake)\n'}
+[6.813057] (-) TimerEvent: {}
+[6.916866] (-) TimerEvent: {}
+[7.017269] (-) TimerEvent: {}
+[7.117838] (-) TimerEvent: {}
+[7.218223] (-) TimerEvent: {}
+[7.257868] (chassis) StdoutLine: {'line': b"-- Using RMW implementation 'rmw_fastrtps_cpp' as default\n"}
+[7.319816] (-) TimerEvent: {}
+[7.420933] (-) TimerEvent: {}
+[7.521508] (-) TimerEvent: {}
+[7.566133] (chassis) StdoutLine: {'line': b'-- Found rclcpp_lifecycle: 16.0.19 (/opt/ros/humble/share/rclcpp_lifecycle/cmake)\n'}
+[7.622195] (-) TimerEvent: {}
+[7.670583] (chassis) StdoutLine: {'line': b'-- Found hardware_interface: 2.54.2 (/opt/ros/humble/share/hardware_interface/cmake)\n'}
+[7.724247] (-) TimerEvent: {}
+[7.827081] (-) TimerEvent: {}
+[7.927847] (-) TimerEvent: {}
+[8.029957] (-) TimerEvent: {}
+[8.132970] (-) TimerEvent: {}
+[8.234926] (-) TimerEvent: {}
+[8.308956] (chassis) StdoutLine: {'line': b'-- Found shared_package: 0.0.0 (/home/carbon/Program_Projects/Control_Frame/install/shared_package/share/shared_package/cmake)\n'}
+[8.336865] (-) TimerEvent: {}
+[8.437422] (-) TimerEvent: {}
+[8.539821] (-) TimerEvent: {}
+[8.572092] (chassis) StdoutLine: {'line': b'-- Configuring done\n'}
+[8.640145] (-) TimerEvent: {}
+[8.690826] (chassis) StdoutLine: {'line': b'-- Generating done\n'}
+[8.726808] (chassis) StdoutLine: {'line': b'-- Build files have been written to: /home/carbon/Program_Projects/Control_Frame/build/chassis\n'}
+[8.740369] (-) TimerEvent: {}
+[8.842612] (-) TimerEvent: {}
+[8.944262] (-) TimerEvent: {}
+[9.017475] (chassis) StdoutLine: {'line': b'Consolidate compiler generated dependencies of target chassis_hardware\n'}
+[9.047915] (-) TimerEvent: {}
+[9.148357] (-) TimerEvent: {}
+[9.183547] (chassis) StdoutLine: {'line': b'[ 50%] Building CXX object CMakeFiles/chassis_hardware.dir/src/chassis_system.cpp.o\n'}
+[9.248934] (-) TimerEvent: {}
+[9.349869] (-) TimerEvent: {}
+[9.451863] (-) TimerEvent: {}
+[9.552272] (-) TimerEvent: {}
+[9.653983] (-) TimerEvent: {}
+[9.754393] (-) TimerEvent: {}
+[9.857588] (-) TimerEvent: {}
+[9.958106] (-) TimerEvent: {}
+[10.059987] (-) TimerEvent: {}
+[10.162969] (-) TimerEvent: {}
+[10.265914] (-) TimerEvent: {}
+[10.369825] (-) TimerEvent: {}
+[10.472211] (-) TimerEvent: {}
+[10.572635] (-) TimerEvent: {}
+[10.674004] (-) TimerEvent: {}
+[10.774483] (-) TimerEvent: {}
+[10.876466] (-) TimerEvent: {}
+[10.978016] (-) TimerEvent: {}
+[11.078859] (-) TimerEvent: {}
+[11.179423] (-) TimerEvent: {}
+[11.280628] (-) TimerEvent: {}
+[11.382007] (-) TimerEvent: {}
+[11.484901] (-) TimerEvent: {}
+[11.586290] (-) TimerEvent: {}
+[11.687521] (-) TimerEvent: {}
+[11.789024] (-) TimerEvent: {}
+[11.889448] (-) TimerEvent: {}
+[11.992460] (-) TimerEvent: {}
+[12.096080] (-) TimerEvent: {}
+[12.197850] (-) TimerEvent: {}
+[12.299581] (-) TimerEvent: {}
+[12.403978] (-) TimerEvent: {}
+[12.505453] (-) TimerEvent: {}
+[12.607581] (-) TimerEvent: {}
+[12.709139] (-) TimerEvent: {}
+[12.809837] (-) TimerEvent: {}
+[12.911886] (-) TimerEvent: {}
+[13.014147] (-) TimerEvent: {}
+[13.114574] (-) TimerEvent: {}
+[13.216385] (-) TimerEvent: {}
+[13.317076] (-) TimerEvent: {}
+[13.420864] (-) TimerEvent: {}
+[13.521312] (-) TimerEvent: {}
+[13.622381] (-) TimerEvent: {}
+[13.724154] (-) TimerEvent: {}
+[13.825362] (-) TimerEvent: {}
+[13.927056] (-) TimerEvent: {}
+[14.027747] (-) TimerEvent: {}
+[14.128880] (-) TimerEvent: {}
+[14.229381] (-) TimerEvent: {}
+[14.330310] (-) TimerEvent: {}
+[14.433387] (-) TimerEvent: {}
+[14.533865] (-) TimerEvent: {}
+[14.637477] (-) TimerEvent: {}
+[14.738313] (-) TimerEvent: {}
+[14.841638] (-) TimerEvent: {}
+[14.944251] (-) TimerEvent: {}
+[15.047816] (-) TimerEvent: {}
+[15.150165] (-) TimerEvent: {}
+[15.250971] (-) TimerEvent: {}
+[15.352166] (-) TimerEvent: {}
+[15.452639] (-) TimerEvent: {}
+[15.553374] (-) TimerEvent: {}
+[15.656887] (-) TimerEvent: {}
+[15.757509] (-) TimerEvent: {}
+[15.858629] (-) TimerEvent: {}
+[15.960429] (-) TimerEvent: {}
+[16.061607] (-) TimerEvent: {}
+[16.162141] (-) TimerEvent: {}
+[16.263830] (-) TimerEvent: {}
+[16.367471] (-) TimerEvent: {}
+[16.468981] (-) TimerEvent: {}
+[16.569464] (-) TimerEvent: {}
+[16.670444] (-) TimerEvent: {}
+[16.772163] (-) TimerEvent: {}
+[16.876520] (-) TimerEvent: {}
+[16.979334] (-) TimerEvent: {}
+[17.079826] (-) TimerEvent: {}
+[17.180534] (-) TimerEvent: {}
+[17.281262] (-) TimerEvent: {}
+[17.382829] (-) TimerEvent: {}
+[17.486328] (-) TimerEvent: {}
+[17.587630] (-) TimerEvent: {}
+[17.691864] (-) TimerEvent: {}
+[17.794607] (-) TimerEvent: {}
+[17.896479] (-) TimerEvent: {}
+[18.000878] (-) TimerEvent: {}
+[18.102006] (-) TimerEvent: {}
+[18.203382] (-) TimerEvent: {}
+[18.303953] (-) TimerEvent: {}
+[18.404997] (-) TimerEvent: {}
+[18.506852] (-) TimerEvent: {}
+[18.607985] (-) TimerEvent: {}
+[18.709274] (-) TimerEvent: {}
+[18.809943] (-) TimerEvent: {}
+[18.910605] (-) TimerEvent: {}
+[19.012867] (-) TimerEvent: {}
+[19.113589] (-) TimerEvent: {}
+[19.215871] (-) TimerEvent: {}
+[19.317028] (-) TimerEvent: {}
+[19.417877] (-) TimerEvent: {}
+[19.524420] (-) TimerEvent: {}
+[19.625591] (-) TimerEvent: {}
+[19.727223] (-) TimerEvent: {}
+[19.827781] (-) TimerEvent: {}
+[19.929884] (-) TimerEvent: {}
+[19.959371] (chassis) StdoutLine: {'line': b'[100%] Linking CXX shared library libchassis_hardware.so\n'}
+[20.030140] (-) TimerEvent: {}
+[20.130831] (-) TimerEvent: {}
+[20.231490] (-) TimerEvent: {}
+[20.334094] (-) TimerEvent: {}
+[20.434825] (-) TimerEvent: {}
+[20.535440] (-) TimerEvent: {}
+[20.636027] (-) TimerEvent: {}
+[20.726598] (chassis) StdoutLine: {'line': b'[100%] Built target chassis_hardware\n'}
+[20.736859] (-) TimerEvent: {}
+[20.785466] (chassis) CommandEnded: {'returncode': 0}
+[20.793105] (chassis) JobProgress: {'identifier': 'chassis', 'progress': 'install'}
+[20.793147] (chassis) Command: {'cmd': ['/usr/bin/cmake', '--install', '/home/carbon/Program_Projects/Control_Frame/build/chassis'], 'cwd': '/home/carbon/Program_Projects/Control_Frame/build/chassis', 'env': OrderedDict([('LESSOPEN', '| /usr/bin/lesspipe %s'), ('HTTPS_PROXY', 'http://127.0.0.1:7897/'), ('no_proxy', 'localhost,127.0.0.1,192.168.0.0/16,10.0.0.0/8,172.16.0.0/12,::1'), ('AI_AGENT', 'claude-code_2-1-273_agent'), ('LANGUAGE', 'zh_CN:en'), ('USER', 'carbon'), ('CLAUDE_CODE_ENTRYPOINT', 'cli'), ('LC_TIME', 'zh_CN.UTF-8'), ('GIT_EDITOR', 'true'), ('all_proxy', 'socks://127.0.0.1:7897/'), ('XDG_SESSION_TYPE', 'wayland'), ('CLAUDE_CODE_SESSION_ATTENDED', '1'), ('SHLVL', '1'), ('LD_LIBRARY_PATH', '/home/carbon/Program_Projects/Control_Frame/install/shared_package/lib:/opt/ros/humble/opt/rviz_ogre_vendor/lib:/opt/ros/humble/lib/x86_64-linux-gnu:/opt/ros/humble/lib'), ('CLAUDE_CODE_MESSAGING_TOKEN', 'a0921a77f905ccaee80e154d243fca87'), ('HOME', '/home/carbon'), ('OLDPWD', '/home/carbon/Program_Projects/Control_Frame/src'), ('DESKTOP_SESSION', 'ubuntu'), ('NO_PROXY', 'localhost,127.0.0.1,192.168.0.0/16,10.0.0.0/8,172.16.0.0/12,::1'), ('ROS_PYTHON_VERSION', '3'), ('GNOME_SHELL_SESSION_MODE', 'ubuntu'), ('GTK_MODULES', 'gail:atk-bridge'), ('CLAUDE_CODE_CHILD_SESSION', '1'), ('LC_MONETARY', 'zh_CN.UTF-8'), ('DBUS_STARTER_BUS_TYPE', 'session'), ('SYSTEMD_EXEC_PID', '1237'), ('DBUS_SESSION_BUS_ADDRESS', 'unix:path=/run/user/1000/bus,guid=da3da993a341e44656fef5d16aaabfed'), ('COLORTERM', 'truecolor'), ('WAYLAND_DISPLAY', 'wayland-0'), ('https_proxy', 'http://127.0.0.1:7897/'), ('ROS_DISTRO', 'humble'), ('GTK_IM_MODULE', 'ibus'), ('LOGNAME', 'carbon'), ('ALL_PROXY', 'socks://127.0.0.1:7897/'), ('http_proxy', 'http://127.0.0.1:7897/'), ('_', '/usr/bin/colcon'), ('ROS_VERSION', '2'), ('XDG_SESSION_CLASS', 'user'), ('USERNAME', 'carbon'), ('ANTHROPIC_BASE_URL', 'https://api.deepseek.com/anthropic'), ('TERM', 'xterm-256color'), ('GNOME_DESKTOP_SESSION_ID', 'this-is-deprecated'), ('ROS_LOCALHOST_ONLY', '0'), ('PATH', '/home/carbon/.local/bin:/opt/ros/humble/bin:/home/carbon/.local/bin:/usr/local/sbin:/usr/local/bin:/usr/sbin:/usr/bin:/sbin:/bin:/usr/games:/usr/local/games:/snap/bin:/snap/bin'), ('SESSION_MANAGER', 'local/carbon:@/tmp/.ICE-unix/1237,unix/carbon:/tmp/.ICE-unix/1237'), ('PAPERSIZE', 'a4'), ('COREPACK_ENABLE_AUTO_PIN', '0'), ('XDG_MENU_PREFIX', 'gnome-'), ('LC_ADDRESS', 'zh_CN.UTF-8'), ('GNOME_TERMINAL_SCREEN', '/org/gnome/Terminal/screen/dac95d9f_669b_4814_8416_148d014dfe22'), ('GNOME_SETUP_DISPLAY', ':1'), ('XDG_RUNTIME_DIR', '/run/user/1000'), ('CLAUDE_EFFORT', 'high'), ('DISPLAY', ':0'), ('CLAUDE_PID', '3919'), ('NoDefaultCurrentDirectoryInExePath', '1'), ('LANG', 'zh_CN.UTF-8'), ('XDG_CURRENT_DESKTOP', 'ubuntu:GNOME'), ('LC_TELEPHONE', 'zh_CN.UTF-8'), ('XMODIFIERS', '@im=ibus'), ('XDG_SESSION_DESKTOP', 'ubuntu'), ('XAUTHORITY', '/run/user/1000/.mutter-Xwaylandauth.TVFGV3'), ('LS_COLORS', 'rs=0:di=01;34:ln=01;36:mh=00:pi=40;33:so=01;35:do=01;35:bd=40;33;01:cd=40;33;01:or=40;31;01:mi=00:su=37;41:sg=30;43:ca=30;41:tw=30;42:ow=34;42:st=37;44:ex=01;32:*.tar=01;31:*.tgz=01;31:*.arc=01;31:*.arj=01;31:*.taz=01;31:*.lha=01;31:*.lz4=01;31:*.lzh=01;31:*.lzma=01;31:*.tlz=01;31:*.txz=01;31:*.tzo=01;31:*.t7z=01;31:*.zip=01;31:*.z=01;31:*.dz=01;31:*.gz=01;31:*.lrz=01;31:*.lz=01;31:*.lzo=01;31:*.xz=01;31:*.zst=01;31:*.tzst=01;31:*.bz2=01;31:*.bz=01;31:*.tbz=01;31:*.tbz2=01;31:*.tz=01;31:*.deb=01;31:*.rpm=01;31:*.jar=01;31:*.war=01;31:*.ear=01;31:*.sar=01;31:*.rar=01;31:*.alz=01;31:*.ace=01;31:*.zoo=01;31:*.cpio=01;31:*.7z=01;31:*.rz=01;31:*.cab=01;31:*.wim=01;31:*.swm=01;31:*.dwm=01;31:*.esd=01;31:*.jpg=01;35:*.jpeg=01;35:*.mjpg=01;35:*.mjpeg=01;35:*.gif=01;35:*.bmp=01;35:*.pbm=01;35:*.pgm=01;35:*.ppm=01;35:*.tga=01;35:*.xbm=01;35:*.xpm=01;35:*.tif=01;35:*.tiff=01;35:*.png=01;35:*.svg=01;35:*.svgz=01;35:*.mng=01;35:*.pcx=01;35:*.mov=01;35:*.mpg=01;35:*.mpeg=01;35:*.m2v=01;35:*.mkv=01;35:*.webm=01;35:*.webp=01;35:*.ogm=01;35:*.mp4=01;35:*.m4v=01;35:*.mp4v=01;35:*.vob=01;35:*.qt=01;35:*.nuv=01;35:*.wmv=01;35:*.asf=01;35:*.rm=01;35:*.rmvb=01;35:*.flc=01;35:*.avi=01;35:*.fli=01;35:*.flv=01;35:*.gl=01;35:*.dl=01;35:*.xcf=01;35:*.xwd=01;35:*.yuv=01;35:*.cgm=01;35:*.emf=01;35:*.ogv=01;35:*.ogx=01;35:*.aac=00;36:*.au=00;36:*.flac=00;36:*.m4a=00;36:*.mid=00;36:*.midi=00;36:*.mka=00;36:*.mp3=00;36:*.mpc=00;36:*.ogg=00;36:*.ra=00;36:*.wav=00;36:*.oga=00;36:*.opus=00;36:*.spx=00;36:*.xspf=00;36:'), ('GNOME_TERMINAL_SERVICE', ':1.130'), ('SSH_AGENT_LAUNCHER', 'gnome-keyring'), ('SSH_AUTH_SOCK', '/run/user/1000/keyring/ssh'), ('AMENT_PREFIX_PATH', '/home/carbon/Program_Projects/Control_Frame/install/shared_package:/opt/ros/humble'), ('SHELL', '/bin/bash'), ('LC_NAME', 'zh_CN.UTF-8'), ('ANTHROPIC_AUTH_TOKEN', 'sk-d8dd0182949a4feab5fd89a4566f7e68'), ('QT_ACCESSIBILITY', '1'), ('GDMSESSION', 'ubuntu'), ('CLAUDE_CODE_SESSION_ID', '68c96283-759b-43ae-a08e-db0ca9d5d1b5'), ('LESSCLOSE', '/usr/bin/lesspipe %s %s'), ('CLAUDECODE', '1'), ('LC_MEASUREMENT', 'zh_CN.UTF-8'), ('LC_IDENTIFICATION', 'zh_CN.UTF-8'), ('QT_IM_MODULE', 'ibus'), ('PWD', '/home/carbon/Program_Projects/Control_Frame/build/chassis'), ('XDG_CONFIG_DIRS', '/etc/xdg/xdg-ubuntu:/etc/xdg'), ('DBUS_STARTER_ADDRESS', 'unix:path=/run/user/1000/bus,guid=da3da993a341e44656fef5d16aaabfed'), ('XDG_DATA_DIRS', '/usr/share/ubuntu:/usr/local/share/:/usr/share/:/var/lib/snapd/desktop'), ('CLAUDE_CODE_EXECPATH', '/home/carbon/.local/share/claude/versions/2.1.273'), ('PYTHONPATH', '/opt/ros/humble/lib/python3.10/site-packages:/opt/ros/humble/local/lib/python3.10/dist-packages'), ('HTTP_PROXY', 'http://127.0.0.1:7897/'), ('LC_NUMERIC', 'zh_CN.UTF-8'), ('LC_PAPER', 'zh_CN.UTF-8'), ('COLCON', '1'), ('VTE_VERSION', '6800'), ('CLAUDE_CODE_MESSAGING_SOCKET', '/run/user/1000/cc-socks/3919.sock'), ('CMAKE_PREFIX_PATH', '/home/carbon/Program_Projects/Control_Frame/install/shared_package:/opt/ros/humble')]), 'shell': False}
+[20.824988] (chassis) StdoutLine: {'line': b'-- Install configuration: ""\n'}
+[20.827836] (chassis) StdoutLine: {'line': b'-- Installing: /home/carbon/Program_Projects/Control_Frame/install/chassis/share/chassis/chassis_plugin.xml\n'}
+[20.835796] (chassis) StdoutLine: {'line': b'-- Installing: /home/carbon/Program_Projects/Control_Frame/install/chassis/lib/libchassis_hardware.so\n'}
+[20.837843] (-) TimerEvent: {}
+[20.846269] (chassis) StdoutLine: {'line': b'-- Set runtime path of "/home/carbon/Program_Projects/Control_Frame/install/chassis/lib/libchassis_hardware.so" to ""\n'}
+[20.849029] (chassis) StdoutLine: {'line': b'-- Up-to-date: /home/carbon/Program_Projects/Control_Frame/install/chassis/include\n'}
+[20.849292] (chassis) StdoutLine: {'line': b'-- Up-to-date: /home/carbon/Program_Projects/Control_Frame/install/chassis/include/chassis\n'}
+[20.849478] (chassis) StdoutLine: {'line': b'-- Installing: /home/carbon/Program_Projects/Control_Frame/install/chassis/include/chassis/chassis_system.hpp\n'}
+[20.853806] (chassis) StdoutLine: {'line': b'-- Up-to-date: /home/carbon/Program_Projects/Control_Frame/install/chassis/share/chassis/urdf\n'}
+[20.854081] (chassis) StdoutLine: {'line': b'-- Up-to-date: /home/carbon/Program_Projects/Control_Frame/install/chassis/share/chassis/urdf/chassis.urdf\n'}
+[20.854286] (chassis) StdoutLine: {'line': b'-- Up-to-date: /home/carbon/Program_Projects/Control_Frame/install/chassis/share/chassis/config\n'}
+[20.854472] (chassis) StdoutLine: {'line': b'-- Up-to-date: /home/carbon/Program_Projects/Control_Frame/install/chassis/share/chassis/config/chassis_controller.yaml\n'}
+[20.855850] (chassis) StdoutLine: {'line': b'-- Up-to-date: /home/carbon/Program_Projects/Control_Frame/install/chassis/share/chassis/launch\n'}
+[20.857957] (chassis) StdoutLine: {'line': b'-- Up-to-date: /home/carbon/Program_Projects/Control_Frame/install/chassis/share/chassis/launch/chassis.launch\n'}
+[20.859746] (chassis) StdoutLine: {'line': b'-- Up-to-date: /home/carbon/Program_Projects/Control_Frame/install/chassis/share/chassis/environment/library_path.sh\n'}
+[20.859935] (chassis) StdoutLine: {'line': b'-- Installing: /home/carbon/Program_Projects/Control_Frame/install/chassis/share/chassis/environment/library_path.dsv\n'}
+[20.860217] (chassis) StdoutLine: {'line': b'-- Installing: /home/carbon/Program_Projects/Control_Frame/install/chassis/share/ament_index/resource_index/package_run_dependencies/chassis\n'}
+[20.860416] (chassis) StdoutLine: {'line': b'-- Installing: /home/carbon/Program_Projects/Control_Frame/install/chassis/share/ament_index/resource_index/parent_prefix_path/chassis\n'}
+[20.863484] (chassis) StdoutLine: {'line': b'-- Up-to-date: /home/carbon/Program_Projects/Control_Frame/install/chassis/share/chassis/environment/ament_prefix_path.sh\n'}
+[20.864121] (chassis) StdoutLine: {'line': b'-- Installing: /home/carbon/Program_Projects/Control_Frame/install/chassis/share/chassis/environment/ament_prefix_path.dsv\n'}
+[20.868235] (chassis) StdoutLine: {'line': b'-- Up-to-date: /home/carbon/Program_Projects/Control_Frame/install/chassis/share/chassis/environment/path.sh\n'}
+[20.868591] (chassis) StdoutLine: {'line': b'-- Installing: /home/carbon/Program_Projects/Control_Frame/install/chassis/share/chassis/environment/path.dsv\n'}
+[20.868845] (chassis) StdoutLine: {'line': b'-- Up-to-date: /home/carbon/Program_Projects/Control_Frame/install/chassis/share/chassis/local_setup.bash\n'}
+[20.869033] (chassis) StdoutLine: {'line': b'-- Up-to-date: /home/carbon/Program_Projects/Control_Frame/install/chassis/share/chassis/local_setup.sh\n'}
+[20.869217] (chassis) StdoutLine: {'line': b'-- Up-to-date: /home/carbon/Program_Projects/Control_Frame/install/chassis/share/chassis/local_setup.zsh\n'}
+[20.872525] (chassis) StdoutLine: {'line': b'-- Installing: /home/carbon/Program_Projects/Control_Frame/install/chassis/share/chassis/local_setup.dsv\n'}
+[20.875627] (chassis) StdoutLine: {'line': b'-- Installing: /home/carbon/Program_Projects/Control_Frame/install/chassis/share/chassis/package.dsv\n'}
+[20.880087] (chassis) StdoutLine: {'line': b'-- Up-to-date: /home/carbon/Program_Projects/Control_Frame/install/chassis/share/ament_index/resource_index/packages/chassis\n'}
+[20.880327] (chassis) StdoutLine: {'line': b'-- Up-to-date: /home/carbon/Program_Projects/Control_Frame/install/chassis/share/ament_index/resource_index/hardware_interface__pluginlib__plugin/chassis\n'}
+[20.880516] (chassis) StdoutLine: {'line': b'-- Old export file "/home/carbon/Program_Projects/Control_Frame/install/chassis/share/chassis/cmake/export_chassisExport.cmake" will be replaced.  Removing files [/home/carbon/Program_Projects/Control_Frame/install/chassis/share/chassis/cmake/export_chassisExport-noconfig.cmake].\n'}
+[20.882797] (chassis) StdoutLine: {'line': b'-- Installing: /home/carbon/Program_Projects/Control_Frame/install/chassis/share/chassis/cmake/export_chassisExport.cmake\n'}
+[20.883329] (chassis) StdoutLine: {'line': b'-- Installing: /home/carbon/Program_Projects/Control_Frame/install/chassis/share/chassis/cmake/export_chassisExport-noconfig.cmake\n'}
+[20.883555] (chassis) StdoutLine: {'line': b'-- Up-to-date: /home/carbon/Program_Projects/Control_Frame/install/chassis/share/chassis/cmake/ament_cmake_export_targets-extras.cmake\n'}
+[20.885223] (chassis) StdoutLine: {'line': b'-- Installing: /home/carbon/Program_Projects/Control_Frame/install/chassis/share/chassis/cmake/ament_cmake_export_dependencies-extras.cmake\n'}
+[20.885449] (chassis) StdoutLine: {'line': b'-- Up-to-date: /home/carbon/Program_Projects/Control_Frame/install/chassis/share/chassis/cmake/chassisConfig.cmake\n'}
+[20.885632] (chassis) StdoutLine: {'line': b'-- Up-to-date: /home/carbon/Program_Projects/Control_Frame/install/chassis/share/chassis/cmake/chassisConfig-version.cmake\n'}
+[20.889562] (chassis) StdoutLine: {'line': b'-- Installing: /home/carbon/Program_Projects/Control_Frame/install/chassis/share/chassis/package.xml\n'}
+[20.889808] (chassis) CommandEnded: {'returncode': 0}
+[20.940334] (-) TimerEvent: {}
+[20.955979] (chassis) JobEnded: {'identifier': 'chassis', 'rc': 0}
+[20.957011] (-) EventReactorShutdown: {}

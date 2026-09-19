@@ -1,0 +1,41 @@
+-- Found ament_cmake: 1.3.14 (/opt/ros/humble/share/ament_cmake/cmake)
+-- Found ament_lint_auto: 0.12.15 (/opt/ros/humble/share/ament_lint_auto/cmake)
+-- Added test 'cppcheck' to perform static code analysis on C / C++ code
+-- Configured cppcheck include dirs: $<BUILD_INTERFACE:/home/carbon/Program_Projects/Control_Frame/src/shared_package/Middleware>;$<BUILD_INTERFACE:/home/carbon/Program_Projects/Control_Frame/src/shared_package/device>;$<BUILD_INTERFACE:/home/carbon/Program_Projects/Control_Frame/src/shared_package/Algorithm>
+-- Configured cppcheck exclude dirs and/or files: 
+-- Added test 'lint_cmake' to check CMake code style
+-- Added test 'uncrustify' to check C / C++ code style
+-- Configured uncrustify additional arguments: 
+-- Added test 'xmllint' to check XML markup files
+-- Configuring done
+-- Generating done
+-- Build files have been written to: /home/carbon/Program_Projects/Control_Frame/build/shared_package
+Consolidate compiler generated dependencies of target shared_package
+[ 50%] Building CXX object CMakeFiles/shared_package.dir/Middleware/Send_Interface.cpp.o
+[100%] Linking CXX shared library libshared_package.so
+[100%] Built target shared_package
+-- Install configuration: ""
+-- Installing: /home/carbon/Program_Projects/Control_Frame/install/shared_package/lib/libshared_package.so
+-- Up-to-date: /home/carbon/Program_Projects/Control_Frame/install/shared_package/include/Send_Interface.hpp
+-- Up-to-date: /home/carbon/Program_Projects/Control_Frame/install/shared_package/include/alg_crc.h
+-- Installing: /home/carbon/Program_Projects/Control_Frame/install/shared_package/include/motor_base.hpp
+-- Up-to-date: /home/carbon/Program_Projects/Control_Frame/install/shared_package/share/shared_package/environment/library_path.sh
+-- Installing: /home/carbon/Program_Projects/Control_Frame/install/shared_package/share/shared_package/environment/library_path.dsv
+-- Up-to-date: /home/carbon/Program_Projects/Control_Frame/install/shared_package/share/ament_index/resource_index/package_run_dependencies/shared_package
+-- Up-to-date: /home/carbon/Program_Projects/Control_Frame/install/shared_package/share/ament_index/resource_index/parent_prefix_path/shared_package
+-- Up-to-date: /home/carbon/Program_Projects/Control_Frame/install/shared_package/share/shared_package/environment/ament_prefix_path.sh
+-- Installing: /home/carbon/Program_Projects/Control_Frame/install/shared_package/share/shared_package/environment/ament_prefix_path.dsv
+-- Up-to-date: /home/carbon/Program_Projects/Control_Frame/install/shared_package/share/shared_package/environment/path.sh
+-- Installing: /home/carbon/Program_Projects/Control_Frame/install/shared_package/share/shared_package/environment/path.dsv
+-- Up-to-date: /home/carbon/Program_Projects/Control_Frame/install/shared_package/share/shared_package/local_setup.bash
+-- Up-to-date: /home/carbon/Program_Projects/Control_Frame/install/shared_package/share/shared_package/local_setup.sh
+-- Up-to-date: /home/carbon/Program_Projects/Control_Frame/install/shared_package/share/shared_package/local_setup.zsh
+-- Installing: /home/carbon/Program_Projects/Control_Frame/install/shared_package/share/shared_package/local_setup.dsv
+-- Installing: /home/carbon/Program_Projects/Control_Frame/install/shared_package/share/shared_package/package.dsv
+-- Up-to-date: /home/carbon/Program_Projects/Control_Frame/install/shared_package/share/ament_index/resource_index/packages/shared_package
+-- Up-to-date: /home/carbon/Program_Projects/Control_Frame/install/shared_package/share/shared_package/cmake/export_shared_packageExport.cmake
+-- Up-to-date: /home/carbon/Program_Projects/Control_Frame/install/shared_package/share/shared_package/cmake/export_shared_packageExport-noconfig.cmake
+-- Up-to-date: /home/carbon/Program_Projects/Control_Frame/install/shared_package/share/shared_package/cmake/ament_cmake_export_targets-extras.cmake
+-- Up-to-date: /home/carbon/Program_Projects/Control_Frame/install/shared_package/share/shared_package/cmake/shared_packageConfig.cmake
+-- Up-to-date: /home/carbon/Program_Projects/Control_Frame/install/shared_package/share/shared_package/cmake/shared_packageConfig-version.cmake
+-- Up-to-date: /home/carbon/Program_Projects/Control_Frame/install/shared_package/share/shared_package/package.xml

@@ -1,0 +1,6 @@
+[0.000000] (-) TimerEvent: {}
+[0.002256] (-) JobUnselected: {'identifier': 'shared_package'}
+[0.002440] (chassis) JobQueued: {'identifier': 'chassis', 'dependencies': OrderedDict([('shared_package', '/home/carbon/Program_Projects/Control_Frame/src/install/shared_package')])}
+[0.006666] (chassis) JobStarted: {'identifier': 'chassis'}
+[0.087709] (chassis) JobEnded: {'identifier': 'chassis', 'rc': 1}
+[0.092662] (-) EventReactorShutdown: {}

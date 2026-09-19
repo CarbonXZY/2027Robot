@@ -1,0 +1,45 @@
+[0.077s] Invoking command in '/home/carbon/Program_Projects/Control_Frame/build/pkg_communication': CMAKE_PREFIX_PATH=/opt/ros/humble /usr/bin/cmake --build /home/carbon/Program_Projects/Control_Frame/build/pkg_communication -- -j2 -l2
+[0.152s] -- Found ament_cmake: 1.3.14 (/opt/ros/humble/share/ament_cmake/cmake)
+[0.569s] -- Found ament_lint_auto: 0.12.15 (/opt/ros/humble/share/ament_lint_auto/cmake)
+[0.750s] -- Added test 'cppcheck' to perform static code analysis on C / C++ code
+[0.751s] -- Configured cppcheck include dirs: $<BUILD_INTERFACE:/home/carbon/Program_Projects/Control_Frame/src/pkg_communication/Middleware>
+[0.756s] -- Configured cppcheck exclude dirs and/or files: 
+[0.758s] -- Added test 'lint_cmake' to check CMake code style
+[0.770s] -- Added test 'uncrustify' to check C / C++ code style
+[0.771s] -- Configured uncrustify additional arguments: 
+[0.772s] -- Added test 'xmllint' to check XML markup files
+[0.774s] -- Configuring done
+[0.802s] -- Generating done
+[0.816s] -- Build files have been written to: /home/carbon/Program_Projects/Control_Frame/build/pkg_communication
+[0.936s] Consolidate compiler generated dependencies of target pkg_communication
+[0.976s] [ 50%] Building CXX object CMakeFiles/pkg_communication.dir/Middleware/Send_Interface.cpp.o
+[1.554s] [100%] Linking CXX shared library libpkg_communication.so
+[1.881s] [100%] Built target pkg_communication
+[1.925s] Invoked command in '/home/carbon/Program_Projects/Control_Frame/build/pkg_communication' returned '0': CMAKE_PREFIX_PATH=/opt/ros/humble /usr/bin/cmake --build /home/carbon/Program_Projects/Control_Frame/build/pkg_communication -- -j2 -l2
+[1.970s] Invoking command in '/home/carbon/Program_Projects/Control_Frame/build/pkg_communication': CMAKE_PREFIX_PATH=/opt/ros/humble /usr/bin/cmake --install /home/carbon/Program_Projects/Control_Frame/build/pkg_communication
+[2.001s] -- Install configuration: ""
+[2.001s] -- Installing: /home/carbon/Program_Projects/Control_Frame/install/pkg_communication/lib/libpkg_communication.so
+[2.008s] -- Up-to-date: /home/carbon/Program_Projects/Control_Frame/install/pkg_communication/include/Send_Interface.hpp
+[2.008s] -- Up-to-date: /home/carbon/Program_Projects/Control_Frame/install/pkg_communication/include/alg_crc.h
+[2.008s] -- Up-to-date: /home/carbon/Program_Projects/Control_Frame/install/pkg_communication/share/pkg_communication/environment/library_path.sh
+[2.008s] -- Installing: /home/carbon/Program_Projects/Control_Frame/install/pkg_communication/share/pkg_communication/environment/library_path.dsv
+[2.013s] -- Up-to-date: /home/carbon/Program_Projects/Control_Frame/install/pkg_communication/share/ament_index/resource_index/package_run_dependencies/pkg_communication
+[2.015s] -- Up-to-date: /home/carbon/Program_Projects/Control_Frame/install/pkg_communication/share/ament_index/resource_index/parent_prefix_path/pkg_communication
+[2.015s] -- Up-to-date: /home/carbon/Program_Projects/Control_Frame/install/pkg_communication/share/pkg_communication/environment/ament_prefix_path.sh
+[2.016s] -- Installing: /home/carbon/Program_Projects/Control_Frame/install/pkg_communication/share/pkg_communication/environment/ament_prefix_path.dsv
+[2.018s] -- Up-to-date: /home/carbon/Program_Projects/Control_Frame/install/pkg_communication/share/pkg_communication/environment/path.sh
+[2.018s] -- Installing: /home/carbon/Program_Projects/Control_Frame/install/pkg_communication/share/pkg_communication/environment/path.dsv
+[2.018s] -- Up-to-date: /home/carbon/Program_Projects/Control_Frame/install/pkg_communication/share/pkg_communication/local_setup.bash
+[2.018s] -- Up-to-date: /home/carbon/Program_Projects/Control_Frame/install/pkg_communication/share/pkg_communication/local_setup.sh
+[2.018s] -- Up-to-date: /home/carbon/Program_Projects/Control_Frame/install/pkg_communication/share/pkg_communication/local_setup.zsh
+[2.019s] -- Installing: /home/carbon/Program_Projects/Control_Frame/install/pkg_communication/share/pkg_communication/local_setup.dsv
+[2.019s] -- Installing: /home/carbon/Program_Projects/Control_Frame/install/pkg_communication/share/pkg_communication/package.dsv
+[2.019s] -- Up-to-date: /home/carbon/Program_Projects/Control_Frame/install/pkg_communication/share/ament_index/resource_index/packages/pkg_communication
+[2.019s] -- Old export file "/home/carbon/Program_Projects/Control_Frame/install/pkg_communication/share/pkg_communication/cmake/export_pkg_communicationExport.cmake" will be replaced.  Removing files [/home/carbon/Program_Projects/Control_Frame/install/pkg_communication/share/pkg_communication/cmake/export_pkg_communicationExport-noconfig.cmake].
+[2.019s] -- Installing: /home/carbon/Program_Projects/Control_Frame/install/pkg_communication/share/pkg_communication/cmake/export_pkg_communicationExport.cmake
+[2.023s] -- Installing: /home/carbon/Program_Projects/Control_Frame/install/pkg_communication/share/pkg_communication/cmake/export_pkg_communicationExport-noconfig.cmake
+[2.023s] -- Up-to-date: /home/carbon/Program_Projects/Control_Frame/install/pkg_communication/share/pkg_communication/cmake/ament_cmake_export_targets-extras.cmake
+[2.023s] -- Up-to-date: /home/carbon/Program_Projects/Control_Frame/install/pkg_communication/share/pkg_communication/cmake/pkg_communicationConfig.cmake
+[2.024s] -- Up-to-date: /home/carbon/Program_Projects/Control_Frame/install/pkg_communication/share/pkg_communication/cmake/pkg_communicationConfig-version.cmake
+[2.024s] -- Up-to-date: /home/carbon/Program_Projects/Control_Frame/install/pkg_communication/share/pkg_communication/package.xml
+[2.024s] Invoked command in '/home/carbon/Program_Projects/Control_Frame/build/pkg_communication' returned '0': CMAKE_PREFIX_PATH=/opt/ros/humble /usr/bin/cmake --install /home/carbon/Program_Projects/Control_Frame/build/pkg_communication

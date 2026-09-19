@@ -1,0 +1,10 @@
+<library path="chassis_hardware">
+  <class name="chassis/ChassisSystem"
+         type="chassis::ChassisSystem"
+         base_class_type="hardware_interface::SystemInterface">
+    <description>
+      Mecanum wheel chassis hardware interface. Uses shared_package's
+      Communication_Interface to read wheel feedback and write wheel velocity commands.
+    </description>
+  </class>
+</library>

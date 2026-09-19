@@ -1,0 +1,11 @@
+{
+    "cmake.sourceDirectory": "/home/carbon/Program_Projects/Control_Frame/src/chassis",
+    "C_Cpp.default.cppStandard": "c++17",
+    "C_Cpp.default.includePath": [
+        "${workspaceFolder}/src/chassis/include",
+        "${workspaceFolder}/src/shared_package/Middleware",
+        "${workspaceFolder}/src/shared_package/device",
+        "${workspaceFolder}/src/shared_package/Algorithm",
+        "/opt/ros/humble/include/**"
+    ]
+}

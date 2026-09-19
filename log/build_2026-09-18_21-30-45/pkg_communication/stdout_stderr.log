@@ -1,0 +1,39 @@
+-- Found ament_cmake: 1.3.14 (/opt/ros/humble/share/ament_cmake/cmake)
+-- Found ament_lint_auto: 0.12.15 (/opt/ros/humble/share/ament_lint_auto/cmake)
+-- Added test 'cppcheck' to perform static code analysis on C / C++ code
+-- Configured cppcheck include dirs: $<BUILD_INTERFACE:/home/carbon/Program_Projects/Control_Frame/src/pkg_communication/Middleware>
+-- Configured cppcheck exclude dirs and/or files: 
+-- Added test 'lint_cmake' to check CMake code style
+-- Added test 'uncrustify' to check C / C++ code style
+-- Configured uncrustify additional arguments: 
+-- Added test 'xmllint' to check XML markup files
+-- Configuring done
+-- Generating done
+-- Build files have been written to: /home/carbon/Program_Projects/Control_Frame/build/pkg_communication
+Consolidate compiler generated dependencies of target pkg_communication
+[100%] Built target pkg_communication
+-- Install configuration: ""
+-- Up-to-date: /home/carbon/Program_Projects/Control_Frame/install/pkg_communication/lib/libpkg_communication.so
+-- Up-to-date: /home/carbon/Program_Projects/Control_Frame/install/pkg_communication/include/Send_Interface.hpp
+-- Up-to-date: /home/carbon/Program_Projects/Control_Frame/install/pkg_communication/include/alg_crc.h
+-- Installing: /home/carbon/Program_Projects/Control_Frame/install/pkg_communication/include/motor_config.hpp
+-- Up-to-date: /home/carbon/Program_Projects/Control_Frame/install/pkg_communication/share/pkg_communication/environment/library_path.sh
+-- Installing: /home/carbon/Program_Projects/Control_Frame/install/pkg_communication/share/pkg_communication/environment/library_path.dsv
+-- Up-to-date: /home/carbon/Program_Projects/Control_Frame/install/pkg_communication/share/ament_index/resource_index/package_run_dependencies/pkg_communication
+-- Up-to-date: /home/carbon/Program_Projects/Control_Frame/install/pkg_communication/share/ament_index/resource_index/parent_prefix_path/pkg_communication
+-- Up-to-date: /home/carbon/Program_Projects/Control_Frame/install/pkg_communication/share/pkg_communication/environment/ament_prefix_path.sh
+-- Installing: /home/carbon/Program_Projects/Control_Frame/install/pkg_communication/share/pkg_communication/environment/ament_prefix_path.dsv
+-- Up-to-date: /home/carbon/Program_Projects/Control_Frame/install/pkg_communication/share/pkg_communication/environment/path.sh
+-- Installing: /home/carbon/Program_Projects/Control_Frame/install/pkg_communication/share/pkg_communication/environment/path.dsv
+-- Up-to-date: /home/carbon/Program_Projects/Control_Frame/install/pkg_communication/share/pkg_communication/local_setup.bash
+-- Up-to-date: /home/carbon/Program_Projects/Control_Frame/install/pkg_communication/share/pkg_communication/local_setup.sh
+-- Up-to-date: /home/carbon/Program_Projects/Control_Frame/install/pkg_communication/share/pkg_communication/local_setup.zsh
+-- Installing: /home/carbon/Program_Projects/Control_Frame/install/pkg_communication/share/pkg_communication/local_setup.dsv
+-- Installing: /home/carbon/Program_Projects/Control_Frame/install/pkg_communication/share/pkg_communication/package.dsv
+-- Up-to-date: /home/carbon/Program_Projects/Control_Frame/install/pkg_communication/share/ament_index/resource_index/packages/pkg_communication
+-- Up-to-date: /home/carbon/Program_Projects/Control_Frame/install/pkg_communication/share/pkg_communication/cmake/export_pkg_communicationExport.cmake
+-- Up-to-date: /home/carbon/Program_Projects/Control_Frame/install/pkg_communication/share/pkg_communication/cmake/export_pkg_communicationExport-noconfig.cmake
+-- Up-to-date: /home/carbon/Program_Projects/Control_Frame/install/pkg_communication/share/pkg_communication/cmake/ament_cmake_export_targets-extras.cmake
+-- Up-to-date: /home/carbon/Program_Projects/Control_Frame/install/pkg_communication/share/pkg_communication/cmake/pkg_communicationConfig.cmake
+-- Up-to-date: /home/carbon/Program_Projects/Control_Frame/install/pkg_communication/share/pkg_communication/cmake/pkg_communicationConfig-version.cmake
+-- Up-to-date: /home/carbon/Program_Projects/Control_Frame/install/pkg_communication/share/pkg_communication/package.xml

@@ -1,0 +1,45 @@
+[0.062s] Invoking command in '/home/carbon/Program_Projects/Control_Frame/build/shared_package': CMAKE_PREFIX_PATH=/opt/ros/humble /usr/bin/cmake --build /home/carbon/Program_Projects/Control_Frame/build/shared_package -- -j2 -l2
+[0.210s] -- Found ament_cmake: 1.3.14 (/opt/ros/humble/share/ament_cmake/cmake)
+[0.682s] -- Found ament_lint_auto: 0.12.15 (/opt/ros/humble/share/ament_lint_auto/cmake)
+[0.923s] -- Added test 'cppcheck' to perform static code analysis on C / C++ code
+[0.925s] -- Configured cppcheck include dirs: $<BUILD_INTERFACE:/home/carbon/Program_Projects/Control_Frame/src/shared_package/Middleware>;$<BUILD_INTERFACE:/home/carbon/Program_Projects/Control_Frame/src/shared_package/device>;$<BUILD_INTERFACE:/home/carbon/Program_Projects/Control_Frame/src/shared_package/Algorithm>
+[0.925s] -- Configured cppcheck exclude dirs and/or files: 
+[0.931s] -- Added test 'lint_cmake' to check CMake code style
+[0.945s] -- Added test 'uncrustify' to check C / C++ code style
+[0.946s] -- Configured uncrustify additional arguments: 
+[0.946s] -- Added test 'xmllint' to check XML markup files
+[0.951s] -- Configuring done
+[0.992s] -- Generating done
+[1.005s] -- Build files have been written to: /home/carbon/Program_Projects/Control_Frame/build/shared_package
+[1.128s] Consolidate compiler generated dependencies of target shared_package
+[1.209s] [ 50%] Building CXX object CMakeFiles/shared_package.dir/Middleware/Send_Interface.cpp.o
+[1.985s] [100%] Linking CXX shared library libshared_package.so
+[2.353s] [100%] Built target shared_package
+[2.410s] Invoked command in '/home/carbon/Program_Projects/Control_Frame/build/shared_package' returned '0': CMAKE_PREFIX_PATH=/opt/ros/humble /usr/bin/cmake --build /home/carbon/Program_Projects/Control_Frame/build/shared_package -- -j2 -l2
+[2.463s] Invoking command in '/home/carbon/Program_Projects/Control_Frame/build/shared_package': CMAKE_PREFIX_PATH=/opt/ros/humble /usr/bin/cmake --install /home/carbon/Program_Projects/Control_Frame/build/shared_package
+[2.512s] -- Install configuration: ""
+[2.513s] -- Installing: /home/carbon/Program_Projects/Control_Frame/install/shared_package/lib/libshared_package.so
+[2.513s] -- Up-to-date: /home/carbon/Program_Projects/Control_Frame/install/shared_package/include/Send_Interface.hpp
+[2.513s] -- Up-to-date: /home/carbon/Program_Projects/Control_Frame/install/shared_package/include/alg_crc.h
+[2.515s] -- Installing: /home/carbon/Program_Projects/Control_Frame/install/shared_package/include/motor_base.hpp
+[2.515s] -- Up-to-date: /home/carbon/Program_Projects/Control_Frame/install/shared_package/share/shared_package/environment/library_path.sh
+[2.516s] -- Installing: /home/carbon/Program_Projects/Control_Frame/install/shared_package/share/shared_package/environment/library_path.dsv
+[2.516s] -- Up-to-date: /home/carbon/Program_Projects/Control_Frame/install/shared_package/share/ament_index/resource_index/package_run_dependencies/shared_package
+[2.516s] -- Up-to-date: /home/carbon/Program_Projects/Control_Frame/install/shared_package/share/ament_index/resource_index/parent_prefix_path/shared_package
+[2.516s] -- Up-to-date: /home/carbon/Program_Projects/Control_Frame/install/shared_package/share/shared_package/environment/ament_prefix_path.sh
+[2.517s] -- Installing: /home/carbon/Program_Projects/Control_Frame/install/shared_package/share/shared_package/environment/ament_prefix_path.dsv
+[2.521s] -- Up-to-date: /home/carbon/Program_Projects/Control_Frame/install/shared_package/share/shared_package/environment/path.sh
+[2.521s] -- Installing: /home/carbon/Program_Projects/Control_Frame/install/shared_package/share/shared_package/environment/path.dsv
+[2.522s] -- Up-to-date: /home/carbon/Program_Projects/Control_Frame/install/shared_package/share/shared_package/local_setup.bash
+[2.522s] -- Up-to-date: /home/carbon/Program_Projects/Control_Frame/install/shared_package/share/shared_package/local_setup.sh
+[2.523s] -- Up-to-date: /home/carbon/Program_Projects/Control_Frame/install/shared_package/share/shared_package/local_setup.zsh
+[2.524s] -- Installing: /home/carbon/Program_Projects/Control_Frame/install/shared_package/share/shared_package/local_setup.dsv
+[2.524s] -- Installing: /home/carbon/Program_Projects/Control_Frame/install/shared_package/share/shared_package/package.dsv
+[2.527s] -- Up-to-date: /home/carbon/Program_Projects/Control_Frame/install/shared_package/share/ament_index/resource_index/packages/shared_package
+[2.527s] -- Up-to-date: /home/carbon/Program_Projects/Control_Frame/install/shared_package/share/shared_package/cmake/export_shared_packageExport.cmake
+[2.527s] -- Up-to-date: /home/carbon/Program_Projects/Control_Frame/install/shared_package/share/shared_package/cmake/export_shared_packageExport-noconfig.cmake
+[2.527s] -- Up-to-date: /home/carbon/Program_Projects/Control_Frame/install/shared_package/share/shared_package/cmake/ament_cmake_export_targets-extras.cmake
+[2.528s] -- Up-to-date: /home/carbon/Program_Projects/Control_Frame/install/shared_package/share/shared_package/cmake/shared_packageConfig.cmake
+[2.528s] -- Up-to-date: /home/carbon/Program_Projects/Control_Frame/install/shared_package/share/shared_package/cmake/shared_packageConfig-version.cmake
+[2.530s] -- Up-to-date: /home/carbon/Program_Projects/Control_Frame/install/shared_package/share/shared_package/package.xml
+[2.532s] Invoked command in '/home/carbon/Program_Projects/Control_Frame/build/shared_package' returned '0': CMAKE_PREFIX_PATH=/opt/ros/humble /usr/bin/cmake --install /home/carbon/Program_Projects/Control_Frame/build/shared_package

@@ -1,0 +1,61 @@
+[0.076s] Invoking command in '/home/carbon/Program_Projects/Control_Frame/build/chassis': AMENT_PREFIX_PATH=/home/carbon/Program_Projects/Control_Frame/install/shared_package:${AMENT_PREFIX_PATH} CMAKE_PREFIX_PATH=/home/carbon/Program_Projects/Control_Frame/install/shared_package:/opt/ros/humble LD_LIBRARY_PATH=/home/carbon/Program_Projects/Control_Frame/install/shared_package/lib:${LD_LIBRARY_PATH} /usr/bin/cmake --build /home/carbon/Program_Projects/Control_Frame/build/chassis -- -j2 -l2
+[0.330s] -- Found ament_cmake: 1.3.14 (/opt/ros/humble/share/ament_cmake/cmake)
+[1.043s] -- Found rclcpp: 16.0.19 (/opt/ros/humble/share/rclcpp/cmake)
+[1.265s] -- Found rosidl_generator_c: 3.1.9 (/opt/ros/humble/share/rosidl_generator_c/cmake)
+[1.286s] -- Found rosidl_adapter: 3.1.9 (/opt/ros/humble/share/rosidl_adapter/cmake)
+[1.333s] -- Found rosidl_generator_cpp: 3.1.9 (/opt/ros/humble/share/rosidl_generator_cpp/cmake)
+[1.401s] -- Using all available rosidl_typesupport_c: rosidl_typesupport_fastrtps_c;rosidl_typesupport_introspection_c
+[1.516s] -- Using all available rosidl_typesupport_cpp: rosidl_typesupport_fastrtps_cpp;rosidl_typesupport_introspection_cpp
+[1.746s] -- Found rmw_implementation_cmake: 6.1.2 (/opt/ros/humble/share/rmw_implementation_cmake/cmake)
+[1.764s] -- Found rmw_fastrtps_cpp: 6.2.10 (/opt/ros/humble/share/rmw_fastrtps_cpp/cmake)
+[2.266s] -- Using RMW implementation 'rmw_fastrtps_cpp' as default
+[2.560s] -- Found rclcpp_lifecycle: 16.0.19 (/opt/ros/humble/share/rclcpp_lifecycle/cmake)
+[2.650s] -- Found hardware_interface: 2.54.2 (/opt/ros/humble/share/hardware_interface/cmake)
+[3.164s] -- Found shared_package: 0.0.0 (/home/carbon/Program_Projects/Control_Frame/install/shared_package/share/shared_package/cmake)
+[3.185s] -- Found realtime_tools: 2.15.1 (/opt/ros/humble/share/realtime_tools/cmake)
+[3.723s] -- Configuring done
+[3.976s] -- Generating done
+[4.027s] -- Build files have been written to: /home/carbon/Program_Projects/Control_Frame/build/chassis
+[4.287s] Consolidate compiler generated dependencies of target chassis_hardware
+[4.396s] [ 50%] Building CXX object CMakeFiles/chassis_hardware.dir/src/chassis_system.cpp.o
+[23.283s] [100%] Linking CXX shared library libchassis_hardware.so
+[24.325s] [100%] Built target chassis_hardware
+[24.425s] Invoked command in '/home/carbon/Program_Projects/Control_Frame/build/chassis' returned '0': AMENT_PREFIX_PATH=/home/carbon/Program_Projects/Control_Frame/install/shared_package:${AMENT_PREFIX_PATH} CMAKE_PREFIX_PATH=/home/carbon/Program_Projects/Control_Frame/install/shared_package:/opt/ros/humble LD_LIBRARY_PATH=/home/carbon/Program_Projects/Control_Frame/install/shared_package/lib:${LD_LIBRARY_PATH} /usr/bin/cmake --build /home/carbon/Program_Projects/Control_Frame/build/chassis -- -j2 -l2
+[24.455s] Invoking command in '/home/carbon/Program_Projects/Control_Frame/build/chassis': AMENT_PREFIX_PATH=/home/carbon/Program_Projects/Control_Frame/install/shared_package:${AMENT_PREFIX_PATH} CMAKE_PREFIX_PATH=/home/carbon/Program_Projects/Control_Frame/install/shared_package:/opt/ros/humble LD_LIBRARY_PATH=/home/carbon/Program_Projects/Control_Frame/install/shared_package/lib:${LD_LIBRARY_PATH} /usr/bin/cmake --install /home/carbon/Program_Projects/Control_Frame/build/chassis
+[24.546s] -- Install configuration: ""
+[24.546s] -- Up-to-date: /home/carbon/Program_Projects/Control_Frame/install/chassis/share/chassis/chassis_plugin.xml
+[24.549s] -- Installing: /home/carbon/Program_Projects/Control_Frame/install/chassis/lib/libchassis_hardware.so
+[24.575s] -- Set runtime path of "/home/carbon/Program_Projects/Control_Frame/install/chassis/lib/libchassis_hardware.so" to ""
+[24.575s] -- Up-to-date: /home/carbon/Program_Projects/Control_Frame/install/chassis/include
+[24.577s] -- Up-to-date: /home/carbon/Program_Projects/Control_Frame/install/chassis/include/chassis
+[24.578s] -- Installing: /home/carbon/Program_Projects/Control_Frame/install/chassis/include/chassis/chassis_system.hpp
+[24.583s] -- Up-to-date: /home/carbon/Program_Projects/Control_Frame/install/chassis/share/chassis/urdf
+[24.583s] -- Up-to-date: /home/carbon/Program_Projects/Control_Frame/install/chassis/share/chassis/urdf/chassis.urdf
+[24.598s] -- Up-to-date: /home/carbon/Program_Projects/Control_Frame/install/chassis/share/chassis/config
+[24.598s] -- Up-to-date: /home/carbon/Program_Projects/Control_Frame/install/chassis/share/chassis/config/chassis_controller.yaml
+[24.598s] -- Up-to-date: /home/carbon/Program_Projects/Control_Frame/install/chassis/share/chassis/launch
+[24.599s] -- Up-to-date: /home/carbon/Program_Projects/Control_Frame/install/chassis/share/chassis/launch/chassis.launch
+[24.599s] -- Up-to-date: /home/carbon/Program_Projects/Control_Frame/install/chassis/share/chassis/environment/library_path.sh
+[24.599s] -- Installing: /home/carbon/Program_Projects/Control_Frame/install/chassis/share/chassis/environment/library_path.dsv
+[24.606s] -- Installing: /home/carbon/Program_Projects/Control_Frame/install/chassis/share/ament_index/resource_index/package_run_dependencies/chassis
+[24.606s] -- Up-to-date: /home/carbon/Program_Projects/Control_Frame/install/chassis/share/ament_index/resource_index/parent_prefix_path/chassis
+[24.606s] -- Up-to-date: /home/carbon/Program_Projects/Control_Frame/install/chassis/share/chassis/environment/ament_prefix_path.sh
+[24.607s] -- Installing: /home/carbon/Program_Projects/Control_Frame/install/chassis/share/chassis/environment/ament_prefix_path.dsv
+[24.610s] -- Up-to-date: /home/carbon/Program_Projects/Control_Frame/install/chassis/share/chassis/environment/path.sh
+[24.611s] -- Installing: /home/carbon/Program_Projects/Control_Frame/install/chassis/share/chassis/environment/path.dsv
+[24.611s] -- Up-to-date: /home/carbon/Program_Projects/Control_Frame/install/chassis/share/chassis/local_setup.bash
+[24.611s] -- Up-to-date: /home/carbon/Program_Projects/Control_Frame/install/chassis/share/chassis/local_setup.sh
+[24.611s] -- Up-to-date: /home/carbon/Program_Projects/Control_Frame/install/chassis/share/chassis/local_setup.zsh
+[24.614s] -- Installing: /home/carbon/Program_Projects/Control_Frame/install/chassis/share/chassis/local_setup.dsv
+[24.614s] -- Installing: /home/carbon/Program_Projects/Control_Frame/install/chassis/share/chassis/package.dsv
+[24.623s] -- Up-to-date: /home/carbon/Program_Projects/Control_Frame/install/chassis/share/ament_index/resource_index/packages/chassis
+[24.625s] -- Up-to-date: /home/carbon/Program_Projects/Control_Frame/install/chassis/share/ament_index/resource_index/hardware_interface__pluginlib__plugin/chassis
+[24.631s] -- Old export file "/home/carbon/Program_Projects/Control_Frame/install/chassis/share/chassis/cmake/export_chassisExport.cmake" will be replaced.  Removing files [/home/carbon/Program_Projects/Control_Frame/install/chassis/share/chassis/cmake/export_chassisExport-noconfig.cmake].
+[24.632s] -- Installing: /home/carbon/Program_Projects/Control_Frame/install/chassis/share/chassis/cmake/export_chassisExport.cmake
+[24.633s] -- Installing: /home/carbon/Program_Projects/Control_Frame/install/chassis/share/chassis/cmake/export_chassisExport-noconfig.cmake
+[24.635s] -- Up-to-date: /home/carbon/Program_Projects/Control_Frame/install/chassis/share/chassis/cmake/ament_cmake_export_targets-extras.cmake
+[24.638s] -- Installing: /home/carbon/Program_Projects/Control_Frame/install/chassis/share/chassis/cmake/ament_cmake_export_dependencies-extras.cmake
+[24.643s] -- Up-to-date: /home/carbon/Program_Projects/Control_Frame/install/chassis/share/chassis/cmake/chassisConfig.cmake
+[24.644s] -- Up-to-date: /home/carbon/Program_Projects/Control_Frame/install/chassis/share/chassis/cmake/chassisConfig-version.cmake
+[24.644s] -- Installing: /home/carbon/Program_Projects/Control_Frame/install/chassis/share/chassis/package.xml
+[24.659s] Invoked command in '/home/carbon/Program_Projects/Control_Frame/build/chassis' returned '0': AMENT_PREFIX_PATH=/home/carbon/Program_Projects/Control_Frame/install/shared_package:${AMENT_PREFIX_PATH} CMAKE_PREFIX_PATH=/home/carbon/Program_Projects/Control_Frame/install/shared_package:/opt/ros/humble LD_LIBRARY_PATH=/home/carbon/Program_Projects/Control_Frame/install/shared_package/lib:${LD_LIBRARY_PATH} /usr/bin/cmake --install /home/carbon/Program_Projects/Control_Frame/build/chassis

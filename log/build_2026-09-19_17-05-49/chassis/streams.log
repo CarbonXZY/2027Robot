@@ -1,0 +1,43 @@
+[0.114s] Invoking command in '/home/carbon/Program_Projects/Control_Frame/build/chassis': AMENT_PREFIX_PATH=/home/carbon/Program_Projects/Control_Frame/install/shared_package:${AMENT_PREFIX_PATH} CMAKE_PREFIX_PATH=/home/carbon/Program_Projects/Control_Frame/install/shared_package:/opt/ros/humble LD_LIBRARY_PATH=/home/carbon/Program_Projects/Control_Frame/install/shared_package/lib:${LD_LIBRARY_PATH} /usr/bin/cmake --build /home/carbon/Program_Projects/Control_Frame/build/chassis -- -j2 -l2
+[0.512s] Consolidate compiler generated dependencies of target chassis_hardware
+[0.611s] [ 50%] Building CXX object CMakeFiles/chassis_hardware.dir/src/chassis_system.cpp.o
+[11.955s] [100%] Linking CXX shared library libchassis_hardware.so
+[12.814s] [100%] Built target chassis_hardware
+[12.897s] Invoked command in '/home/carbon/Program_Projects/Control_Frame/build/chassis' returned '0': AMENT_PREFIX_PATH=/home/carbon/Program_Projects/Control_Frame/install/shared_package:${AMENT_PREFIX_PATH} CMAKE_PREFIX_PATH=/home/carbon/Program_Projects/Control_Frame/install/shared_package:/opt/ros/humble LD_LIBRARY_PATH=/home/carbon/Program_Projects/Control_Frame/install/shared_package/lib:${LD_LIBRARY_PATH} /usr/bin/cmake --build /home/carbon/Program_Projects/Control_Frame/build/chassis -- -j2 -l2
+[12.987s] Invoking command in '/home/carbon/Program_Projects/Control_Frame/build/chassis': AMENT_PREFIX_PATH=/home/carbon/Program_Projects/Control_Frame/install/shared_package:${AMENT_PREFIX_PATH} CMAKE_PREFIX_PATH=/home/carbon/Program_Projects/Control_Frame/install/shared_package:/opt/ros/humble LD_LIBRARY_PATH=/home/carbon/Program_Projects/Control_Frame/install/shared_package/lib:${LD_LIBRARY_PATH} /usr/bin/cmake --install /home/carbon/Program_Projects/Control_Frame/build/chassis
+[13.070s] -- Install configuration: ""
+[13.070s] -- Up-to-date: /home/carbon/Program_Projects/Control_Frame/install/chassis/share/chassis/chassis_plugin.xml
+[13.077s] -- Installing: /home/carbon/Program_Projects/Control_Frame/install/chassis/lib/libchassis_hardware.so
+[13.098s] -- Set runtime path of "/home/carbon/Program_Projects/Control_Frame/install/chassis/lib/libchassis_hardware.so" to ""
+[13.099s] -- Up-to-date: /home/carbon/Program_Projects/Control_Frame/install/chassis/include
+[13.099s] -- Up-to-date: /home/carbon/Program_Projects/Control_Frame/install/chassis/include/chassis
+[13.099s] -- Up-to-date: /home/carbon/Program_Projects/Control_Frame/install/chassis/include/chassis/chassis_system.hpp
+[13.105s] -- Up-to-date: /home/carbon/Program_Projects/Control_Frame/install/chassis/share/chassis/urdf
+[13.105s] -- Up-to-date: /home/carbon/Program_Projects/Control_Frame/install/chassis/share/chassis/urdf/chassis.urdf
+[13.108s] -- Up-to-date: /home/carbon/Program_Projects/Control_Frame/install/chassis/share/chassis/config
+[13.108s] -- Up-to-date: /home/carbon/Program_Projects/Control_Frame/install/chassis/share/chassis/config/chassis_controller.yaml
+[13.111s] -- Up-to-date: /home/carbon/Program_Projects/Control_Frame/install/chassis/share/chassis/launch
+[13.111s] -- Up-to-date: /home/carbon/Program_Projects/Control_Frame/install/chassis/share/chassis/launch/chassis.launch
+[13.111s] -- Up-to-date: /home/carbon/Program_Projects/Control_Frame/install/chassis/share/chassis/environment/library_path.sh
+[13.112s] -- Up-to-date: /home/carbon/Program_Projects/Control_Frame/install/chassis/share/chassis/environment/library_path.dsv
+[13.112s] -- Up-to-date: /home/carbon/Program_Projects/Control_Frame/install/chassis/share/ament_index/resource_index/package_run_dependencies/chassis
+[13.112s] -- Up-to-date: /home/carbon/Program_Projects/Control_Frame/install/chassis/share/ament_index/resource_index/parent_prefix_path/chassis
+[13.114s] -- Up-to-date: /home/carbon/Program_Projects/Control_Frame/install/chassis/share/chassis/environment/ament_prefix_path.sh
+[13.115s] -- Up-to-date: /home/carbon/Program_Projects/Control_Frame/install/chassis/share/chassis/environment/ament_prefix_path.dsv
+[13.115s] -- Up-to-date: /home/carbon/Program_Projects/Control_Frame/install/chassis/share/chassis/environment/path.sh
+[13.115s] -- Up-to-date: /home/carbon/Program_Projects/Control_Frame/install/chassis/share/chassis/environment/path.dsv
+[13.115s] -- Up-to-date: /home/carbon/Program_Projects/Control_Frame/install/chassis/share/chassis/local_setup.bash
+[13.116s] -- Up-to-date: /home/carbon/Program_Projects/Control_Frame/install/chassis/share/chassis/local_setup.sh
+[13.116s] -- Up-to-date: /home/carbon/Program_Projects/Control_Frame/install/chassis/share/chassis/local_setup.zsh
+[13.116s] -- Up-to-date: /home/carbon/Program_Projects/Control_Frame/install/chassis/share/chassis/local_setup.dsv
+[13.116s] -- Installing: /home/carbon/Program_Projects/Control_Frame/install/chassis/share/chassis/package.dsv
+[13.119s] -- Up-to-date: /home/carbon/Program_Projects/Control_Frame/install/chassis/share/ament_index/resource_index/packages/chassis
+[13.125s] -- Up-to-date: /home/carbon/Program_Projects/Control_Frame/install/chassis/share/ament_index/resource_index/hardware_interface__pluginlib__plugin/chassis
+[13.125s] -- Up-to-date: /home/carbon/Program_Projects/Control_Frame/install/chassis/share/chassis/cmake/export_chassisExport.cmake
+[13.126s] -- Up-to-date: /home/carbon/Program_Projects/Control_Frame/install/chassis/share/chassis/cmake/export_chassisExport-noconfig.cmake
+[13.127s] -- Up-to-date: /home/carbon/Program_Projects/Control_Frame/install/chassis/share/chassis/cmake/ament_cmake_export_targets-extras.cmake
+[13.127s] -- Up-to-date: /home/carbon/Program_Projects/Control_Frame/install/chassis/share/chassis/cmake/ament_cmake_export_dependencies-extras.cmake
+[13.127s] -- Up-to-date: /home/carbon/Program_Projects/Control_Frame/install/chassis/share/chassis/cmake/chassisConfig.cmake
+[13.127s] -- Up-to-date: /home/carbon/Program_Projects/Control_Frame/install/chassis/share/chassis/cmake/chassisConfig-version.cmake
+[13.128s] -- Up-to-date: /home/carbon/Program_Projects/Control_Frame/install/chassis/share/chassis/package.xml
+[13.128s] Invoked command in '/home/carbon/Program_Projects/Control_Frame/build/chassis' returned '0': AMENT_PREFIX_PATH=/home/carbon/Program_Projects/Control_Frame/install/shared_package:${AMENT_PREFIX_PATH} CMAKE_PREFIX_PATH=/home/carbon/Program_Projects/Control_Frame/install/shared_package:/opt/ros/humble LD_LIBRARY_PATH=/home/carbon/Program_Projects/Control_Frame/install/shared_package/lib:${LD_LIBRARY_PATH} /usr/bin/cmake --install /home/carbon/Program_Projects/Control_Frame/build/chassis
