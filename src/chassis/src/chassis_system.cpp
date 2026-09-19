@@ -89,7 +89,8 @@ namespace chassis
 
   hardware_interface::return_type ChassisSystem::read(const rclcpp::Time &, const rclcpp::Duration &)
   {
-    // 只读接收结构体（由 Communication_Interface 自动回填）
+    // 先收 USB → 解包到 rx，再读结构体
+    Communication_Interface->Receive();
     for (size_t i = 0; i < Wheel_Count; ++i)
     {
       Now_Velocity[i] = static_cast<double>(Rx_Buffer.motor[i].velocity);
@@ -100,11 +101,12 @@ namespace chassis
 
   hardware_interface::return_type ChassisSystem::write(const rclcpp::Time &, const rclcpp::Duration &)
   {
-    // 只写发送结构体（由 Communication_Interface 自动发出）
+    // 先写 tx 结构体，再 Send 发出去
     for (size_t i = 0; i < Wheel_Count; ++i)
     {
       Tx_Buffer.velocity[i] = static_cast<float>(Target_Velocity[i]);
     }
+    Communication_Interface->Send();
     return hardware_interface::return_type::OK;
   }
 

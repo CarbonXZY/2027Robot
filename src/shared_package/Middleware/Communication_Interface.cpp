@@ -7,10 +7,11 @@
 namespace Control_Frame
 {
 
-    void Class_Communication_Interface::Init(Send_Function send)
+    void Class_Communication_Interface::Init(Communication_Function send, Communication_Function receive)
     {
         send_function = std::move(send);
-        // 不清空 count/used：绑定由 Register 管理，Init 只负责设置发送函数
+        receive_function = std::move(receive);
+        // 不清空 count/used：绑定由 Register 管理，Init 只负责设置收发函数
     }
 
     bool Class_Communication_Interface::Register(uint8_t id, const void *tx, void *rx, uint8_t tx_size, uint8_t rx_size)
@@ -48,20 +49,30 @@ namespace Control_Frame
         return nullptr;
     }
 
-    void Class_Communication_Interface::Receive(const uint8_t *buf, size_t len)
+    void Class_Communication_Interface::Receive()
     {
-        size_t i = 0;
-        while (i < len)
+        if (!receive_function)
         {
-            const uint8_t id = buf[i++];
+            return;
+        }
+        const int64_t n = receive_function(rx_buffer, kBufferSize);
+        if (n <= 0)
+        {
+            return;
+        }
+
+        size_t i = 0;
+        while (i < static_cast<size_t>(n))
+        {
+            const uint8_t id = rx_buffer[i++];
             Entry *e = Find(id);
-            if (e == nullptr || e->rx_size > len - i)
+            if (e == nullptr || e->rx_size > static_cast<size_t>(n) - i)
             {
                 return;
             }
             if (e->rx != nullptr)
             {
-                std::memcpy(e->rx, buf + i, e->rx_size);
+                std::memcpy(e->rx, rx_buffer + i, e->rx_size);
             }
             i += e->rx_size;
         }
