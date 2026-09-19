@@ -1,4 +1,0 @@
-source;share/chassis/local_setup.bash
-source;share/chassis/local_setup.dsv
-source;share/chassis/local_setup.sh
-source;share/chassis/local_setup.zsh
