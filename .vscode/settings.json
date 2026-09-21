@@ -4,7 +4,9 @@
     "C_Cpp.default.includePath": [
         "${workspaceFolder}/src/chassis/include",
         "${workspaceFolder}/src/shared_package/Middleware",
-        "${workspaceFolder}/src/shared_package/device",
+        "${workspaceFolder}/src/shared_package/Driver/usb_cdc",
+        "${workspaceFolder}/src/shared_package/Task",
+        "${workspaceFolder}/src/shared_package/Device",
         "${workspaceFolder}/src/shared_package/Algorithm",
         "/opt/ros/humble/include/**"
     ],
@@ -60,5 +62,6 @@
         "/home/lyh/moveit2_ws/install/launch_param_builder/lib/python3.10/site-packages",
         "/opt/ros/humble/lib/python3.10/site-packages",
         "/opt/ros/humble/local/lib/python3.10/dist-packages"
-    ]
+    ],
+    "C_Cpp.errorSquiggles": "disabled"
 }

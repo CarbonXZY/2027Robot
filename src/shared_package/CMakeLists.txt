@@ -12,15 +12,23 @@ endif()
 
 # 纯工具库，无 ROS 运行时依赖
 find_package(ament_cmake REQUIRED)
+find_package(Threads REQUIRED)
 
-# 把 Middleware（通信）编译成库，供其他包 find_package(shared_package) 后链接
-add_library(shared_package SHARED Middleware/Communication_Interface.cpp)
+# 把 Middleware（通信）、Task（初始化接线）编译成库，供其他包 find_package(shared_package) 后链接
+add_library(shared_package SHARED
+  Middleware/Communication_Interface.cpp
+  Driver/usb_cdc/usb_cdc.cpp
+  Task/tsk_config_and_callback.cpp)
 target_compile_features(shared_package PUBLIC cxx_std_17)
 target_include_directories(shared_package PUBLIC
   $<BUILD_INTERFACE:${CMAKE_CURRENT_SOURCE_DIR}/Middleware>
-  $<BUILD_INTERFACE:${CMAKE_CURRENT_SOURCE_DIR}/device>
+  $<BUILD_INTERFACE:${CMAKE_CURRENT_SOURCE_DIR}/Driver/usb_cdc>
+  $<BUILD_INTERFACE:${CMAKE_CURRENT_SOURCE_DIR}/Task>
+  $<BUILD_INTERFACE:${CMAKE_CURRENT_SOURCE_DIR}/Device>
   $<BUILD_INTERFACE:${CMAKE_CURRENT_SOURCE_DIR}/Algorithm>
   $<INSTALL_INTERFACE:include>)
+# PRIVATE：std::thread 只在库内部用，不必逼下游也 find_package(Threads)
+target_link_libraries(shared_package PRIVATE Threads::Threads)
 
 install(TARGETS shared_package
   EXPORT export_${PROJECT_NAME}
@@ -28,11 +36,13 @@ install(TARGETS shared_package
   LIBRARY DESTINATION lib
   RUNTIME DESTINATION bin)
 
-# 通信头（Middleware）+ 算法头（Algorithm）+ 设备结构体头（device）
+# 通信头（Middleware）+ 驱动头（Driver）+ 初始化接线头（Task）+ 算法头（Algorithm）+ 设备结构体头（Device）
 install(FILES
   Middleware/Communication_Interface.hpp
+  Driver/usb_cdc/usb_cdc.hpp
+  Task/tsk_config_and_callback.hpp
   Algorithm/alg_crc.h
-  device/motor_base.hpp
+  Device/motor_base.hpp
   DESTINATION include)
 
 ament_export_targets(export_${PROJECT_NAME} HAS_LIBRARY_TARGET)

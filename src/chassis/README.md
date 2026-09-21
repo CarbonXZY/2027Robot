@@ -34,7 +34,7 @@ struct Struct_Motor_Tx { float velocity[kWheelCount]; };
 struct Struct_Motor_Rx { Control_Frame::Struct_Motor_Base motor[kWheelCount]; };
 ```
 
-`Struct_Motor_Base` 定义在共享包 `shared_package/device/motor_base.hpp`：
+`Struct_Motor_Base` 定义在共享包 `shared_package/Device/motor_base.hpp`：
 
 ```cpp
 struct Struct_Motor_Base {

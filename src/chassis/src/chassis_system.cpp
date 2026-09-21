@@ -6,6 +6,7 @@
 #include <hardware_interface/types/hardware_interface_type_values.hpp>
 #include <pluginlib/class_list_macros.hpp>
 #include <rclcpp/rclcpp.hpp>
+#include <tsk_config_and_callback.hpp>
 
 namespace chassis
 {
@@ -33,6 +34,12 @@ namespace chassis
     for (size_t i = 0; i < Wheel_Count; ++i)
     {
       Wheels[i] = WheelConfig{info.joints[i].name, ids[i]};
+    }
+
+    // 打开 USB-CDC，并把 Control_Frame 的收发回调接上
+    if (!Control_Frame::Task_Init())
+    {
+      return CallbackReturn::ERROR;
     }
 
     return CallbackReturn::SUCCESS;
@@ -89,8 +96,7 @@ namespace chassis
 
   hardware_interface::return_type ChassisSystem::read(const rclcpp::Time &, const rclcpp::Duration &)
   {
-    // 先收 USB → 解包到 rx，再读结构体
-    Communication_Interface->Receive();
+    // 数据在接收线程到达时已由 Rx_RptlCallback() 分发进 Rx_Buffer，这里只做读取
     for (size_t i = 0; i < Wheel_Count; ++i)
     {
       Now_Velocity[i] = static_cast<double>(Rx_Buffer.motor[i].velocity);
