@@ -22,18 +22,13 @@ namespace chassis
       return CallbackReturn::ERROR;
     }
 
-    // 读取各轮帧 id（默认 1..4）
-    const uint8_t ids[Wheel_Count] = {
-        Control_Frame::ReadParam<uint8_t>(info.hardware_parameters, "front_left_wheel_id", 1),
-        Control_Frame::ReadParam<uint8_t>(info.hardware_parameters, "front_right_wheel_id", 2),
-        Control_Frame::ReadParam<uint8_t>(info.hardware_parameters, "rear_left_wheel_id", 3),
-        Control_Frame::ReadParam<uint8_t>(info.hardware_parameters, "rear_right_wheel_id", 4),
-    };
+    // 整个底盘一帧，id 与下位机固件约定
+    Chassis_Id = Control_Frame::ReadParam<uint8_t>(info.hardware_parameters, "chassis_id", 1);
 
-    // 按 URDF 关节声明顺序（前左/前右/后左/后右）直接映射到 Wheels 下标
+    // 按 URDF 关节声明顺序（前左/前右/后左/后右）存下关节名
     for (size_t i = 0; i < Wheel_Count; ++i)
     {
-      Wheels[i] = WheelConfig{info.joints[i].name, ids[i]};
+      Joint_Names[i] = info.joints[i].name;
     }
 
     // 打开 USB-CDC，并把 Control_Frame 的收发回调接上
@@ -50,8 +45,8 @@ namespace chassis
     std::vector<hardware_interface::StateInterface> ifs;
     for (size_t i = 0; i < Wheel_Count; ++i)
     {
-      ifs.emplace_back(Wheels[i].joint, HW_IF_VELOCITY, &Now_Velocity[i]);
-      ifs.emplace_back(Wheels[i].joint, HW_IF_POSITION, &Now_Position[i]);
+      ifs.emplace_back(Joint_Names[i], HW_IF_VELOCITY, &Now_Velocity[i]);
+      ifs.emplace_back(Joint_Names[i], HW_IF_POSITION, &Now_Position[i]);
     }
     return ifs;
   }
@@ -61,26 +56,25 @@ namespace chassis
     std::vector<hardware_interface::CommandInterface> ifs;
     for (size_t i = 0; i < Wheel_Count; ++i)
     {
-      ifs.emplace_back(Wheels[i].joint, HW_IF_VELOCITY, &Target_Velocity[i]);
+      ifs.emplace_back(Joint_Names[i], HW_IF_VELOCITY, &Target_Velocity[i]);
     }
     return ifs;
   }
 
   CallbackReturn ChassisSystem::on_configure(const rclcpp_lifecycle::State &)
   {
-    // 指向全局实例，并手动绑定两个结构体（每轮一帧）
+    // 指向全局实例，整个底盘绑成一帧：下行 Tx_Buffer，上行 Rx_Buffer
     Communication_Interface = &Control_Frame::USB_Communication_Interface;
 
-    for (size_t i = 0; i < Wheel_Count; ++i)
+    if (!Communication_Interface->Register(Chassis_Id, &Tx_Buffer, &Rx_Buffer,
+                                           sizeof(Tx_Buffer), sizeof(Rx_Buffer)))
     {
-      if (!Communication_Interface->Register(Wheels[i].frame_id, &Tx_Buffer.velocity[i], &Rx_Buffer.motor[i], sizeof(float), sizeof(Control_Frame::Struct_Motor_Base)))
-      {
-        RCLCPP_ERROR(rclcpp::get_logger("ChassisSystem"), "绑定帧 id=%u 失败", Wheels[i].frame_id);
-        return CallbackReturn::ERROR;
-      }
+      RCLCPP_ERROR(rclcpp::get_logger("ChassisSystem"), "绑定帧 id=%u 失败", Chassis_Id);
+      return CallbackReturn::ERROR;
     }
 
-    RCLCPP_INFO(rclcpp::get_logger("ChassisSystem"), "已绑定 4 个轮子帧（tx/rx 结构体）");
+    RCLCPP_INFO(rclcpp::get_logger("ChassisSystem"), "已绑定底盘帧 id=%u（tx %zu 字节 / rx %zu 字节）",
+                Chassis_Id, sizeof(Tx_Buffer), sizeof(Rx_Buffer));
     return CallbackReturn::SUCCESS;
   }
 

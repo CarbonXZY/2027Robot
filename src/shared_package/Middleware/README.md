@@ -133,8 +133,8 @@
 
 ## 已知限制
 
-- **`kMaxFrames = 8`** 是进程级上限。全局只有一个注册表，底盘已占 4 帧，
-  将来 ≥5 关节的机械臂会让 `Register` 返回 `false`。多设备共用时应按实例划分 id。
+- **`kMaxFrames = 8`** 是进程级上限。全局只有一个注册表、且只在 bringup 绑一次，
+  所以一个进程里最多挂 8 个设备（底盘这种整帧绑定的只占 1 个）。
 - **绑定只在 bringup 做一次**。`Init` 不可重入、`Register` 不可撤销，
   `on_cleanup` 之后重走 `on_configure` 会因为重复 id 被拒。USB 掉了就重启节点。
 - **不做重组**。前提是下位机固件保证一次 `write` 对应一个 USB 传输，
@@ -155,14 +155,8 @@ struct Struct_Motor_Rx { Control_Frame::Struct_Motor_Base motor[4]; };
 Struct_Motor_Tx Tx;
 Struct_Motor_Rx Rx;
 
-// 绑定：每轮一帧，发 4 字节、收 8 字节
-for (size_t i = 0; i < 4; ++i)
-{
-    Control_Frame::USB_Communication_Interface.Register(
-        static_cast<uint8_t>(i + 1),
-        &Tx.velocity[i], &Rx.motor[i],
-        sizeof(float), sizeof(Control_Frame::Struct_Motor_Base));
-}
+// 绑定：整个结构体一帧，id=1，下行 16 字节、上行 32 字节
+Control_Frame::USB_Communication_Interface.Register(1, &Tx, &Rx, sizeof(Tx), sizeof(Rx));
 
 // 控制线程：写结构体后打包发出
 Tx.velocity[0] = 1.5f;

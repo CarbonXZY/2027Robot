@@ -95,11 +95,8 @@
   <ros2_control name="ChassisSystem" type="system">
     <hardware>
       <plugin>chassis/ChassisSystem</plugin>
-      <!-- 四个轮子对应的 Communication_Interface 帧 id -->
-      <param name="front_left_wheel_id">1</param>
-      <param name="front_right_wheel_id">2</param>
-      <param name="rear_left_wheel_id">3</param>
-      <param name="rear_right_wheel_id">4</param>
+      <!-- 整个底盘一帧，id 与下位机固件约定 -->
+      <param name="chassis_id">1</param>
     </hardware>
 
     <joint name="front_left_wheel_joint">

@@ -1,5 +1,5 @@
 {
-    "cmake.sourceDirectory": "/home/carbon/Program_Projects/Control_Frame/src/chassis",
+    "cmake.sourceDirectory": "F:/Electronic_Control/2027Robot/src/chassis",
     "C_Cpp.default.cppStandard": "c++17",
     "C_Cpp.default.includePath": [
         "${workspaceFolder}/src/chassis/include",

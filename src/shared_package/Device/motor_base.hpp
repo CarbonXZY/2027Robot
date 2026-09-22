@@ -7,11 +7,13 @@
 namespace Control_Frame
 {
 
+#pragma pack(push, 1)
 struct Struct_Motor_Base
 {
     float velocity = 0.0f;  // 速度 (rad/s)
     float position = 0.0f;  // 位置 (rad)
 };
+#pragma pack(pop)
 
 // 通用模板：从参数表里读一个参数，找不到返回默认值
 template <typename T>

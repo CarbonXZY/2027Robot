@@ -28,10 +28,10 @@ sudo apt install ros-humble-ros2-control ros-humble-ros2-controllers
 
 ```cpp
 // 发（下发指令）：4 个电机目标速度
-struct Struct_Motor_Tx { float velocity[kWheelCount]; };
+struct Struct_Motor_Tx { float velocity[Wheel_Count]; };
 
 // 收（电机回传）：4 个电机速度 + 位置
-struct Struct_Motor_Rx { Control_Frame::Struct_Motor_Base motor[kWheelCount]; };
+struct Struct_Motor_Rx { Control_Frame::Struct_Motor_Base motor[Wheel_Count]; };
 ```
 
 `Struct_Motor_Base` 定义在共享包 `shared_package/Device/motor_base.hpp`：
@@ -43,21 +43,27 @@ struct Struct_Motor_Base {
 };
 ```
 
-`on_configure` 里把这两个结构体绑到全局 `Control_Frame::USB_Communication_Interface`（每轮一帧）：
+`on_configure` 里把这两个结构体绑到全局 `Control_Frame::USB_Communication_Interface`。
+**整个底盘是线上的一帧**——一个结构体对一个 id，不是每个电机一个 id：
 
-| 轮子 | 默认帧 id | 发送(tx)            | 接收(rx)              |
-|------|----------|--------------------|----------------------|
-| 前左 front_left  | 1 | velocity (4 字节)   | velocity + position (8 字节) |
-| 前右 front_right | 2 | velocity (4 字节)   | velocity + position (8 字节) |
-| 后左 rear_left   | 3 | velocity (4 字节)   | velocity + position (8 字节) |
-| 后右 rear_right  | 4 | velocity (4 字节)   | velocity + position (8 字节) |
+| 方向 | 帧 id | 载荷 |
+|------|-------|------|
+| 下行 tx | `chassis_id`（默认 1） | `Struct_Motor_Tx`，16 字节 |
+| 上行 rx | 同上 | `Struct_Motor_Rx`，32 字节 |
 
-- **write()**：只把指令速度写进 `Tx_Buffer.velocity[i]`。
-- **read()**：只从 `Rx_Buffer.motor[i]` 读速度/位置。
-- 真正的打包/解包由 `Communication_Interface` 的 `Send()`/`Receive()` 完成，由传输层（USB）驱动；
-  本类不直接做 I/O，也不做位置积分（位置来自电机回传）。
+线上每帧是 `[id][data][crc16]`，所以实际下发 19 字节、回传 35 字节，
+都在单包上限 64 字节以内，各一个 USB 包。轮子之间的顺序就是结构体里数组的顺序，
+不再由 id 区分。
 
-帧 id 可在 URDF 的 `<param name="xxx_wheel_id">` 里改。
+- **write()**：只把指令速度写进 `Tx_Buffer.velocity[i]`，随后 `Send()` 打成包发出去。
+- **read()**：只从 `Rx_Buffer.motor[i]` 读速度/位置——数据在接收线程到达时已由中间件
+  分发进 `Rx_Buffer`，`read()` 本身不做 I/O。
+- 本类不做位置积分（位置来自电机回传）。
+
+两个结构体都带 `#pragma pack(push, 1)`。线格式没有长度字段，收发两侧的尺寸必须严格
+一致，一旦有填充字节就会整体错位。
+
+`chassis_id` 可在 URDF 的 `<param name="chassis_id">` 里改，需与下位机固件约定一致。
 
 ## 控制器
 

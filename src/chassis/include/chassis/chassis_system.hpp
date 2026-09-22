@@ -24,6 +24,7 @@ namespace chassis
 
 constexpr size_t Wheel_Count = 4;  // 麦克纳姆底盘 4 个电机
 
+#pragma pack(push, 1)
 // 底盘发送结构体（下发指令）：4 个电机目标速度
 struct Struct_Motor_Tx
 {
@@ -35,6 +36,7 @@ struct Struct_Motor_Rx
 {
   Control_Frame::Struct_Motor_Base motor[Wheel_Count];
 };
+#pragma pack(pop)
 
 // 麦克纳姆底盘硬件接口（ros2_control SystemInterface）。
 // 收发交给 shared_package 的 Communication_Interface（绑定结构体后自动打包/解包），
@@ -52,13 +54,11 @@ public:
   hardware_interface::return_type write(const rclcpp::Time & time, const rclcpp::Duration & period) override;
 
 private:
-  struct WheelConfig
-  {
-    std::string joint;     // URDF 里的关节名
-    uint8_t     frame_id;  // Communication_Interface 帧 id
-  };
+  // 按 URDF 关节声明顺序（前左/前右/后左/后右）存下来的关节名
+  std::array<std::string, Wheel_Count> Joint_Names{};
 
-  std::array<WheelConfig, Wheel_Count> Wheels{};
+  // 整个底盘绑成一帧，id 来自 URDF 的 chassis_id
+  uint8_t Chassis_Id = 1;
 
   // ros2_control 侧（double）
   std::array<double, Wheel_Count> Target_Velocity{};
