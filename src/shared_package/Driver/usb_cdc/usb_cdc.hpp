@@ -8,6 +8,9 @@
 #include <thread>
 #include <vector>
 
+namespace Driver
+{
+
 /**
  * @brief USB-CDC 设备封装类, 基于 POSIX 接口实现对 /dev/ttyACMx 的实时收发
  *
@@ -138,5 +141,7 @@ private:
 };
 
 constexpr char USB_CDC_DEFAULT_DEVICE[] = "/dev/ttyACM0";
+
+} // namespace Driver
 
 #endif // USB_CDC_HPP

@@ -8,6 +8,7 @@
 #include <pluginlib/class_list_macros.hpp>
 #include <rclcpp/rclcpp.hpp>
 #include <tsk_config_and_callback.hpp>
+#include <utils.hpp>
 
 namespace leg
 {
@@ -24,7 +25,7 @@ namespace leg
     }
 
     // 四条腿一帧，id 与下位机固件约定
-    Leg_Id = Control_Frame::ReadParam<uint8_t>(info.hardware_parameters, "leg_id", 3);
+    Leg_Id = Utils::ReadParam<uint8_t>(info.hardware_parameters, "leg_id", 3);
 
     // 按 URDF 关节声明顺序（前左/前右/后左/后右）存下关节名
     for (size_t i = 0; i < Leg_Count; ++i)
@@ -59,7 +60,7 @@ namespace leg
   CallbackReturn LegSystem::on_configure(const rclcpp_lifecycle::State &)
   {
     // 指向全局实例，四条腿绑成一帧：下行 Tx_Buffer，上行 Rx_Buffer
-    Communication_Interface = &Control_Frame::USB_Communication_Interface;
+    Communication_Interface = &Middleware::USB_Communication_Interface;
 
     if (!Communication_Interface->Register(Leg_Id, &Tx_Buffer, &Rx_Buffer,
                                            sizeof(Tx_Buffer), sizeof(Rx_Buffer)))
@@ -68,7 +69,7 @@ namespace leg
       return CallbackReturn::ERROR;
     }
 
-    if (!Control_Frame::Task_Init())
+    if (!Task::Task_Init())
     {
       RCLCPP_ERROR(rclcpp::get_logger("LegSystem"), "打开 USB-CDC 失败");
       return CallbackReturn::ERROR;
@@ -97,17 +98,34 @@ namespace leg
       Now_Position[i] = static_cast<double>(Rx_Buffer.motor[i].position);
       Now_Velocity[i] = static_cast<double>(Rx_Buffer.motor[i].velocity);
     }
+
+    // 调试：表格更新式打印四条腿位置（windows_name "leg"，首次调用会自动弹独立窗口）
+    Utils::Debug_Log::CurrentMode() = Utils::Debug_Log::Mode::Refresh;
+    Utils::Debug_Log::Print("leg", "pos = %.3f %.3f %.3f %.3f",
+        Rx_Buffer.motor[0].position, Rx_Buffer.motor[1].position,
+        Rx_Buffer.motor[2].position, Rx_Buffer.motor[3].position);
+
     return hardware_interface::return_type::OK;
   }
 
   hardware_interface::return_type LegSystem::write(const rclcpp::Time &, const rclcpp::Duration &)
   {
+    // 测试：第一条腿位置每拍 +0.01，到 1.0 后回卷，供下位机验证下行链路是否收到
+    static float test_pos = 0.0f;
+    test_pos += 0.01f;
+    if (test_pos > 1.0f)
+    {
+      test_pos = 0.0f;
+    }
+
     // 只写 tx 结构体；Send() 不在这里调 —— 它会把所有已注册的帧打成一包，
     for (size_t i = 0; i < Leg_Count; ++i)
     {
       Tx_Buffer.position[i] = static_cast<float>(Target_Position[i]);
     }
-    Control_Frame::Task_Loop();
+    Tx_Buffer.position[0] = test_pos;  // 第一条腿覆盖为递增测试值
+
+    Task::Task_Loop();
     return hardware_interface::return_type::OK;
   }
 

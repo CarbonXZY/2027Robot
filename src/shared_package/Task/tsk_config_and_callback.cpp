@@ -1,36 +1,59 @@
-// tsk_config_and_callback.cpp
+/**
+ * @file    tsk_config_and_callback.cpp
+ * @author  Carbon
+ * @brief   任务配置与回调：USB-CDC 收发接线、链路存活检测
+ * @version 1.0
+ * @date    2026-09-27
+ *
+ * @note    连接底层 USB-CDC 驱动与中间层 Communication_Interface
+ */
+
+/* Includes ------------------------------------------------------------------*/
+
 #include "tsk_config_and_callback.hpp"
 
+#include <chrono>
 #include <cstdint>
 #include <memory>
 
 #include "Communication_Interface.hpp"
 #include "usb_cdc.hpp"
+#include "utils.hpp"
 
-namespace Control_Frame
+namespace Task
 {
 
-namespace
-{
-std::unique_ptr<USB_CDC> g_usb_device; // 全局 USB-CDC 实例
+/* Private variables ---------------------------------------------------------*/
 
-uint32_t Alive_Flag = 0;
-uint32_t Pre_Alive_Flag = 0;
+static std::unique_ptr<Driver::USB_CDC> g_usb_device;  // USB-CDC 设备实例
+static uint32_t Alive_Flag = 0;                // 累计收包计数
+static uint32_t Pre_Alive_Flag = 0;            // 上一拍收包计数
 
-// 收：USB 接收线程把一整包递进来。先记一次计数，链路确认之前一律不解包
-void MCU_RxCallback(uint8_t *data, uint16_t length)
+/* Public variables ----------------------------------------------------------*/
+
+bool MCU_Alive = false;    // 下位机链路存活标志位
+bool initialized = false;  // Task_Init() 是否已完成
+
+/* Private functions ---------------------------------------------------------*/
+
+/**
+ * @brief 收：USB 接收线程把一整包递进来。先记一次计数，链路确认之前一律不解包
+ */
+static void MCU_RxCallback(uint8_t *data, uint16_t length)
 {
     Alive_Flag += 1;
 
-    if (!Alive)
+    if (!MCU_Alive)
     {
         return;
     }
-    USB_Communication_Interface.Rx_RptlCallback(data, length);
+    Middleware::USB_Communication_Interface.Rx_RptlCallback(data, length);
 }
 
-// 发：Send() 打包好一整包后在这里交给设备
-int64_t MCU_SendData(uint8_t *data, size_t length)
+/**
+ * @brief 发：Send() 打包好一整包后在这里交给设备
+ */
+static int64_t MCU_SendData(uint8_t *data, size_t length)
 {
     if (g_usb_device->TransmitAdd(data, static_cast<uint16_t>(length)) == 0)
     {
@@ -38,36 +61,29 @@ int64_t MCU_SendData(uint8_t *data, size_t length)
     }
     return static_cast<int64_t>(length);
 }
-} // namespace
 
-// 下位机链路存活标志位
-bool Alive = false;
-
-// Task_Init() 是否已完成
-bool initialized = false;
+/* Public functions ----------------------------------------------------------*/
 
 /**
  * @brief 到点检测一次下位机是否存活，由控制循环按窗口周期调用
- *
  */
 void Alive_PeriodElapsedCallback()
 {
     if (Alive_Flag == Pre_Alive_Flag)
     {
         // 下位机断开连接
-        Alive = false;
+        MCU_Alive = false;
     }
     else
     {
         // 下位机保持连接
-        Alive = true;
+        MCU_Alive = true;
     }
     Pre_Alive_Flag = Alive_Flag;
 }
 
 /**
  * @brief 控制循环每拍调一次：存活才往外发
- *
  */
 void Task_Loop()
 {
@@ -80,12 +96,12 @@ void Task_Loop()
     Alive_PeriodElapsedCallback();
 
     // 没收到下位机回显之前一个字节都不发
-    if (!Alive)
+    if (!MCU_Alive)
     {
         return;
     }
 
-    USB_Communication_Interface.Send();
+    Middleware::USB_Communication_Interface.Send();
 }
 
 bool Task_Init()
@@ -96,18 +112,18 @@ bool Task_Init()
         return true;
     }
 
-    g_usb_device = std::make_unique<USB_CDC>(USB_CDC_DEFAULT_DEVICE);
-    if (!g_usb_device->IsOpen())
-    {
-        g_usb_device.reset();
-        return false;
-    }
+    // USB 可能还没枚举完成(刚上电/刚插拔), 打不开就忙等重试,
+    // 而不是直接返回 false 让 on_configure 报错、把 ROS 整个带崩。
+    Utils::RetryUntil(
+        [&] { g_usb_device = std::make_unique<Driver::USB_CDC>(Driver::USB_CDC_DEFAULT_DEVICE); },
+        [&] { return g_usb_device->IsOpen(); },
+        std::chrono::milliseconds(500));
 
     g_usb_device->RegisterRxCallback(MCU_RxCallback);
-    USB_Communication_Interface.Init(MCU_SendData);
+    Middleware::USB_Communication_Interface.Init(MCU_SendData);
 
     initialized = true;
     return true;
 }
 
-} // namespace Control_Frame
+} // namespace Task

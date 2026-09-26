@@ -7,6 +7,9 @@
 #include <termios.h>
 #include <unistd.h>
 
+namespace Driver
+{
+
 USB_CDC::USB_CDC(const std::string& device, uint32_t tx_period_ms)
     : device_path_(device), 
     fd_(-1), 
@@ -203,3 +206,5 @@ void USB_CDC::TxThreadLoop()
         next_wake_time += period;
     }
 }
+
+} // namespace Driver

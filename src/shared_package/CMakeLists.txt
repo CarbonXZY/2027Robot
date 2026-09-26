@@ -26,6 +26,7 @@ target_include_directories(shared_package PUBLIC
   $<BUILD_INTERFACE:${CMAKE_CURRENT_SOURCE_DIR}/Task>
   $<BUILD_INTERFACE:${CMAKE_CURRENT_SOURCE_DIR}/Device>
   $<BUILD_INTERFACE:${CMAKE_CURRENT_SOURCE_DIR}/Algorithm>
+  $<BUILD_INTERFACE:${CMAKE_CURRENT_SOURCE_DIR}/Utils>
   $<INSTALL_INTERFACE:include>)
 # PRIVATE：std::thread 只在库内部用，不必逼下游也 find_package(Threads)
 target_link_libraries(shared_package PRIVATE Threads::Threads)
@@ -36,13 +37,14 @@ install(TARGETS shared_package
   LIBRARY DESTINATION lib
   RUNTIME DESTINATION bin)
 
-# 通信头（Middleware）+ 驱动头（Driver）+ 初始化接线头（Task）+ 算法头（Algorithm）+ 设备结构体头（Device）
+# 通信头（Middleware）+ 驱动头（Driver）+ 初始化接线头（Task）+ 算法头（Algorithm）+ 设备结构体头（Device）+ 工具头（Utils）
 install(FILES
   Middleware/Communication_Interface.hpp
   Driver/usb_cdc/usb_cdc.hpp
   Task/tsk_config_and_callback.hpp
   Algorithm/alg_crc.h
   Device/motor_base.hpp
+  Utils/utils.hpp
   DESTINATION include)
 
 ament_export_targets(export_${PROJECT_NAME} HAS_LIBRARY_TARGET)

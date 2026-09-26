@@ -13,6 +13,9 @@
   </node>
 
   <node pkg="controller_manager" exec="spawner" output="screen"
+        args="joint_state_broadcaster --controller-type joint_state_broadcaster/JointStateBroadcaster"/>
+
+  <node pkg="controller_manager" exec="spawner" output="screen"
         args="mecanum_drive_controller --controller-type mecanum_drive_controller/MecanumDriveController --param-file $(find-pkg-share chassis)/config/chassis_controller.yaml"/>
 
   <node pkg="controller_manager" exec="spawner" output="screen"

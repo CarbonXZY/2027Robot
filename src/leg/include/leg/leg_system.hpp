@@ -34,7 +34,7 @@ struct Struct_Motor_Tx
 // 腿接收结构体（电机回传）：每条腿速度 + 位置
 struct Struct_Motor_Rx
 {
-  Control_Frame::Struct_Motor_Base motor[Leg_Count];
+  Device::Struct_Motor_Base motor[Leg_Count];
 };
 #pragma pack(pop)
 
@@ -69,7 +69,7 @@ private:
   Struct_Motor_Tx Tx_Buffer{};
   Struct_Motor_Rx Rx_Buffer{};
 
-  Control_Frame::Class_Communication_Interface * Communication_Interface = nullptr;  // 指向全局实例 USB_Communication_Interface
+  Middleware::Class_Communication_Interface * Communication_Interface = nullptr;  // 指向全局实例 USB_Communication_Interface
 };
 
 }  // namespace leg

@@ -4,7 +4,7 @@
 #include <cstddef>
 #include <cstdint>
 
-namespace Control_Frame
+namespace Middleware
 {
 
 // 中间层：算法 <-> 通信。
@@ -67,4 +67,4 @@ private:
 // 全局实例：chassis 与传输层共用同一个 Communication_Interface
 extern Class_Communication_Interface USB_Communication_Interface;
 
-}  // namespace Control_Frame
+}  // namespace Middleware

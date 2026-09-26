@@ -5,7 +5,7 @@
 
 #include "alg_crc.h"
 
-namespace Control_Frame
+namespace Middleware
 {
 
 void Class_Communication_Interface::Init(Communication_Function send)
@@ -119,4 +119,4 @@ void Class_Communication_Interface::Rx_RptlCallback(uint8_t *data, uint16_t leng
 
 Class_Communication_Interface USB_Communication_Interface;
 
-} // namespace Control_Frame
+} // namespace Middleware

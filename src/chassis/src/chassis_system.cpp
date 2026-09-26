@@ -7,6 +7,7 @@
 #include <pluginlib/class_list_macros.hpp>
 #include <rclcpp/rclcpp.hpp>
 #include <tsk_config_and_callback.hpp>
+#include <utils.hpp>
 
 namespace chassis
 {
@@ -23,7 +24,7 @@ namespace chassis
     }
 
     // 整个底盘一帧，id 与下位机固件约定
-    Chassis_Id = Control_Frame::ReadParam<uint8_t>(info.hardware_parameters, "chassis_id", 1);
+    Chassis_Id = Utils::ReadParam<uint8_t>(info.hardware_parameters, "chassis_id", 1);
 
     // 按 URDF 关节声明顺序（前左/前右/后左/后右）存下关节名
     for (size_t i = 0; i < Wheel_Count; ++i)
@@ -58,7 +59,7 @@ namespace chassis
   CallbackReturn ChassisSystem::on_configure(const rclcpp_lifecycle::State &)
   {
     // 指向全局实例，整个底盘绑成一帧：下行 Tx_Buffer，上行 Rx_Buffer
-    Communication_Interface = &Control_Frame::USB_Communication_Interface;
+    Communication_Interface = &Middleware::USB_Communication_Interface;
 
     if (!Communication_Interface->Register(Chassis_Id, &Tx_Buffer, &Rx_Buffer,
                                            sizeof(Tx_Buffer), sizeof(Rx_Buffer)))
@@ -67,7 +68,7 @@ namespace chassis
       return CallbackReturn::ERROR;
     }
 
-    if (!Control_Frame::Task_Init())
+    if (!Task::Task_Init())
     {
       RCLCPP_ERROR(rclcpp::get_logger("ChassisSystem"), "打开 USB-CDC 失败");
       return CallbackReturn::ERROR;
