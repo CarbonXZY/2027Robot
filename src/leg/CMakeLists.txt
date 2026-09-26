@@ -1,5 +1,5 @@
 cmake_minimum_required(VERSION 3.8)
-project(chassis)
+project(leg)
 
 if(CMAKE_COMPILER_IS_GNUCXX OR CMAKE_CXX_COMPILER_ID MATCHES "Clang")
   add_compile_options(-Wall -Wextra -Wpedantic)
@@ -13,12 +13,12 @@ find_package(pluginlib REQUIRED)
 find_package(shared_package REQUIRED)
 
 # ros2_control 硬件接口插件（编译成动态库，由 pluginlib 加载）
-add_library(chassis_hardware SHARED src/chassis_system.cpp)
-target_compile_features(chassis_hardware PUBLIC cxx_std_17)
-target_include_directories(chassis_hardware PUBLIC
+add_library(leg_hardware SHARED src/leg_system.cpp)
+target_compile_features(leg_hardware PUBLIC cxx_std_17)
+target_include_directories(leg_hardware PUBLIC
   $<BUILD_INTERFACE:${CMAKE_CURRENT_SOURCE_DIR}/include>
   $<INSTALL_INTERFACE:include>)
-ament_target_dependencies(chassis_hardware
+ament_target_dependencies(leg_hardware
   rclcpp
   rclcpp_lifecycle
   hardware_interface
@@ -26,9 +26,9 @@ ament_target_dependencies(chassis_hardware
   shared_package)
 
 # 注册为 hardware_interface 插件
-pluginlib_export_plugin_description_file(hardware_interface chassis_plugin.xml)
+pluginlib_export_plugin_description_file(hardware_interface leg_plugin.xml)
 
-install(TARGETS chassis_hardware
+install(TARGETS leg_hardware
   EXPORT export_${PROJECT_NAME}
   LIBRARY DESTINATION lib
   ARCHIVE DESTINATION lib

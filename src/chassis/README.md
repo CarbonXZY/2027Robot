@@ -10,11 +10,11 @@ chassis/
 ├── chassis_plugin.xml                 # pluginlib 插件描述
 ├── include/chassis/chassis_system.hpp  # 硬件接口 + 收/发两个结构体
 ├── src/chassis_system.cpp             # SystemInterface 实现
-├── urdf/chassis.urdf                  # 示例 URDF（4 轮 + ros2_control 标签）
 ├── config/chassis_controller.yaml     # mecanum_drive_controller 配置
-├── launch/chassis.launch              # XML launch
 └── README.md
 ```
+
+整机 URDF（含本包的 `<ros2_control>` 标签）在 `control_launch` 包里，本包不再自带 URDF/launch。
 
 ## 依赖安装（Humble）
 
@@ -30,7 +30,7 @@ sudo apt install ros-humble-ros2-control ros-humble-ros2-controllers
 // 发（下发指令）：4 个电机目标速度
 struct Struct_Motor_Tx { float velocity[Wheel_Count]; };
 
-// 收（电机回传）：4 个电机速度 + 位置
+// 收（电机回传）：4 个电机速度 + 位置 + alive_flag
 struct Struct_Motor_Rx { Control_Frame::Struct_Motor_Base motor[Wheel_Count]; };
 ```
 
@@ -40,8 +40,11 @@ struct Struct_Motor_Rx { Control_Frame::Struct_Motor_Base motor[Wheel_Count]; };
 struct Struct_Motor_Base {
     float velocity;  // 速度 (rad/s)
     float position;  // 位置 (rad)
+    uint8_t alive_flag;
 };
 ```
+
+`alive_flag` 由下位机填：`1` 表示该电机在线，`0` 表示异常或尚未收到过回传（结构体默认值就是 0，所以第一帧到达之前是 0）。
 
 `on_configure` 里把这两个结构体绑到全局 `Control_Frame::USB_Communication_Interface`。
 **整个底盘是线上的一帧**——一个结构体对一个 id，不是每个电机一个 id：
@@ -49,13 +52,14 @@ struct Struct_Motor_Base {
 | 方向 | 帧 id | 载荷 |
 |------|-------|------|
 | 下行 tx | `chassis_id`（默认 1） | `Struct_Motor_Tx`，16 字节 |
-| 上行 rx | 同上 | `Struct_Motor_Rx`，32 字节 |
+| 上行 rx | 同上 | `Struct_Motor_Rx`，36 字节 |
 
-线上每帧是 `[id][data][crc16]`，所以实际下发 19 字节、回传 35 字节，
+线上每帧是 `[id][data][crc16]`，所以实际下发 19 字节、回传 39 字节，
 都在单包上限 64 字节以内，各一个 USB 包。轮子之间的顺序就是结构体里数组的顺序，
 不再由 id 区分。
 
-- **write()**：只把指令速度写进 `Tx_Buffer.velocity[i]`，随后 `Send()` 打成包发出去。
+- **write()**：只把指令速度写进 `Tx_Buffer.velocity[i]`，不发送。`Send()` 由
+  `Control_Frame::Task_Loop()` 每拍统一调一次，避免多部件重复发包。
 - **read()**：只从 `Rx_Buffer.motor[i]` 读速度/位置——数据在接收线程到达时已由中间件
   分发进 `Rx_Buffer`，`read()` 本身不做 I/O。
 - 本类不做位置积分（位置来自电机回传）。
@@ -82,7 +86,7 @@ struct Struct_Motor_Base {
 cd ~/Program_Projects/Control_Frame
 colcon build
 source install/setup.bash
-ros2 launch chassis chassis.launch
+ros2 launch control_launch robot.launch
 
 # 下发指令（Twist：vx 前后，vy 横移，wz 自转）
 ros2 topic pub /mecanum_drive_controller/reference_unstamped geometry_msgs/msg/Twist \

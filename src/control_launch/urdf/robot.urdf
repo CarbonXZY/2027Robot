@@ -1,11 +1,11 @@
 <?xml version="1.0"?>
 <!--
-  麦克纳姆底盘示例 URDF。
-  4 个轮子关节：front_left / front_right / rear_left / rear_right。
-  轮子半径 wheels_radius=0.05，轮心距中心 lx=0.2、ly=0.15（lx+ly=0.35）。
-  需与 config/chassis_controller.yaml 里的 kinematics 参数保持一致。
+  整机 URDF：公共体 / 底盘 / 腿，按模块分区。
+  两处 <ros2_control> 各自独立，各对应下位机的一帧，id 见块内 <param>。
 -->
-<robot name="chassis">
+<robot name="robot">
+
+  <!-- ========== 公共：车体 ========== -->
   <material name="grey">
     <color rgba="0.5 0.5 0.5 1.0"/>
   </material>
@@ -18,6 +18,9 @@
     </inertial>
   </link>
 
+  <!-- ========== 底盘 chassis：4 个轮子 ========== -->
+  <!-- 轮半径 0.05，轮心距中心 lx=0.2、ly=0.15（lx+ly=0.35），
+       需与 config/chassis_controller.yaml 的 kinematics 参数保持一致。 -->
   <link name="front_left_wheel">
     <inertial>
       <mass value="0.3"/>
@@ -118,6 +121,70 @@
       <command_interface name="velocity"/>
       <state_interface name="velocity"/>
       <state_interface name="position"/>
+    </joint>
+  </ros2_control>
+
+  <!-- ========== 腿 leg：4 条腿 ========== -->
+  <link name="front_left_leg"/>
+  <link name="front_right_leg"/>
+  <link name="rear_left_leg"/>
+  <link name="rear_right_leg"/>
+
+  <joint name="front_left_leg_joint" type="revolute">
+    <parent link="base_link"/>
+    <child link="front_left_leg"/>
+    <origin xyz="0.2 0.15 0" rpy="0 0 0"/>
+    <axis xyz="0 1 0"/>
+    <limit lower="-1.57" upper="1.57" effort="10.0" velocity="10.0"/>
+  </joint>
+  <joint name="front_right_leg_joint" type="revolute">
+    <parent link="base_link"/>
+    <child link="front_right_leg"/>
+    <origin xyz="0.2 -0.15 0" rpy="0 0 0"/>
+    <axis xyz="0 1 0"/>
+    <limit lower="-1.57" upper="1.57" effort="10.0" velocity="10.0"/>
+  </joint>
+  <joint name="rear_left_leg_joint" type="revolute">
+    <parent link="base_link"/>
+    <child link="rear_left_leg"/>
+    <origin xyz="-0.2 0.15 0" rpy="0 0 0"/>
+    <axis xyz="0 1 0"/>
+    <limit lower="-1.57" upper="1.57" effort="10.0" velocity="10.0"/>
+  </joint>
+  <joint name="rear_right_leg_joint" type="revolute">
+    <parent link="base_link"/>
+    <child link="rear_right_leg"/>
+    <origin xyz="-0.2 -0.15 0" rpy="0 0 0"/>
+    <axis xyz="0 1 0"/>
+    <limit lower="-1.57" upper="1.57" effort="10.0" velocity="10.0"/>
+  </joint>
+
+  <ros2_control name="LegSystem" type="system">
+    <hardware>
+      <plugin>leg/LegSystem</plugin>
+      <!-- 四条腿一帧，id 与下位机固件约定 -->
+      <param name="leg_id">3</param>
+    </hardware>
+
+    <joint name="front_left_leg_joint">
+      <command_interface name="position"/>
+      <state_interface name="position"/>
+      <state_interface name="velocity"/>
+    </joint>
+    <joint name="front_right_leg_joint">
+      <command_interface name="position"/>
+      <state_interface name="position"/>
+      <state_interface name="velocity"/>
+    </joint>
+    <joint name="rear_left_leg_joint">
+      <command_interface name="position"/>
+      <state_interface name="position"/>
+      <state_interface name="velocity"/>
+    </joint>
+    <joint name="rear_right_leg_joint">
+      <command_interface name="position"/>
+      <state_interface name="position"/>
+      <state_interface name="velocity"/>
     </joint>
   </ros2_control>
 </robot>

@@ -31,12 +31,6 @@ namespace chassis
       Joint_Names[i] = info.joints[i].name;
     }
 
-    // 打开 USB-CDC，并把 Control_Frame 的收发回调接上
-    if (!Control_Frame::Task_Init())
-    {
-      return CallbackReturn::ERROR;
-    }
-
     return CallbackReturn::SUCCESS;
   }
 
@@ -73,6 +67,12 @@ namespace chassis
       return CallbackReturn::ERROR;
     }
 
+    if (!Control_Frame::Task_Init())
+    {
+      RCLCPP_ERROR(rclcpp::get_logger("ChassisSystem"), "打开 USB-CDC 失败");
+      return CallbackReturn::ERROR;
+    }
+
     RCLCPP_INFO(rclcpp::get_logger("ChassisSystem"), "已绑定底盘帧 id=%u（tx %zu 字节 / rx %zu 字节）",
                 Chassis_Id, sizeof(Tx_Buffer), sizeof(Rx_Buffer));
     return CallbackReturn::SUCCESS;
@@ -101,12 +101,10 @@ namespace chassis
 
   hardware_interface::return_type ChassisSystem::write(const rclcpp::Time &, const rclcpp::Duration &)
   {
-    // 先写 tx 结构体，再 Send 发出去
     for (size_t i = 0; i < Wheel_Count; ++i)
     {
       Tx_Buffer.velocity[i] = static_cast<float>(Target_Velocity[i]);
     }
-    Communication_Interface->Send();
     return hardware_interface::return_type::OK;
   }
 

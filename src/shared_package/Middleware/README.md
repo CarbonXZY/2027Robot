@@ -155,7 +155,7 @@ struct Struct_Motor_Rx { Control_Frame::Struct_Motor_Base motor[4]; };
 Struct_Motor_Tx Tx;
 Struct_Motor_Rx Rx;
 
-// 绑定：整个结构体一帧，id=1，下行 16 字节、上行 32 字节
+// 绑定：整个结构体一帧，id=1，下行 16 字节、上行 36 字节
 Control_Frame::USB_Communication_Interface.Register(1, &Tx, &Rx, sizeof(Tx), sizeof(Rx));
 
 // 控制线程：写结构体后打包发出

@@ -1,0 +1,22 @@
+<?xml version="1.0"?>
+<?xml-model href="http://download.ros.org/schema/package_format3.xsd" schematypens="http://www.w3.org/2001/XMLSchema"?>
+<package format="3">
+  <name>control_launch</name>
+  <version>0.0.0</version>
+  <description>Whole-robot bringup: a single ros2_control_node hosting both the chassis and leg hardware interfaces.</description>
+  <maintainer email="carbon@todo.todo">carbon</maintainer>
+  <license>Apache-2.0</license>
+
+  <buildtool_depend>ament_cmake</buildtool_depend>
+
+  <exec_depend>robot_state_publisher</exec_depend>
+  <exec_depend>controller_manager</exec_depend>
+  <exec_depend>mecanum_drive_controller</exec_depend>
+  <exec_depend>joint_trajectory_controller</exec_depend>
+  <exec_depend>chassis</exec_depend>
+  <exec_depend>leg</exec_depend>
+
+  <export>
+    <build_type>ament_cmake</build_type>
+  </export>
+</package>

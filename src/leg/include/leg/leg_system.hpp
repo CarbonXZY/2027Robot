@@ -1,4 +1,4 @@
-// chassis_system.hpp
+// leg_system.hpp
 #pragma once
 
 #include <array>
@@ -14,34 +14,34 @@
 #include <motor_base.hpp>
 
 /**
- * 麦克纳姆底盘轮子布局
+ * 四条腿的布局，每条腿一个电机
  * [0][1]
  * [2][3]
  */
 
-namespace chassis
+namespace leg
 {
 
-constexpr size_t Wheel_Count = 4;  // 麦克纳姆底盘 4 个电机
+constexpr size_t Leg_Count = 4;  // 四条腿
 
 #pragma pack(push, 1)
-// 底盘发送结构体（下发指令）：4 个电机目标速度
+// 腿发送结构体（下发指令）：每条腿的目标位置
 struct Struct_Motor_Tx
 {
-  float velocity[Wheel_Count];
+  float position[Leg_Count];
 };
 
-// 底盘接收结构体（电机回传）：4 个电机速度 + 位置
+// 腿接收结构体（电机回传）：每条腿速度 + 位置
 struct Struct_Motor_Rx
 {
-  Control_Frame::Struct_Motor_Base motor[Wheel_Count];
+  Control_Frame::Struct_Motor_Base motor[Leg_Count];
 };
 #pragma pack(pop)
 
-// 麦克纳姆底盘硬件接口（ros2_control SystemInterface）。
+// 腿硬件接口（ros2_control SystemInterface）。
 // 收发交给 shared_package 的 Communication_Interface（绑定结构体后自动打包/解包），
 // 本类 read/write 只读写 Tx_Buffer/Rx_Buffer 两个结构体。
-class ChassisSystem : public hardware_interface::SystemInterface
+class LegSystem : public hardware_interface::SystemInterface
 {
 public:
   CallbackReturn on_init(const hardware_interface::HardwareInfo & info) override;
@@ -55,15 +55,15 @@ public:
 
 private:
   // 按 URDF 关节声明顺序（前左/前右/后左/后右）存下来的关节名
-  std::array<std::string, Wheel_Count> Joint_Names{};
+  std::array<std::string, Leg_Count> Joint_Names{};
 
-  // 整个底盘绑成一帧，id 来自 URDF 的 chassis_id
-  uint8_t Chassis_Id = 1;
+  // 四条腿绑成一帧，id 来自 URDF 的 leg_id
+  uint8_t Leg_Id = 3;
 
   // ros2_control 侧（double）
-  std::array<double, Wheel_Count> Target_Velocity{};
-  std::array<double, Wheel_Count> Now_Velocity{};
-  std::array<double, Wheel_Count> Now_Position{};
+  std::array<double, Leg_Count> Target_Position{};
+  std::array<double, Leg_Count> Now_Position{};
+  std::array<double, Leg_Count> Now_Velocity{};
 
   // 绑定到 Communication_Interface 的两个结构体：发 / 收
   Struct_Motor_Tx Tx_Buffer{};
@@ -72,4 +72,4 @@ private:
   Control_Frame::Class_Communication_Interface * Communication_Interface = nullptr;  // 指向全局实例 USB_Communication_Interface
 };
 
-}  // namespace chassis
+}  // namespace leg

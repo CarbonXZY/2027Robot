@@ -1,0 +1,10 @@
+<library path="leg_hardware">
+  <class name="leg/LegSystem"
+         type="leg::LegSystem"
+         base_class_type="hardware_interface::SystemInterface">
+    <description>
+      Leg hardware interface. Uses shared_package's Communication_Interface
+      to read joint feedback and write joint commands.
+    </description>
+  </class>
+</library>

@@ -1,6 +1,7 @@
 // motor_base.hpp
 #pragma once
 
+#include <cstdint>
 #include <string>
 #include <unordered_map>
 
@@ -12,6 +13,7 @@ struct Struct_Motor_Base
 {
     float velocity = 0.0f;  // 速度 (rad/s)
     float position = 0.0f;  // 位置 (rad)
+    uint8_t alive_flag = 0;
 };
 #pragma pack(pop)
 
