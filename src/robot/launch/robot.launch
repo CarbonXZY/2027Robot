@@ -1,6 +1,6 @@
 <?xml version="1.0"?>
 <launch>
-  <arg name="robot_description" default="$(command 'cat $(find-pkg-share control_launch)/urdf/robot.urdf')"/>
+  <arg name="robot_description" default="$(command 'cat $(find-pkg-share robot)/urdf/robot.urdf')"/>
 
   <node pkg="robot_state_publisher" exec="robot_state_publisher">
     <param name="robot_description" value="$(var robot_description)"/>
@@ -19,5 +19,5 @@
         args="mecanum_drive_controller --controller-type mecanum_drive_controller/MecanumDriveController --param-file $(find-pkg-share chassis)/config/chassis_controller.yaml"/>
 
   <node pkg="controller_manager" exec="spawner" output="screen"
-        args="joint_trajectory_controller --controller-type joint_trajectory_controller/JointTrajectoryController --param-file $(find-pkg-share leg)/config/leg_controller.yaml"/>
+        args="leg_controller --controller-type leg/LegController --param-file $(find-pkg-share leg)/config/leg_controller.yaml"/>
 </launch>

@@ -14,7 +14,7 @@ chassis/
 └── README.md
 ```
 
-整机 URDF（含本包的 `<ros2_control>` 标签）在 `control_launch` 包里，本包不再自带 URDF/launch。
+整机 URDF（含本包的 `<ros2_control>` 标签）在 `robot` 包里，本包不再自带 URDF/launch。
 
 ## 依赖安装（Humble）
 
@@ -86,7 +86,7 @@ struct Struct_Motor_Base {
 cd ~/Program_Projects/Control_Frame
 colcon build
 source install/setup.bash
-ros2 launch control_launch robot.launch
+ros2 launch robot robot.launch
 
 # 下发指令（Twist：vx 前后，vy 横移，wz 自转）
 ros2 topic pub /mecanum_drive_controller/reference_unstamped geometry_msgs/msg/Twist \

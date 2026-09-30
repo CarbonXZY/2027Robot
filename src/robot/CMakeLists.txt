@@ -1,5 +1,5 @@
 cmake_minimum_required(VERSION 3.8)
-project(control_launch)
+project(robot)
 
 find_package(ament_cmake REQUIRED)
 

@@ -7,4 +7,12 @@
       to read joint feedback and write joint commands.
     </description>
   </class>
+
+  <class name="leg/LegController"
+         type="leg::LegController"
+         base_class_type="controller_interface::ControllerInterface">
+    <description>
+      Leg controller (scaffold). Not spawned by robot.launch yet.
+    </description>
+  </class>
 </library>

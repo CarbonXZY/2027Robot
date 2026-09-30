@@ -12,6 +12,7 @@
   <depend>rclcpp</depend>
   <depend>rclcpp_lifecycle</depend>
   <depend>hardware_interface</depend>
+  <depend>controller_interface</depend>
   <depend>pluginlib</depend>
   <depend>shared_package</depend>
 

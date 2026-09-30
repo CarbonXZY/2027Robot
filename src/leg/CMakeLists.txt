@@ -9,6 +9,7 @@ find_package(ament_cmake REQUIRED)
 find_package(rclcpp REQUIRED)
 find_package(rclcpp_lifecycle REQUIRED)
 find_package(hardware_interface REQUIRED)
+find_package(controller_interface REQUIRED)
 find_package(pluginlib REQUIRED)
 find_package(shared_package REQUIRED)
 
@@ -22,11 +23,13 @@ ament_target_dependencies(leg_hardware
   rclcpp
   rclcpp_lifecycle
   hardware_interface
+  controller_interface
   pluginlib
   shared_package)
 
-# 注册为 hardware_interface 插件
+# 注册为 hardware_interface / controller_interface 插件（同一个 xml，两类基类各一条）
 pluginlib_export_plugin_description_file(hardware_interface leg_plugin.xml)
+pluginlib_export_plugin_description_file(controller_interface leg_plugin.xml)
 
 install(TARGETS leg_hardware
   EXPORT export_${PROJECT_NAME}
@@ -38,6 +41,6 @@ install(DIRECTORY include/ DESTINATION include)
 install(DIRECTORY config DESTINATION share/${PROJECT_NAME})
 
 ament_export_targets(export_${PROJECT_NAME} HAS_LIBRARY_TARGET)
-ament_export_dependencies(rclcpp rclcpp_lifecycle hardware_interface pluginlib shared_package)
+ament_export_dependencies(rclcpp rclcpp_lifecycle hardware_interface controller_interface pluginlib shared_package)
 
 ament_package()
