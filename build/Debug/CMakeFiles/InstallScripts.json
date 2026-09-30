@@ -1,0 +1,8 @@
+{
+	"InstallScripts" : 
+	[
+		"F:/Electronic_Control/R2_Embedded/build/Debug/cmake_install.cmake",
+		"F:/Electronic_Control/R2_Embedded/build/Debug/cmake/stm32cubemx/cmake_install.cmake"
+	],
+	"Parallel" : false
+}
