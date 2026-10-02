@@ -30,18 +30,16 @@ namespace
 constexpr uint8_t kIdLeg = 3;
 } // namespace
 
-template <uint8_t kLegNum>
-Leg<kLegNum>::Leg(std::array<Device::MotorBase *, kLegNum> leg_motor)
+Leg::Leg(std::array<Device::MotorBase *, kLegCount> leg_motor)
     : leg_motor_(leg_motor)
 {
 }
 
-template <uint8_t kLegNum>
-void Leg<kLegNum>::Init(const Parameters &parameters)
+void Leg::Init(const Parameters &parameters)
 {
     param_ = parameters;
 
-    for (uint8_t i = 0; i < kLegNum; ++i)
+    for (uint8_t i = 0; i < kLegCount; ++i)
     {
         // 方向归一到 ±1，0 视为正向
         param_.direction_sign[i] = (param_.direction_sign[i] < 0) ? -1 : 1;
@@ -60,10 +58,9 @@ void Leg<kLegNum>::Init(const Parameters &parameters)
         static_cast<uint8_t>(sizeof(rx_buffer_)), static_cast<uint8_t>(sizeof(tx_buffer_)));
 }
 
-template <uint8_t kLegNum>
-void Leg<kLegNum>::MoveToPosition()
+void Leg::MoveToPosition()
 {
-    for (uint8_t i = 0; i < kLegNum; ++i)
+    for (uint8_t i = 0; i < kLegCount; ++i)
     {
         if (leg_motor_[i] == nullptr)
         {
@@ -95,8 +92,7 @@ void Leg<kLegNum>::MoveToPosition()
     }
 }
 
-template <uint8_t kLegNum>
-void Leg<kLegNum>::TimCalculatePeriodElapsedCallback()
+void Leg::TimCalculatePeriodElapsedCallback()
 {
     if (!calibrated_)
     {
@@ -107,7 +103,7 @@ void Leg<kLegNum>::TimCalculatePeriodElapsedCallback()
         MoveToPosition();
     }
 
-    for (uint8_t i = 0; i < kLegNum; ++i)
+    for (uint8_t i = 0; i < kLegCount; ++i)
     {
         if (leg_motor_[i] == nullptr)
         {
@@ -127,12 +123,11 @@ void Leg<kLegNum>::TimCalculatePeriodElapsedCallback()
     }
 }
 
-template <uint8_t kLegNum>
-void Leg<kLegNum>::Calibrate()
+void Leg::Calibrate()
 {
     bool all_done = true;
 
-    for (uint8_t i = 0; i < kLegNum; ++i)
+    for (uint8_t i = 0; i < kLegCount; ++i)
     {
         if (leg_motor_[i] == nullptr || calibrated_motor_[i])
         {
@@ -156,8 +151,5 @@ void Leg<kLegNum>::Calibrate()
 
     calibrated_ = all_done;
 }
-
-// 显式实例化，确保 .cpp 里的模板定义被生成
-template class Leg<4>;
 
 } // namespace Module

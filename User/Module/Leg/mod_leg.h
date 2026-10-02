@@ -48,7 +48,6 @@ struct LegRx
 };
 #pragma pack(pop)
 
-template <uint8_t kLegNum = kLegCount>
 class Leg
 {
 public:
@@ -66,7 +65,7 @@ public:
 
         // ±1：电机安装方向，1=与关节正向同向，-1=镜像反向
         // Init 里归一到 ±1，0 视为 1
-        int8_t direction_sign[kLegNum] = {};
+        int8_t direction_sign[kLegCount] = {};
 
         Device::CalibrateParams calibrate{};
     };
@@ -74,7 +73,7 @@ public:
     /**
      * @brief 绑定各腿电机指针，需已接好反馈回调
      */
-    explicit Leg(std::array<Device::MotorBase *, kLegNum> leg_motor);
+    explicit Leg(std::array<Device::MotorBase *, kLegCount> leg_motor);
 
     /**
      * @brief 写入控制参数，并把 id=3 的两帧注册进通信中间件
@@ -100,14 +99,14 @@ public:
     LegRx rx_buffer_{};
 
 private:
-    std::array<Device::MotorBase *, kLegNum> leg_motor_{}; // 各腿电机
+    std::array<Device::MotorBase *, kLegCount> leg_motor_{}; // 各腿电机
 
-    float target_position_[kLegNum]{};   // 目标位置 (rad)
-    float feedback_position_[kLegNum]{}; // 反馈位置 (rad)
-    float feedback_velocity_[kLegNum]{}; // 反馈速度 (rad/s)
+    float target_position_[kLegCount]{};   // 目标位置 (rad)
+    float feedback_position_[kLegCount]{}; // 反馈位置 (rad)
+    float feedback_velocity_[kLegCount]{}; // 反馈速度 (rad/s)
 
-    float offset_[kLegNum]{};          // 各腿机械零点, 电机侧原始角 (rad)
-    bool calibrated_motor_[kLegNum]{}; // 单腿标定完成标记
+    float offset_[kLegCount]{};          // 各腿机械零点, 电机侧原始角 (rad)
+    bool calibrated_motor_[kLegCount]{}; // 单腿标定完成标记
 
     Parameters param_{}; // 腿控制参数
 

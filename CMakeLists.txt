@@ -35,9 +35,7 @@ set(CMAKE_CXX_STANDARD_REQUIRED ON)
 set(CMAKE_CXX_EXTENSIONS ON)
 
 # Create an executable object type
-add_executable(${CMAKE_PROJECT_NAME}
-    User/Module/Gripper/mod_gripper.cpp
-    User/Module/Gripper/mod_gripper.h)
+add_executable(${CMAKE_PROJECT_NAME})
 
 # Add STM32CubeMX generated sources
 add_subdirectory(cmake/stm32cubemx)
@@ -77,7 +75,9 @@ target_sources(${CMAKE_PROJECT_NAME} PRIVATE
 target_include_directories(${CMAKE_PROJECT_NAME} PRIVATE
     ${CMAKE_SOURCE_DIR}/User/Algorithm
     ${CMAKE_SOURCE_DIR}/User/Module
+    ${CMAKE_SOURCE_DIR}/User/Module/Chassis
     ${CMAKE_SOURCE_DIR}/User/Module/Leg
+    ${CMAKE_SOURCE_DIR}/User/Module/Telecontrol
     ${CMAKE_SOURCE_DIR}/User/Device
     ${CMAKE_SOURCE_DIR}/User/Driver
     ${CMAKE_SOURCE_DIR}/User/Interaction
