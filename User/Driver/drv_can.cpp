@@ -1,5 +1,5 @@
 /**
- * @file drv_can.c
+ * @file drv_can.cpp
  * @author Lucy
  * @brief H723 FDCAN配置为经典CAN数据包
  * @version 0.1
@@ -23,9 +23,9 @@ namespace Driver
 {
 
 //定义FdcanManage结构体
-FdcanManageObject g_fdcan1_manage_object = {0};
-FdcanManageObject g_fdcan2_manage_object = {0};
-FdcanManageObject g_fdcan3_manage_object = {0};
+FdcanManageObject g_fdcan1_manage_object = {};
+FdcanManageObject g_fdcan2_manage_object = {};
+FdcanManageObject g_fdcan3_manage_object = {};
 
 // CAN通信发送缓冲区
 uint8_t g_fdcan1_0x1ff_tx_data[8];
