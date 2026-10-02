@@ -10,20 +10,20 @@ namespace Device
 {
 
 /**
- * @brief 构造函数 — 带控制参数版本
+ * @brief 构造函数, 仅做硬件绑定
  *
- * 工作流程：
- * 1. 校验参数合法性（gearbox_rate > 0、current_max > 0、PID 参数有限）
+ * 只管底层外设与不可变硬件量的绑定, 不负责电控逻辑:
+ * 1. 校验硬件参数合法性（gearbox_rate > 0、current_max > 0）
  * 2. 绑定 FDCAN 句柄到对应的 FdcanManageObject
  * 3. 从 FDCAN 共享发送缓冲区分配 2 字节 tx_data_
  * 4. 清零所有状态和目标值
  *
+ * 控制模式与 PID 参数由 Init() 在运行期配置。
  * 构造函数在静态初始化期运行，因此句柄只做指针比较，不解引用。
  */
 MotorDjiC610::MotorDjiC610(
     FDCAN_HandleTypeDef *hfdcan,
     MotorDjiId fdcan_rx_id,
-    const Parameters &parameters,
     float gearbox_rate,
     float current_max)
 {
@@ -41,11 +41,6 @@ MotorDjiC610::MotorDjiC610(
         !IsFinite(current_max) ||
         gearbox_rate <= 0.0f ||
         current_max <= 0.0f)
-    {
-        return;
-    }
-
-    if (!CheckParameters(parameters))
     {
         return;
     }
@@ -77,7 +72,6 @@ MotorDjiC610::MotorDjiC610(
     fdcan_rx_id_ = fdcan_rx_id;
     gearbox_rate_ = gearbox_rate;
     current_max_ = current_max;
-    param_ = parameters;
 
     control_method_ = MotorControlMethod::kCurrent;
 
@@ -98,6 +92,37 @@ MotorDjiC610::MotorDjiC610(
     pre_flag_ = 0;
     motor_status_ = MotorStatus::kDisable;
     rx_data_ = {};
+
+    initialized_ = true;
+}
+
+/**
+ * @brief 电机控制初始化
+ *
+ * 硬件绑定已经在构造函数里完成, 这里只管电控层面:
+ * 1. 校验控制参数合法性
+ * 2. 写入 param_
+ * 3. 初始化位置环 / 速度环 PID
+ * 4. 设置控制模式
+ *
+ * 可在运行期重复调用以整定 / 切换参数。
+ * 硬件绑定失败或参数非法时直接返回, 保持原有配置不变。
+ */
+void MotorDjiC610::Init(MotorControlMethod method, const Parameters &parameters)
+{
+    if (!initialized_)
+    {
+        return;
+    }
+
+    if (!CheckParameters(parameters))
+    {
+        return;
+    }
+
+    param_ = parameters;
+
+    control_method_ = method;
 
     // PID 初始化
     pid_position.Init(parameters.pid_position.k_p,
@@ -126,7 +151,12 @@ MotorDjiC610::MotorDjiC610(
                    parameters.pid_omega.i_separate_threshold,
                    parameters.pid_omega.d_first);
 
-    initialized_ = true;
+    // 重新配置后清掉历史积分与前馈, 避免沿用上一组参数
+    pid_position.SetIntegralError(0.0f);
+    pid_omega.SetIntegralError(0.0f);
+
+    feedforward_speed_ = 0.0f;
+    feedforward_current_ = 0.0f;
 }
 
 /**
@@ -639,10 +669,21 @@ namespace
     }
 }
 
+/**
+ * @brief 构造函数, 仅做硬件绑定
+ *
+ * 只管底层外设与不可变硬件量的绑定, 不负责电控逻辑:
+ * 1. 校验硬件参数合法性（gearbox_rate > 0、current_max > 0）
+ * 2. 绑定 FDCAN 句柄到对应的 FdcanManageObject
+ * 3. 从 FDCAN 共享发送缓冲区分配 2 字节 tx_data_
+ * 4. 清零所有状态和目标值
+ *
+ * 控制模式与 PID 参数由 Init() 在运行期配置。
+ * 构造函数在静态初始化期运行，因此句柄只做指针比较，不解引用。
+ */
 MotorDjiC620::MotorDjiC620(
     FDCAN_HandleTypeDef *hfdcan,
     MotorDjiId fdcan_rx_id,
-    const Parameters &parameters,
     float gearbox_rate,
     float current_max)
 {
@@ -660,11 +701,6 @@ MotorDjiC620::MotorDjiC620(
         !IsFinite(current_max) ||
         gearbox_rate <= 0.0f ||
         current_max <= 0.0f)
-    {
-        return;
-    }
-
-    if (!CheckParameters(parameters))
     {
         return;
     }
@@ -696,7 +732,6 @@ MotorDjiC620::MotorDjiC620(
     fdcan_rx_id_ = fdcan_rx_id;
     gearbox_rate_ = gearbox_rate;
     current_max_ = current_max;
-    param_ = parameters;
 
     control_method_ = MotorControlMethod::kCurrent;
 
@@ -719,6 +754,37 @@ MotorDjiC620::MotorDjiC620(
     pre_flag_ = 0;
     motor_status_ = MotorStatus::kDisable;
     rx_data_ = {};
+
+    initialized_ = true;
+}
+
+/**
+ * @brief 电机控制初始化 — 配置控制模式与控制参数
+ *
+ * 硬件绑定已经在构造函数里完成, 这里只管电控层面:
+ * 1. 校验控制参数合法性
+ * 2. 写入 param_
+ * 3. 初始化位置环 / 速度环 PID
+ * 4. 设置控制模式
+ *
+ * 可在运行期重复调用以整定 / 切换参数。
+ * 硬件绑定失败或参数非法时直接返回, 保持原有配置不变。
+ */
+void MotorDjiC620::Init(MotorControlMethod method, const Parameters &parameters)
+{
+    if (!initialized_)
+    {
+        return;
+    }
+
+    if (!CheckParameters(parameters))
+    {
+        return;
+    }
+
+    param_ = parameters;
+
+    control_method_ = method;
 
     pid_position.Init(parameters.pid_position.k_p,
                       parameters.pid_position.k_i,
@@ -746,7 +812,15 @@ MotorDjiC620::MotorDjiC620(
                    parameters.pid_omega.i_separate_threshold,
                    parameters.pid_omega.d_first);
 
-    initialized_ = true;
+    // 重新配置后清掉历史积分与前馈, 避免沿用上一组参数
+    pid_position.SetIntegralError(0.0f);
+    pid_omega.SetIntegralError(0.0f);
+
+    feedforward_speed_ = 0.0f;
+    feedforward_current_ = 0.0f;
+
+    power_estimate_ = 0.0f;
+    power_factor_ = 1.0f;
 }
 
 bool MotorDjiC620::CheckParameters(const Parameters &parameters) const

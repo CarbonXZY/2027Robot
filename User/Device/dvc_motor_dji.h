@@ -38,14 +38,14 @@ namespace Device
      */
     enum class MotorDjiId
     {
-        kId0x201 = 1,
-        kId0x202,
-        kId0x203,
-        kId0x204,
-        kId0x205,
-        kId0x206,
-        kId0x207,
-        kId0x208,
+        kId0x201 = 0x201,
+        kId0x202 = 0x202,
+        kId0x203 = 0x203,
+        kId0x204 = 0x204,
+        kId0x205 = 0x205,
+        kId0x206 = 0x206,
+        kId0x207 = 0x207,
+        kId0x208 = 0x208,
     };
 
     /**
@@ -133,20 +133,25 @@ namespace Device
 
 
         /**
-         * @brief 硬件初始化
+         * @brief 硬件绑定, 只管底层外设绑定, 不负责电控逻辑
          *
          * @param hfdcan FDCAN 句柄
          * @param fdcan_rx_id 电机反馈 ID，0x201 ~ 0x208
-         * @param parameters Base 控制参数
          * @param gearbox_rate 减速比，舵向若无减速箱可设 1
          * @param current_max 最大输出电流，A
          */
         MotorDjiC610(
             FDCAN_HandleTypeDef *hfdcan,
             MotorDjiId fdcan_rx_id,
-            const Parameters &parameters,
             float gearbox_rate = 36.0f,
             float current_max = 10.0f);
+
+        /**
+         * @brief 电机控制初始化
+         * @param method 控制模式
+         * @param parameters 控制参数
+         */
+        void Init(MotorControlMethod method, const Parameters &parameters);
 
         inline void SetControlMethod(MotorControlMethod method) override;
 
@@ -211,7 +216,7 @@ namespace Device
         inline void SetFeedforwardOmega(float feedforward_omega);
         inline void SetFeedforwardCurrent(float feedforward_current);
 
-    private:
+    protected:
         /*
          * CAN / DJI 底层相关
          */
@@ -445,20 +450,25 @@ namespace Device
         Algorithm::Pid pid_position;
 
         /**
-         * @brief 硬件初始化
+         * @brief 硬件绑定, 只管底层外设绑定, 不负责电控逻辑
          *
          * @param hfdcan FDCAN 句柄
          * @param fdcan_rx_id 电机反馈 ID，0x201 ~ 0x208
-         * @param parameters Base 控制参数
          * @param gearbox_rate 减速比
          * @param current_max 最大输出电流，A
          */
         MotorDjiC620(
             FDCAN_HandleTypeDef *hfdcan,
             MotorDjiId fdcan_rx_id,
-            const Parameters &parameters,
             float gearbox_rate = 3591.0f / 187.0f,
             float current_max = 20.0f);
+
+        /**
+         * @brief 电机控制初始化
+         * @param method 控制模式
+         * @param parameters 控制参数
+         */
+        void Init(MotorControlMethod method, const Parameters &parameters);
 
         inline void SetControlMethod(MotorControlMethod method) override;
         inline void SetTargetCurrent(float target_current) override;
@@ -494,7 +504,7 @@ namespace Device
         inline float GetNowAngle() const;
         inline float GetNowOmega() const;
         inline float GetNowCurrent() const;
-        inline float GetNowtemperature() const;
+        inline float GetNowTemperature() const;
         inline float GetNowPower() const;
         inline float GetPowerEstimate() const;
 
@@ -510,7 +520,7 @@ namespace Device
         inline void SetPowerFactor(float power_factor);
         inline void SetOut(float out);
 
-    private:
+    protected:
         Driver::FdcanManageObject *fdcan_manage_object_ = nullptr;
         MotorDjiId fdcan_rx_id_ = MotorDjiId::kId0x201;
         uint8_t *tx_data_ = nullptr;
@@ -584,7 +594,7 @@ namespace Device
         return rx_data_.now_current;
     }
 
-    inline float MotorDjiC620::GetNowtemperature() const
+    inline float MotorDjiC620::GetNowTemperature() const
     {
         return rx_data_.now_temperature;
     }
