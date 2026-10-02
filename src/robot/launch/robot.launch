@@ -20,4 +20,20 @@
 
   <node pkg="controller_manager" exec="spawner" output="screen"
         args="leg_controller --controller-type leg/LegController --param-file $(find-pkg-share leg)/config/leg_controller.yaml"/>
+
+  <node pkg="controller_manager" exec="spawner" output="screen"
+        args="telecontrol_broadcaster --controller-type telecontrol/TelecontrolBroadcaster --param-file $(find-pkg-share telecontrol)/config/telecontrol_controller.yaml"/>
+
+  <!-- 人机交互口子：遥控 vs 上位机 Twist 仲裁后驱动麦轮底盘 -->
+  <node pkg="robot" exec="robot" output="screen">
+    <param name="rc_topic" value="/telecontrol/rc_state"/>
+    <param name="pc_twist_topic" value="/cmd_vel"/>
+    <param name="twist_topic" value="/mecanum_drive_controller/reference_unstamped"/>
+    <param name="max_linear_x" value="1.0"/>
+    <param name="max_linear_y" value="1.0"/>
+    <param name="max_angular_z" value="2.0"/>
+    <param name="deadzone" value="0.05"/>
+    <param name="pc_switch_value" value="2"/>
+    <param name="sa_disable_value" value="2"/>
+  </node>
 </launch>

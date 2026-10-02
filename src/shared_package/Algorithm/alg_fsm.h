@@ -16,73 +16,58 @@
 
 #include <cstdint>
 
-/* Exported macros -----------------------------------------------------------*/
+namespace Algorithm
+{
 
-#define STATUS_MAX (30)
+/* Exported constants --------------------------------------------------------*/
+
+// 状态数量上限
+constexpr uint8_t kStatusMax = 30;
 
 /* Exported types ------------------------------------------------------------*/
 
 /**
  * @brief 状态所处的阶段
- *
  */
-enum Enum_Status_Stage
+enum class StatusStage
 {
-    Status_Stage_DISABLE = 0,
-    Status_Stage_ENABLE,
+    kDisable = 0,
+    kEnable,
 };
 
 /**
  * @brief 状态结构体
- *
  */
-struct Struct_Status
+struct Status
 {
-    Enum_Status_Stage Status_Stage;
-    uint32_t Count_Time;
+    StatusStage status_stage;
+    uint32_t count_time;
 };
 
 /**
  * @brief Reusable, 有限自动机核心, 一般有时间需求的则采用有限自动机
  * 使用时请继承->声明友元后使用
- *
  */
-class Class_FSM
+class Fsm
 {
 public:
-    Struct_Status Status[STATUS_MAX];
+    Status status_[kStatusMax];
 
-    void Init(uint8_t __Status_Number, uint8_t __Now_Status_Serial = 0);
+    void Init(uint8_t status_number, uint8_t now_status_serial = 0);
 
-    inline uint8_t Get_Now_Status_Serial();
+    inline uint8_t GetNowStatusSerial() const;
 
-    inline void Set_Status(uint8_t Next_Status_serial);
+    inline void SetStatus(uint8_t next_status_serial);
 
-    void TIM_Calculate_PeriodElapsedCallback();
+    void TimCalculatePeriodElapsedCallback();
 
 protected:
-    // 初始化相关常量
-
     // 状态数量
-    uint8_t Status_Number;
-
-    // 常量
-
-    // 内部变量
-
-    // 读变量
+    uint8_t status_number_;
 
     // FSM当前状态
-    uint8_t Now_Status_Serial = 0;
-
-    // 写变量
-
-    // 读写变量
-
-    // 内部函数
+    uint8_t now_status_serial_ = 0;
 };
-
-/* Exported variables --------------------------------------------------------*/
 
 /* Exported function declarations --------------------------------------------*/
 
@@ -91,26 +76,28 @@ protected:
  *
  * @return uint8_t FSM当前状态
  */
-inline uint8_t Class_FSM::Get_Now_Status_Serial()
+inline uint8_t Fsm::GetNowStatusSerial() const
 {
-    return (Now_Status_Serial);
+    return now_status_serial_;
 }
 
 /**
  * @brief 设置状态改变
  *
- * @param Next_Status_serial 下一个状态
+ * @param next_status_serial 下一个状态
  */
-inline void Class_FSM::Set_Status(uint8_t Next_Status_serial)
+inline void Fsm::SetStatus(uint8_t next_status_serial)
 {
     // 失能当前状态, 计数器清零
-    Status[Now_Status_Serial].Status_Stage = Status_Stage_DISABLE;
-    Status[Now_Status_Serial].Count_Time = 0;
+    status_[now_status_serial_].status_stage = StatusStage::kDisable;
+    status_[now_status_serial_].count_time = 0;
 
     // 转到下一个状态
-    Status[Next_Status_serial].Status_Stage = Status_Stage_ENABLE;
-    Now_Status_Serial = Next_Status_serial;
+    status_[next_status_serial].status_stage = StatusStage::kEnable;
+    now_status_serial_ = next_status_serial;
 }
+
+} // namespace Algorithm
 
 #endif
 

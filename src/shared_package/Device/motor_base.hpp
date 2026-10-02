@@ -7,7 +7,7 @@ namespace Device
 {
 
 #pragma pack(push, 1)
-struct Struct_Motor_Base
+struct MotorFeedbackFrame
 {
     float velocity = 0.0f;  // 速度 (rad/s)
     float position = 0.0f;  // 位置 (rad)

@@ -26,13 +26,13 @@ namespace Algorithm
  * @note 典型用法：中断里 Push，主循环里 Pop。
  */
 template <typename T, uint32_t N>
-class Class_Circular_Buffer
+class CircularBuffer
 {
 public:
-    Class_Circular_Buffer() = default;
+    CircularBuffer() = default;
 
-    Class_Circular_Buffer(const Class_Circular_Buffer &) = delete;
-    Class_Circular_Buffer &operator=(const Class_Circular_Buffer &) = delete;
+    CircularBuffer(const CircularBuffer &) = delete;
+    CircularBuffer &operator=(const CircularBuffer &) = delete;
 
     /**
      * @brief  写入一个元素。
@@ -70,7 +70,7 @@ private:
  * @brief 写入元素：先落数据，再发布计数器，保证消费者不会读到半成品。
  */
 template <typename T, uint32_t N>
-bool Class_Circular_Buffer<T, N>::Push(const T &value)
+bool CircularBuffer<T, N>::Push(const T &value)
 {
     const uint32_t head = head_.load(std::memory_order_relaxed);
 
@@ -94,7 +94,7 @@ bool Class_Circular_Buffer<T, N>::Push(const T &value)
  * @brief 取出最旧元素。
  */
 template <typename T, uint32_t N>
-bool Class_Circular_Buffer<T, N>::Pop(T &out)
+bool CircularBuffer<T, N>::Pop(T &out)
 {
     const uint32_t tail = tail_.load(std::memory_order_relaxed);
 
@@ -117,7 +117,7 @@ bool Class_Circular_Buffer<T, N>::Pop(T &out)
  * @brief 清空缓冲区。
  */
 template <typename T, uint32_t N>
-void Class_Circular_Buffer<T, N>::Clear()
+void CircularBuffer<T, N>::Clear()
 {
     head_ = 0;
     tail_ = 0;

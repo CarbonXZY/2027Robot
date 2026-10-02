@@ -13,37 +13,32 @@
 
 #include "alg_fsm.h"
 
-/* Private macros ------------------------------------------------------------*/
-
-/* Private types -------------------------------------------------------------*/
-
-/* Private variables ---------------------------------------------------------*/
-
-/* Private function declarations ---------------------------------------------*/
-
 /* Function prototypes -------------------------------------------------------*/
+
+namespace Algorithm
+{
 
 /**
  * @brief 状态机初始化
  *
- * @param __Status_Number 状态数量
- * @param __Now_Status_Serial 当前指定状态机初始编号
+ * @param status_number 状态数量
+ * @param now_status_serial 当前指定状态机初始编号
  */
-void Class_FSM::Init(uint8_t __Status_Number, uint8_t __Now_Status_Serial)
+void Fsm::Init(uint8_t status_number, uint8_t now_status_serial)
 {
-    Status_Number = __Status_Number;
+    status_number_ = status_number;
 
-    Now_Status_Serial = __Now_Status_Serial;
+    now_status_serial_ = now_status_serial;
 
     // 所有状态全刷0
-    for (int i = 0; i < Status_Number; i++)
+    for (int i = 0; i < status_number_; i++)
     {
-        Status[i].Status_Stage = Status_Stage_DISABLE;
-        Status[i].Count_Time = 0;
+        status_[i].status_stage = StatusStage::kDisable;
+        status_[i].count_time = 0;
     }
 
     // 使能初始状态
-    Status[__Now_Status_Serial].Status_Stage = Status_Stage_ENABLE;
+    status_[now_status_serial_].status_stage = StatusStage::kEnable;
 }
 
 /**
@@ -51,11 +46,13 @@ void Class_FSM::Init(uint8_t __Status_Number, uint8_t __Now_Status_Serial)
  * 这是一个模板, 使用时请根据不同处理情况在不同文件内重新定义
  *
  */
-void Class_FSM::TIM_Calculate_PeriodElapsedCallback()
+void Fsm::TimCalculatePeriodElapsedCallback()
 {
-    Status[Now_Status_Serial].Count_Time++;
+    status_[now_status_serial_].count_time++;
 
     // 自己接着编写状态转移函数
 }
+
+} // namespace Algorithm
 
 /************************ COPYRIGHT(C) USTC-ROBOWALKER **************************/

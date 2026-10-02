@@ -9,12 +9,17 @@
 
   <buildtool_depend>ament_cmake</buildtool_depend>
 
+  <depend>rclcpp</depend>
+  <depend>geometry_msgs</depend>
+  <depend>telecontrol_msgs</depend>
+
   <exec_depend>robot_state_publisher</exec_depend>
   <exec_depend>controller_manager</exec_depend>
   <exec_depend>joint_state_broadcaster</exec_depend>
   <exec_depend>mecanum_drive_controller</exec_depend>
   <exec_depend>chassis</exec_depend>
   <exec_depend>leg</exec_depend>
+  <exec_depend>telecontrol</exec_depend>
 
   <export>
     <build_type>ament_cmake</build_type>

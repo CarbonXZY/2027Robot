@@ -23,16 +23,6 @@
 #include <tsk_config_and_callback.hpp>
 #include <utils.hpp>
 
-/* Private macros ------------------------------------------------------------*/
-
-/* Private types -------------------------------------------------------------*/
-
-/* Private variables ---------------------------------------------------------*/
-
-/* Private function declarations ---------------------------------------------*/
-
-/* Function prototypes -------------------------------------------------------*/
-
 namespace leg
 {
 
@@ -54,12 +44,12 @@ CallbackReturn LegSystem::on_init(const hardware_interface::HardwareInfo &info)
     }
 
     // 四条腿一帧，id 与下位机固件约定
-    Leg_Id = Utils::ReadParam<uint8_t>(info.hardware_parameters, "leg_id", 3);
+    leg_id_ = Utils::ReadParam<uint8_t>(info.hardware_parameters, "leg_id", 3);
 
     // 按 URDF 关节声明顺序（前左/前右/后左/后右）存下关节名
-    for (size_t i = 0; i < Leg_Count; ++i)
+    for (size_t i = 0; i < kLegCount; ++i)
     {
-        Joint_Names[i] = info.joints[i].name;
+        joint_names_[i] = info.joints[i].name;
     }
 
     return CallbackReturn::SUCCESS;
@@ -73,10 +63,10 @@ CallbackReturn LegSystem::on_init(const hardware_interface::HardwareInfo &info)
 std::vector<hardware_interface::StateInterface> LegSystem::export_state_interfaces()
 {
     std::vector<hardware_interface::StateInterface> ifs;
-    for (size_t i = 0; i < Leg_Count; ++i)
+    for (size_t i = 0; i < kLegCount; ++i)
     {
-        ifs.emplace_back(Joint_Names[i], HW_IF_POSITION, &Now_Position[i]);
-        ifs.emplace_back(Joint_Names[i], HW_IF_VELOCITY, &Now_Velocity[i]);
+        ifs.emplace_back(joint_names_[i], HW_IF_POSITION, &now_position_[i]);
+        ifs.emplace_back(joint_names_[i], HW_IF_VELOCITY, &now_velocity_[i]);
     }
     return ifs;
 }
@@ -89,9 +79,9 @@ std::vector<hardware_interface::StateInterface> LegSystem::export_state_interfac
 std::vector<hardware_interface::CommandInterface> LegSystem::export_command_interfaces()
 {
     std::vector<hardware_interface::CommandInterface> ifs;
-    for (size_t i = 0; i < Leg_Count; ++i)
+    for (size_t i = 0; i < kLegCount; ++i)
     {
-        ifs.emplace_back(Joint_Names[i], HW_IF_POSITION, &Target_Position[i]);
+        ifs.emplace_back(joint_names_[i], HW_IF_POSITION, &target_position_[i]);
     }
     return ifs;
 }
@@ -103,24 +93,24 @@ std::vector<hardware_interface::CommandInterface> LegSystem::export_command_inte
  */
 CallbackReturn LegSystem::on_configure(const rclcpp_lifecycle::State &)
 {
-    // 指向全局实例，四条腿绑成一帧：下行 Tx_Buffer，上行 Rx_Buffer
-    Communication_Interface = &Middleware::USB_Communication_Interface;
+    // 指向全局实例，四条腿绑成一帧：下行 tx_buffer_，上行 rx_buffer_
+    communication_interface_ = &Middleware::g_usb_communication_interface;
 
-    if (!Communication_Interface->Register(Leg_Id, &Tx_Buffer, &Rx_Buffer,
-                                           sizeof(Tx_Buffer), sizeof(Rx_Buffer)))
+    if (!communication_interface_->Register(leg_id_, &tx_buffer_, &rx_buffer_,
+                                            sizeof(tx_buffer_), sizeof(rx_buffer_)))
     {
-        RCLCPP_ERROR(rclcpp::get_logger("LegSystem"), "绑定帧 id=%u 失败", Leg_Id);
+        RCLCPP_ERROR(rclcpp::get_logger("LegSystem"), "绑定帧 id=%u 失败", leg_id_);
         return CallbackReturn::ERROR;
     }
 
-    if (!Task::Task_Init())
+    if (!Task::TaskInit())
     {
         RCLCPP_ERROR(rclcpp::get_logger("LegSystem"), "打开 USB-CDC 失败");
         return CallbackReturn::ERROR;
     }
 
     RCLCPP_INFO(rclcpp::get_logger("LegSystem"), "已绑定腿帧 id=%u（tx %zu 字节 / rx %zu 字节）",
-                Leg_Id, sizeof(Tx_Buffer), sizeof(Rx_Buffer));
+                leg_id_, sizeof(tx_buffer_), sizeof(rx_buffer_));
     return CallbackReturn::SUCCESS;
 }
 
@@ -145,42 +135,42 @@ CallbackReturn LegSystem::on_deactivate(const rclcpp_lifecycle::State &)
 }
 
 /**
- * @brief 把 Rx_Buffer 里的值刷进状态接口
- * 数据在接收线程到达时已由 Rx_RptlCallback() 分发进 Rx_Buffer，这里只做读取。
+ * @brief 把 rx_buffer_ 里的值刷进状态接口
+ * 数据在接收线程到达时已由 RxRptlCallback() 分发进 rx_buffer_，这里只做读取。
  *
  * @return hardware_interface::return_type 结果
  */
 hardware_interface::return_type LegSystem::read(const rclcpp::Time &, const rclcpp::Duration &)
 {
-    for (size_t i = 0; i < Leg_Count; ++i)
+    for (size_t i = 0; i < kLegCount; ++i)
     {
-        Now_Position[i] = static_cast<double>(Rx_Buffer.motor[i].position);
-        Now_Velocity[i] = static_cast<double>(Rx_Buffer.motor[i].velocity);
+        now_position_[i] = static_cast<double>(rx_buffer_.motor[i].position);
+        now_velocity_[i] = static_cast<double>(rx_buffer_.motor[i].velocity);
     }
 
     // 调试：表格更新式打印四条腿位置（windows_name "leg"，首次调用会自动弹独立窗口）
     Utils::Debug_Log::CurrentMode() = Utils::Debug_Log::Mode::Refresh;
     Utils::Debug_Log::Print("leg", "pos = %.3f %.3f %.3f %.3f",
-                            Rx_Buffer.motor[0].position, Rx_Buffer.motor[1].position,
-                            Rx_Buffer.motor[2].position, Rx_Buffer.motor[3].position);
+                            rx_buffer_.motor[0].position, rx_buffer_.motor[1].position,
+                            rx_buffer_.motor[2].position, rx_buffer_.motor[3].position);
 
     return hardware_interface::return_type::OK;
 }
 
 /**
- * @brief 把命令接口里的目标位置写进 Tx_Buffer，并推一包
+ * @brief 把命令接口里的目标位置写进 tx_buffer_，并推一包
  *
  * @return hardware_interface::return_type 结果
  */
 hardware_interface::return_type LegSystem::write(const rclcpp::Time &, const rclcpp::Duration &)
 {
     // 只写 tx 结构体；Send() 不在这里调 —— 它会把所有已注册的帧打成一包，
-    for (size_t i = 0; i < Leg_Count; ++i)
+    for (size_t i = 0; i < kLegCount; ++i)
     {
-        Tx_Buffer.position[i] = static_cast<float>(Target_Position[i]);
+        tx_buffer_.position[i] = static_cast<float>(target_position_[i]);
     }
 
-    Task::Task_Loop();
+    Task::TaskLoop();
     return hardware_interface::return_type::OK;
 }
 
@@ -193,19 +183,19 @@ hardware_interface::return_type LegSystem::write(const rclcpp::Time &, const rcl
  */
 controller_interface::CallbackReturn LegController::on_init()
 {
-    Joint_Names = auto_declare<std::vector<std::string>>("joints", {});
-    Now_Position.assign(Joint_Names.size(), 0.0);
-    Now_Velocity.assign(Joint_Names.size(), 0.0);
-    Target_Position.assign(Joint_Names.size(), 0.0);
+    joint_names_ = auto_declare<std::vector<std::string>>("joints", {});
+    now_position_.assign(joint_names_.size(), 0.0);
+    now_velocity_.assign(joint_names_.size(), 0.0);
+    target_position_.assign(joint_names_.size(), 0.0);
 
-    FSM_Leg.Controller = this;
-    FSM_Leg.Init(MAX_LEG_STATUS, Leg_Status_Init);
+    fsm_leg_.controller_ = this;
+    fsm_leg_.Init(static_cast<uint8_t>(LegStatus::kCount), static_cast<uint8_t>(LegStatus::kInit));
 
     return controller_interface::CallbackReturn::SUCCESS;
 }
 
 /**
- * @brief 认领四条腿的 position 命令接口（写入硬件侧的 Target_Position）
+ * @brief 认领四条腿的 position 命令接口（写入硬件侧的 target_position_）
  *
  * @return controller_interface::InterfaceConfiguration 配置
  */
@@ -213,7 +203,7 @@ controller_interface::InterfaceConfiguration LegController::command_interface_co
 {
     controller_interface::InterfaceConfiguration cfg;
     cfg.type = controller_interface::interface_configuration_type::INDIVIDUAL;
-    for (const auto &name : Joint_Names)
+    for (const auto &name : joint_names_)
     {
         cfg.names.push_back(name + "/" + HW_IF_POSITION);
     }
@@ -229,7 +219,7 @@ controller_interface::InterfaceConfiguration LegController::state_interface_conf
 {
     controller_interface::InterfaceConfiguration cfg;
     cfg.type = controller_interface::interface_configuration_type::INDIVIDUAL;
-    for (const auto &name : Joint_Names)
+    for (const auto &name : joint_names_)
     {
         cfg.names.push_back(name + "/" + HW_IF_POSITION);
         cfg.names.push_back(name + "/" + HW_IF_VELOCITY);
@@ -245,34 +235,34 @@ controller_interface::InterfaceConfiguration LegController::state_interface_conf
 controller_interface::return_type LegController::update(const rclcpp::Time &, const rclcpp::Duration &)
 {
     // 下位机断链：整个控制循环停手，状态机也冻结，等下一次 alive 再继续
-    if (!Task::MCU_Alive)
+    if (!Task::g_mcu_alive)
     {
         return controller_interface::return_type::OK;
     }
 
     // INDIVIDUAL 下 state_interfaces_ 的顺序 = state_interface_configuration() 里 names 的顺序
-    for (size_t i = 0; i < Joint_Names.size(); ++i)
+    for (size_t i = 0; i < joint_names_.size(); ++i)
     {
-        Now_Position[i] = state_interfaces_[2 * i].get_value();
-        Now_Velocity[i] = state_interfaces_[2 * i + 1].get_value();
-        command_interfaces_[i].set_value(Target_Position[i]);
+        now_position_[i] = state_interfaces_[2 * i].get_value();
+        now_velocity_[i] = state_interfaces_[2 * i + 1].get_value();
+        command_interfaces_[i].set_value(target_position_[i]);
     }
 
-    FSM_Leg.Leg_TIM_Status_PeriodElapsedCallback();
+    fsm_leg_.TimStatusPeriodElapsedCallback();
 
     return controller_interface::return_type::OK;
 }
 
 /**
- * @brief 按当前状态把目标位置刷进 Target_Position
+ * @brief 按当前状态把目标位置刷进 target_position_
  */
-void LegController::Move_To_Position()
+void LegController::MoveToPosition()
 {
-    uint8_t status = FSM_Leg.Get_Now_Status_Serial();
+    const uint8_t status = fsm_leg_.GetNowStatusSerial();
 
-    for (size_t i = 0; i < Joint_Names.size(); ++i)
+    for (size_t i = 0; i < joint_names_.size(); ++i)
     {
-        Target_Position[i] = Approach_Target[status][i];
+        target_position_[i] = approach_target_[status][i];
     }
 }
 
@@ -282,12 +272,12 @@ void LegController::Move_To_Position()
  * @return true 都到位
  * @return false 还有腿没到
  */
-bool LegController::Is_Action_Finished()
+bool LegController::IsActionFinished()
 {
-    for (size_t i = 0; i < Joint_Names.size(); ++i)
+    for (size_t i = 0; i < joint_names_.size(); ++i)
     {
-        if (std::abs(Now_Velocity[i]) >= Velocity_Approach_Threthold ||
-            std::abs(Now_Position[i] - Target_Position[i]) >= Distance_Approach_Threthold)
+        if (std::abs(now_velocity_[i]) >= velocity_approach_threshold_ ||
+            std::abs(now_position_[i] - target_position_[i]) >= distance_approach_threshold_)
         {
             return false;
         }
@@ -299,30 +289,30 @@ bool LegController::Is_Action_Finished()
 /**
  * @brief 状态机周期回调，节奏由 launch 的 update_rate 决定（10 Hz）
  */
-void LegFSM::Leg_TIM_Status_PeriodElapsedCallback()
+void LegFsm::TimStatusPeriodElapsedCallback()
 {
-    Status[Now_Status_Serial].Count_Time++;
+    status_[now_status_serial_].count_time++;
 
-    switch (Now_Status_Serial)
+    switch (now_status_serial_)
     {
-        case Leg_Status_Init:
+        case static_cast<uint8_t>(LegStatus::kInit):
         {
-            Controller->Move_To_Position();
+            controller_->MoveToPosition();
 
-            if (Controller->Is_Action_Finished())
+            if (controller_->IsActionFinished())
             {
-                Set_Status(Leg_Status_Lift);
+                SetStatus(static_cast<uint8_t>(LegStatus::kLift));
             }
             break;
         }
 
-        case Leg_Status_Lift:
+        case static_cast<uint8_t>(LegStatus::kLift):
         {
-            Controller->Move_To_Position();
+            controller_->MoveToPosition();
 
-            if (Controller->Is_Action_Finished())
+            if (controller_->IsActionFinished())
             {
-                Set_Status(Leg_Status_Init);
+                SetStatus(static_cast<uint8_t>(LegStatus::kInit));
             }
             break;
         }

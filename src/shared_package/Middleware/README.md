@@ -52,16 +52,16 @@
 
 | 接口 | 说明 |
 | --- | --- |
-| `void Init(Communication_Function send)` | 绑定发送函数，通常在 bringup 时调用一次 |
+| `void Init(CommunicationFunction send)` | 绑定发送函数，通常在 bringup 时调用一次 |
 | `bool Register(uint8_t id, const void* tx, void* rx, uint8_t tx_size, uint8_t rx_size)` | 注册一帧，成功返回 `true` |
 | `void Send()` | 打包所有已注册的 tx 帧并交给 `send_function` |
-| `void Rx_RptlCallback(uint8_t* data, uint16_t length)` | 接收入口，由传输层的接收线程调用 |
+| `void RxRptlCallback(uint8_t* data, uint16_t length)` | 接收入口，由传输层的接收线程调用 |
 
-发送回调类型为 `using Communication_Function = int64_t (*)(uint8_t* buf, size_t len)`，
+发送回调类型为 `using CommunicationFunction = int64_t (*)(uint8_t* buf, size_t len)`，
 返回值是实际接受的字节数，返回负值表示失败。它是**裸函数指针而非 `std::function`**，
 所以只能绑定静态函数或无捕获 lambda。
 
-全局实例 `Control_Frame::USB_Communication_Interface` 定义在 `.cpp` 末尾，
+全局实例 `Middleware::g_usb_communication_interface` 定义在 `.cpp` 末尾，
 进程内共享同一个注册表和同一个 `send_function`。
 
 ### Register 的拒绝条件
@@ -98,7 +98,7 @@
 
 ## 接收
 
-`Rx_RptlCallback()` 由传输层的接收线程直接调用，就地解包、校验、分发，
+`RxRptlCallback()` 由传输层的接收线程直接调用，就地解包、校验、分发，
 **不跨调用保留任何状态**——没有重组缓冲，一包进来就处理完一包。
 
 逐帧推进的流程：
@@ -125,7 +125,7 @@
 ## 线程与并发
 
 - `Send()` 只应在控制线程调用。打包缓冲 `buffer` 与注册表在发送期间被读写。
-- `Rx_RptlCallback()` 在接收线程中被调用，会写入各 `rx` 结构体。
+- `RxRptlCallback()` 在接收线程中被调用，会写入各 `rx` 结构体。
 - 因此 **`rx` 结构体是「接收线程写、控制线程读」**。两侧对同一结构体的访问是
   普通的内存读写，没有任何同步。这是刻意的设计取舍：控制器输入本身就有滞后，
   丢一个周期的采样对闭环稳定性没有影响，所以不做加锁也不做强同步。
@@ -149,24 +149,24 @@
 ```cpp
 #include <Communication_Interface.hpp>
 
-struct Struct_Motor_Tx { float velocity[4]; };
-struct Struct_Motor_Rx { Control_Frame::Struct_Motor_Base motor[4]; };
+struct ChassisTx { float velocity[4]; };
+struct ChassisRx { Device::MotorFeedbackFrame motor[4]; };
 
-Struct_Motor_Tx Tx;
-Struct_Motor_Rx Rx;
+ChassisTx Tx;
+ChassisRx Rx;
 
 // 绑定：整个结构体一帧，id=1，下行 16 字节、上行 36 字节
-Control_Frame::USB_Communication_Interface.Register(1, &Tx, &Rx, sizeof(Tx), sizeof(Rx));
+Middleware::g_usb_communication_interface.Register(1, &Tx, &Rx, sizeof(Tx), sizeof(Rx));
 
 // 控制线程：写结构体后打包发出
 Tx.velocity[0] = 1.5f;
-Control_Frame::USB_Communication_Interface.Send();
+Middleware::g_usb_communication_interface.Send();
 
 // 控制线程：读结构体（由接收线程在数据到达时填好）
 const float v = Rx.motor[0].velocity;
 ```
 
-传输层的接线方式见 `Task/tsk_config_and_callback.cpp`：在 `Task_Init()` 里打开
+传输层的接线方式见 `Task/tsk_config_and_callback.cpp`：在 `TaskInit()` 里打开
 USB-CDC，用两个无捕获 lambda 分别接上收发，再调用 `Init()`。
 
 ## 仿真
@@ -183,7 +183,7 @@ g++ -std=c++17 -Wall -Wextra -Wpedantic \
 ```
 
 - `sim_host.cpp` 用的是真的本中间件（全局实例），发送回调是一条「假传输」，
-  把打包好的字节直接喂给从机，再把从机的回包喂回 `Rx_RptlCallback()`。
+  把打包好的字节直接喂给从机，再把从机的回包喂回 `RxRptlCallback()`。
 - `sim_slave.cpp` **独立重写了一遍线格式与 CRC**，且刻意不 include
   `motor_base.hpp`、自己按相同布局写了一遍结构体，用来交叉验证两侧对线格式和
   内存布局的理解确实一致。
