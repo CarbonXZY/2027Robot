@@ -146,6 +146,12 @@ namespace Device
             float gearbox_rate = 36.0f,
             float current_max = 10.0f);
 
+        // 禁止无参构造
+        MotorDjiC610() = delete;
+
+        // 禁止赋值构造
+        MotorDjiC610& operator=(const MotorDjiC610&) = delete;
+
         /**
          * @brief 电机控制初始化
          * @param method 控制模式
@@ -462,6 +468,11 @@ namespace Device
             MotorDjiId fdcan_rx_id,
             float gearbox_rate = 3591.0f / 187.0f,
             float current_max = 20.0f);
+
+        MotorDjiC620() = delete;
+
+        // 禁止赋值构造
+        MotorDjiC620& operator=(const MotorDjiC620&) = delete;
 
         /**
          * @brief 电机控制初始化

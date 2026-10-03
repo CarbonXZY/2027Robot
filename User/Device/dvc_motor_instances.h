@@ -17,6 +17,8 @@ extern MotorDjiC620 g_leg_front_right;
 extern MotorDjiC620 g_leg_rear_left;
 extern MotorDjiC620 g_leg_rear_right;
 
+extern MotorDjiC610 g_motor_clamp;
+
 // 底盘 4 轮，与上位机 joints 一一对应（前左/前右/后左/后右）
 extern MotorDjiC620 g_chassis_front_left;
 extern MotorDjiC620 g_chassis_front_right;

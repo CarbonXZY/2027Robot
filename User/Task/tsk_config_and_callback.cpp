@@ -23,6 +23,7 @@
 #include "dvc_motor_instances.h"
 #include "ita_chariot.h"
 #include "tsk_config_and_callback.h"
+#include "Gripper/mod_gripper.h"
 
 namespace Task
 {

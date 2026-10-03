@@ -64,6 +64,54 @@ public:
     float GetIntegralError();
     float GetOut();
 
+    // 初始化相关常量
+
+    // 获取PID计时器周期, s
+    float GetDT() const { return (d_t_); }
+    // 获取死区
+    float GetDeadZone() const { return (dead_zone_); }
+    // 获取微分先行
+    PidDFirst GetDFirst() const { return (d_first_); }
+
+    // 内部变量
+
+    // 获取之前的当前值
+    float GetPreNow() const { return (pre_now_); }
+    // 获取之前的目标值
+    float GetPreTarget() const { return (pre_target_); }
+    // 获取之前的输出值
+    float GetPreOut() const { return (pre_out_); }
+    // 获取前向误差
+    float GetPreError() const { return (pre_error_); }
+
+    // 写变量
+
+    // 获取PID的P
+    float GetKp() const { return (k_p_); }
+    // 获取PID的I
+    float GetKi() const { return (k_i_); }
+    // 获取PID的D
+    float GetKd() const { return (k_d_); }
+    // 获取前馈
+    float GetKf() const { return (k_f_); }
+
+    // 获取积分限幅, 0为不限制
+    float GetIOutMax() const { return (i_out_max_); }
+    // 获取输出限幅, 0为不限制
+    float GetOutMax() const { return (out_max_); }
+
+    // 获取变速积分定速内段阈值, 0为不限制
+    float GetIVariableSpeedA() const { return (i_variable_speed_a_); }
+    // 获取变速积分变速区间, 0为不限制
+    float GetIVariableSpeedB() const { return (i_variable_speed_b_); }
+    // 获取积分分离阈值, 0为不限制
+    float GetISeparateThreshold() const { return (i_separate_threshold_); }
+
+    // 获取目标值
+    float GetTarget() const { return (target_); }
+    // 获取当前值
+    float GetNow() const { return (now_); }
+
     void SetKP(float k_p);
     void SetKI(float k_i);
     void SetKD(float k_d);

@@ -24,6 +24,8 @@ MotorDjiC620 g_leg_front_right(&hfdcan1, MotorDjiId::kId0x202);
 MotorDjiC620 g_leg_rear_left(&hfdcan1, MotorDjiId::kId0x203);
 MotorDjiC620 g_leg_rear_right(&hfdcan1, MotorDjiId::kId0x204);
 
+MotorDjiC610 g_motor_clamp(&hfdcan1, MotorDjiId::kId0x201);
+
 // 底盘 4 轮，接在腿后面（M3508 标准 ID 段 0x201~0x208）
 MotorDjiC620 g_chassis_front_left(&hfdcan1, MotorDjiId::kId0x205);
 MotorDjiC620 g_chassis_front_right(&hfdcan1, MotorDjiId::kId0x206);
