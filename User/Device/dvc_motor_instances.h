@@ -11,11 +11,15 @@
 namespace Device
 {
 
+// void MotorAlive100msCallback();
+
 // 腿 4 关节，与上位机 joints 一一对应
 extern MotorDjiC620 g_leg_front_left;
 extern MotorDjiC620 g_leg_front_right;
 extern MotorDjiC620 g_leg_rear_left;
 extern MotorDjiC620 g_leg_rear_right;
+
+extern MotorDjiC610 g_motor_clamp;
 
 } // namespace Device
 

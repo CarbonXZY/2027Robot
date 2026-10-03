@@ -25,4 +25,12 @@ MotorDjiC620 g_leg_front_left(&hfdcan1, MotorDjiId::kId0x201);
 MotorDjiC620 g_leg_front_right(&hfdcan1, MotorDjiId::kId0x202);
 MotorDjiC620 g_leg_rear_left(&hfdcan1, MotorDjiId::kId0x203);
 MotorDjiC620 g_leg_rear_right(&hfdcan1, MotorDjiId::kId0x204);
+
+MotorDjiC610 g_motor_clamp(&hfdcan1, MotorDjiId::kId0x201);
+
+// void MotorAlive100msCallback()
+// {
+//     g_motor_clamp.Tim100msAlivePeriodElapsedCallback();
+// }
+
 } // namespace Device
