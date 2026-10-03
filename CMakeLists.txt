@@ -37,7 +37,11 @@ set(CMAKE_CXX_EXTENSIONS ON)
 # Create an executable object type
 add_executable(${CMAKE_PROJECT_NAME}
     User/Module/Gripper/mod_gripper.cpp
-    User/Module/Gripper/mod_gripper.h)
+    User/Module/Gripper/mod_gripper.h
+    User/Device/test/motor_dji.cpp
+    User/Device/test/motor_dji.h
+    User/Algorithm/alg_mit.cpp
+    User/Algorithm/alg_mit.h)
 
 # Add STM32CubeMX generated sources
 add_subdirectory(cmake/stm32cubemx)
