@@ -257,10 +257,11 @@ void Tim1msCanPeriodElapsedCallback()
 		//FdcanSendData(&hfdcan1, 0x1ff, g_fdcan1_0x1ff_tx_data, FdcanIdType::kExtended);
 
     // CAN1电机
-    // 0x200 这一帧管 ID 0x201~0x204 四台电机（每台占两字节），目前只挂了 0x201 那台 C610。
-    // C610 要求控制帧 ~1kHz 不能断，所以这帧必须每毫秒都发，哪怕内容是 0。
+    // 0x200 管 ID 0x201~0x204（腿 4 关节），0x1ff 管 ID 0x205~0x208（底盘 4 轮），
+    // 每台电机占两字节。C620 要求控制帧 ~1kHz 不能断，两帧都必须每毫秒都发，
+    // 哪怕内容是 0。
     FdcanSendData(&hfdcan1, 0x200, g_fdcan1_0x200_tx_data);
-    // FdcanSendData(&hfdcan1, 0x1ff, g_fdcan1_0x1ff_tx_data);
+    FdcanSendData(&hfdcan1, 0x1ff, g_fdcan1_0x1ff_tx_data);
     // FdcanSendData(&hfdcan1, 0x2ff, g_fdcan1_0x2ff_tx_data);
 
     // CAN2电机
