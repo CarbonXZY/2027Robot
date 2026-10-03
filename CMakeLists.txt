@@ -82,6 +82,9 @@ target_include_directories(${CMAKE_PROJECT_NAME} PRIVATE
     ${CMAKE_SOURCE_DIR}/User/Algorithm
     ${CMAKE_SOURCE_DIR}/User/Module
     ${CMAKE_SOURCE_DIR}/User/Module/Leg
+    ${CMAKE_SOURCE_DIR}/User/Module/Chassis
+    ${CMAKE_SOURCE_DIR}/User/Module/Gripper
+    ${CMAKE_SOURCE_DIR}/User/Module/Telecontrol
     ${CMAKE_SOURCE_DIR}/User/Device
     ${CMAKE_SOURCE_DIR}/User/Driver
     ${CMAKE_SOURCE_DIR}/User/Interaction
