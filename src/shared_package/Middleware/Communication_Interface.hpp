@@ -1,4 +1,9 @@
-// Communication_Interface.hpp
+/**
+ * @file    Communication_Interface.hpp
+ * @author  Carbon
+ * @date    2026-10-04
+ * @brief   通信中间件：算法 <-> 通信，定长帧的打包 / 解包 / CRC16 / 按 id 分发
+ */
 #pragma once
 
 #include <cstddef>
@@ -14,14 +19,14 @@ namespace Middleware
 //   crc16 覆盖 [id][data...]
 //
 // 发送：控制线程调 Send()，把所有已注册的 tx 帧打包后交给 send_function。
-// 接收：Rx_RptlCallback() 交给底层 USB 注册，在接收线程里被回调，
+// 接收：RxRptlCallback() 交给底层 USB 注册，在接收线程里被回调，
 //       由它就地把 buffer 里的帧解包、校验并分发到各 rx 结构体。
-class Class_Communication_Interface
+class CommunicationInterface
 {
 public:
-    using Communication_Function = int64_t (*)(uint8_t *buf, size_t len);  // 发送字节，返回字节数
+    using CommunicationFunction = int64_t (*)(uint8_t *buf, size_t len);  // 发送字节，返回字节数
 
-    void Init(Communication_Function send);
+    void Init(CommunicationFunction send);
 
     // 注册一帧；tx/rx 可为空以支持只收/只发。失败返回 false。
     bool Register(uint8_t id, const void *tx, void *rx, uint8_t tx_size, uint8_t rx_size);
@@ -30,7 +35,7 @@ public:
 
     // 接收回调：给底层 USB 用，收到一包就调进来。只解包 + 转发，不跨调用保留状态。
     // 帧长按 id 从 registry 查出，逐帧往前走；CRC 不过的那一帧直接丢掉。
-    void Rx_RptlCallback(uint8_t *data, uint16_t length);
+    void RxRptlCallback(uint8_t *data, uint16_t length);
 
 private:
     static constexpr size_t kMaxFrames  = 8;
@@ -55,16 +60,16 @@ private:
 
     Entry *Find(uint8_t id);
 
-    Entry  entries[kMaxFrames]{};
-    size_t count = 0;
-    size_t used  = 0;
+    Entry  entries_[kMaxFrames]{};
+    size_t count_ = 0;
+    size_t used_  = 0;
 
-    uint8_t buffer[kBufferSize]{};  // 发送打包缓冲，仅控制线程访问
+    uint8_t buffer_[kBufferSize]{};  // 发送打包缓冲，仅控制线程访问
 
-    Communication_Function send_function{};
+    CommunicationFunction send_function_{};
 };
 
-// 全局实例：chassis 与传输层共用同一个 Communication_Interface
-extern Class_Communication_Interface USB_Communication_Interface;
+// 全局实例：chassis / leg 与传输层共用同一个 CommunicationInterface
+extern CommunicationInterface g_usb_communication_interface;
 
 }  // namespace Middleware

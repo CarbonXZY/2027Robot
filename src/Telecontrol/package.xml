@@ -1,9 +1,9 @@
 <?xml version="1.0"?>
 <?xml-model href="http://download.ros.org/schema/package_format3.xsd" schematypens="http://www.w3.org/2001/XMLSchema"?>
 <package format="3">
-  <name>leg</name>
+  <name>telecontrol</name>
   <version>0.0.0</version>
-  <description>ros2_control hardware interface for the 4 leg joints, using shared_package's Communication_Interface for read/write.</description>
+  <description>遥控链路（PC 端）：从 MCU 收遥控帧，经 ros2_control 的 sensor/broadcaster 转发成 ROS2 话题。</description>
   <maintainer email="carbon@todo.todo">carbon</maintainer>
   <license>Apache-2.0</license>
 
@@ -15,6 +15,7 @@
   <depend>controller_interface</depend>
   <depend>pluginlib</depend>
   <depend>shared_package</depend>
+  <depend>telecontrol_msgs</depend>
 
   <export>
     <build_type>ament_cmake</build_type>

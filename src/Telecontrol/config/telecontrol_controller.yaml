@@ -1,0 +1,5 @@
+# TelecontrolBroadcaster 配置（类型在 launch 里用 --controller-type 指定）
+telecontrol_broadcaster:
+  ros__parameters:
+    sensor_name: rc
+    topic: /telecontrol/rc_state

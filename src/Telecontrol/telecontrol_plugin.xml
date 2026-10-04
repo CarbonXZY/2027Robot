@@ -1,0 +1,18 @@
+<library path="telecontrol_hardware">
+  <class name="telecontrol/TelecontrolSystem"
+         type="Telecontrol::TelecontrolSystem"
+         base_class_type="hardware_interface::SensorInterface">
+    <description>
+      Telecontrol sensor interface. Uses shared_package's Communication_Interface
+      to receive the remote-control frame from the MCU and export it as state interfaces.
+    </description>
+  </class>
+
+  <class name="telecontrol/TelecontrolBroadcaster"
+         type="Telecontrol::TelecontrolBroadcaster"
+         base_class_type="controller_interface::ControllerInterface">
+    <description>
+      Publishes the remote-control state interfaces as telecontrol_msgs/RcState.
+    </description>
+  </class>
+</library>

@@ -1,4 +1,9 @@
-// Communication_Interface.cpp
+/**
+ * @file    Communication_Interface.cpp
+ * @author  Carbon
+ * @date    2026-10-04
+ * @brief   通信中间件实现：帧打包发送、收包解帧、CRC16 校验、按 id 分发
+ */
 #include "Communication_Interface.hpp"
 
 #include <cstring>
@@ -8,13 +13,13 @@
 namespace Middleware
 {
 
-void Class_Communication_Interface::Init(Communication_Function send)
+void CommunicationInterface::Init(CommunicationFunction send)
 {
-    // 不可重入：绑定只在 bringup 时做一次，count/used 归 Register 管，这里不动。
-    send_function = send;
+    // 不可重入：绑定只在 bringup 时做一次，count_/used_ 归 Register 管，这里不动。
+    send_function_ = send;
 }
 
-bool Class_Communication_Interface::Register(uint8_t id, const void *tx, void *rx, uint8_t tx_size, uint8_t rx_size)
+bool CommunicationInterface::Register(uint8_t id, const void *tx, void *rx, uint8_t tx_size, uint8_t rx_size)
 {
     if (tx == nullptr && rx == nullptr)
     {
@@ -28,71 +33,71 @@ bool Class_Communication_Interface::Register(uint8_t id, const void *tx, void *r
     {
         return false;
     }
-    if (count >= kMaxFrames)
+    if (count_ >= kMaxFrames)
     {
         return false;
     }
-    if (tx != nullptr && used + tx_size + kFrameOverhead > kBufferSize)
+    if (tx != nullptr && used_ + tx_size + kFrameOverhead > kBufferSize)
     {
         return false;
     }
 
-    used += (tx == nullptr ? 0 : tx_size + kFrameOverhead);
-    entries[count++] = Entry{id, tx, rx, tx_size, rx_size};
+    used_ += (tx == nullptr ? 0 : tx_size + kFrameOverhead);
+    entries_[count_++] = Entry{id, tx, rx, tx_size, rx_size};
     return true;
 }
 
-Class_Communication_Interface::Entry *Class_Communication_Interface::Find(uint8_t id)
+CommunicationInterface::Entry *CommunicationInterface::Find(uint8_t id)
 {
-    for (size_t i = 0; i < count; ++i)
+    for (size_t i = 0; i < count_; ++i)
     {
-        if (entries[i].id == id)
+        if (entries_[i].id == id)
         {
-            return &entries[i];
+            return &entries_[i];
         }
     }
     return nullptr;
 }
 
-void Class_Communication_Interface::Send()
+void CommunicationInterface::Send()
 {
-    if (!send_function || count == 0)
+    if (!send_function_ || count_ == 0)
     {
         return;
     }
 
-    uint8_t *p = buffer;
-    for (size_t i = 0; i < count; ++i)
+    uint8_t *p = buffer_;
+    for (size_t i = 0; i < count_; ++i)
     {
-        if (entries[i].tx == nullptr)
+        if (entries_[i].tx == nullptr)
         {
             continue;
         }
-        const size_t size  = entries[i].tx_size;
+        const size_t size  = entries_[i].tx_size;
         const size_t frame = kIdSize + size + kCrcSize;
 
         // 这一帧装不进本段就先发本段。因为只在帧边界上切，每段开头必定是 id。
-        if (p != buffer && static_cast<size_t>(p - buffer) + frame > kMaxSendSize)
+        if (p != buffer_ && static_cast<size_t>(p - buffer_) + frame > kMaxSendSize)
         {
-            send_function(buffer, static_cast<size_t>(p - buffer));
-            p = buffer;
+            send_function_(buffer_, static_cast<size_t>(p - buffer_));
+            p = buffer_;
         }
 
-        *p++ = entries[i].id;
-        std::memcpy(p, entries[i].tx, size);
-        const uint16_t crc = Algorithm::CRC_Lib::CRC16_CCITT::Calculate(p - kIdSize, kIdSize + size); // 覆盖 [id][data]
+        *p++ = entries_[i].id;
+        std::memcpy(p, entries_[i].tx, size);
+        const uint16_t crc = Algorithm::Crc16Ccitt::Calculate(p - kIdSize, kIdSize + size); // 覆盖 [id][data]
         p += size;
         *p++ = static_cast<uint8_t>(crc & 0xFF);
         *p++ = static_cast<uint8_t>(crc >> 8);
     }
 
-    if (p != buffer)
+    if (p != buffer_)
     {
-        send_function(buffer, static_cast<size_t>(p - buffer));
+        send_function_(buffer_, static_cast<size_t>(p - buffer_));
     }
 }
 
-void Class_Communication_Interface::Rx_RptlCallback(uint8_t *data, uint16_t length)
+void CommunicationInterface::RxRptlCallback(uint8_t *data, uint16_t length)
 {
     // 一包就是完整的一批帧：帧长按 id 从 registry 查出，逐帧往前走，CRC 不过的那帧丢掉。
     Entry *e = nullptr;
@@ -110,13 +115,13 @@ void Class_Communication_Interface::Rx_RptlCallback(uint8_t *data, uint16_t leng
 
         const uint16_t expect = static_cast<uint16_t>(data[i + kIdSize + e->rx_size] |
                                                       (static_cast<uint16_t>(data[i + kIdSize + e->rx_size + 1]) << 8));
-        if (Algorithm::CRC_Lib::CRC16_CCITT::Calculate(data + i, kIdSize + e->rx_size) == expect)
+        if (Algorithm::Crc16Ccitt::Calculate(data + i, kIdSize + e->rx_size) == expect)
         {
             std::memcpy(e->rx, data + i + kIdSize, e->rx_size);
         }
     }
 }
 
-Class_Communication_Interface USB_Communication_Interface;
+CommunicationInterface g_usb_communication_interface;
 
 } // namespace Middleware

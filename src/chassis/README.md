@@ -1,7 +1,7 @@
 # chassis
 
 麦克纳姆底盘的 `ros2_control` 硬件接口包。硬件接口通过 `shared_package` 的全局
-`Communication_Interface`（`Control_Frame::USB_Communication_Interface`）与底层（MCU/USB）收发数据。
+`CommunicationInterface`（`Middleware::g_usb_communication_interface`）与底层（MCU/USB）收发数据。
 
 ## 结构
 
@@ -14,7 +14,7 @@ chassis/
 └── README.md
 ```
 
-整机 URDF（含本包的 `<ros2_control>` 标签）在 `control_launch` 包里，本包不再自带 URDF/launch。
+整机 URDF（含本包的 `<ros2_control>` 标签）在 `robot` 包里，本包不再自带 URDF/launch。
 
 ## 依赖安装（Humble）
 
@@ -28,46 +28,43 @@ sudo apt install ros-humble-ros2-control ros-humble-ros2-controllers
 
 ```cpp
 // 发（下发指令）：4 个电机目标速度
-struct Struct_Motor_Tx { float velocity[Wheel_Count]; };
+struct ChassisTx { float velocity[kWheelCount]; };
 
-// 收（电机回传）：4 个电机速度 + 位置 + alive_flag
-struct Struct_Motor_Rx { Control_Frame::Struct_Motor_Base motor[Wheel_Count]; };
+// 收（电机回传）：4 个电机速度 + 位置
+struct ChassisRx { Device::MotorFeedbackFrame motor[kWheelCount]; };
 ```
 
-`Struct_Motor_Base` 定义在共享包 `shared_package/Device/motor_base.hpp`：
+`MotorFeedbackFrame` 定义在共享包 `shared_package/Device/motor_base.hpp`：
 
 ```cpp
-struct Struct_Motor_Base {
+struct MotorFeedbackFrame {
     float velocity;  // 速度 (rad/s)
     float position;  // 位置 (rad)
-    uint8_t alive_flag;
 };
 ```
 
-`alive_flag` 由下位机填：`1` 表示该电机在线，`0` 表示异常或尚未收到过回传（结构体默认值就是 0，所以第一帧到达之前是 0）。
-
-`on_configure` 里把这两个结构体绑到全局 `Control_Frame::USB_Communication_Interface`。
+`on_configure` 里把这两个结构体绑到全局 `Middleware::g_usb_communication_interface`。
 **整个底盘是线上的一帧**——一个结构体对一个 id，不是每个电机一个 id：
 
 | 方向 | 帧 id | 载荷 |
 |------|-------|------|
-| 下行 tx | `chassis_id`（默认 1） | `Struct_Motor_Tx`，16 字节 |
-| 上行 rx | 同上 | `Struct_Motor_Rx`，36 字节 |
+| 下行 tx | `CommFrameId::kChassis`（=1） | `ChassisTx`，16 字节 |
+| 上行 rx | 同上 | `ChassisRx`，32 字节 |
 
-线上每帧是 `[id][data][crc16]`，所以实际下发 19 字节、回传 39 字节，
+线上每帧是 `[id][data][crc16]`，所以实际下发 19 字节、回传 35 字节，
 都在单包上限 64 字节以内，各一个 USB 包。轮子之间的顺序就是结构体里数组的顺序，
 不再由 id 区分。
 
-- **write()**：只把指令速度写进 `Tx_Buffer.velocity[i]`，不发送。`Send()` 由
-  `Control_Frame::Task_Loop()` 每拍统一调一次，避免多部件重复发包。
-- **read()**：只从 `Rx_Buffer.motor[i]` 读速度/位置——数据在接收线程到达时已由中间件
-  分发进 `Rx_Buffer`，`read()` 本身不做 I/O。
+- **write()**：只把指令速度写进 `tx_buffer_.velocity[i]`，不发送。`Send()` 由
+  `Task::TaskLoop()` 每拍统一调一次，避免多部件重复发包。
+- **read()**：只从 `rx_buffer_.motor[i]` 读速度/位置——数据在接收线程到达时已由中间件
+  分发进 `rx_buffer_`，`read()` 本身不做 I/O。
 - 本类不做位置积分（位置来自电机回传）。
 
 两个结构体都带 `#pragma pack(push, 1)`。线格式没有长度字段，收发两侧的尺寸必须严格
 一致，一旦有填充字节就会整体错位。
 
-`chassis_id` 可在 URDF 的 `<param name="chassis_id">` 里改，需与下位机固件约定一致。
+帧 id 取自 `shared_package/Middleware/mid_config.h` 的 `CommFrameId::kChassis`，需与下位机固件约定一致。
 
 ## 控制器
 
@@ -86,7 +83,7 @@ struct Struct_Motor_Base {
 cd ~/Program_Projects/Control_Frame
 colcon build
 source install/setup.bash
-ros2 launch control_launch robot.launch
+ros2 launch robot robot.launch
 
 # 下发指令（Twist：vx 前后，vy 横移，wz 自转）
 ros2 topic pub /mecanum_drive_controller/reference_unstamped geometry_msgs/msg/Twist \

@@ -25,5 +25,5 @@ fi
 source install/setup.bash
 
 # 3. 启动
-echo "[launch.sh] ros2 launch control_launch robot.launch"
-ros2 launch control_launch robot.launch
+echo "[launch.sh] ros2 launch robot robot.launch"
+ros2 launch robot robot.launch

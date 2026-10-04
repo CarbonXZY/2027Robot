@@ -98,8 +98,6 @@
   <ros2_control name="ChassisSystem" type="system">
     <hardware>
       <plugin>chassis/ChassisSystem</plugin>
-      <!-- 整个底盘一帧，id 与下位机固件约定 -->
-      <param name="chassis_id">1</param>
     </hardware>
 
     <joint name="front_left_wheel_joint">
@@ -162,8 +160,6 @@
   <ros2_control name="LegSystem" type="system">
     <hardware>
       <plugin>leg/LegSystem</plugin>
-      <!-- 四条腿一帧，id 与下位机固件约定 -->
-      <param name="leg_id">3</param>
     </hardware>
 
     <joint name="front_left_leg_joint">
@@ -186,5 +182,28 @@
       <state_interface name="position"/>
       <state_interface name="velocity"/>
     </joint>
+  </ros2_control>
+
+  <ros2_control name="TelecontrolSystem" type="sensor">
+    <hardware>
+      <plugin>telecontrol/TelecontrolSystem</plugin>
+    </hardware>
+
+    <sensor name="rc">
+      <state_interface name="right_x"/>
+      <state_interface name="right_y"/>
+      <state_interface name="left_x"/>
+      <state_interface name="left_y"/>
+      <state_interface name="s1"/>
+      <state_interface name="sa"/>
+      <state_interface name="sb"/>
+      <state_interface name="sc"/>
+      <state_interface name="sd"/>
+      <state_interface name="se"/>
+      <state_interface name="rssi"/>
+      <state_interface name="link_quality"/>
+      <state_interface name="snr"/>
+      <state_interface name="failsafe"/>
+    </sensor>
   </ros2_control>
 </robot>

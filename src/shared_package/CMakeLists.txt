@@ -15,10 +15,12 @@ find_package(ament_cmake REQUIRED)
 find_package(Threads REQUIRED)
 
 # 把 Middleware（通信）、Task（初始化接线）编译成库，供其他包 find_package(shared_package) 后链接
-add_library(shared_package SHARED
-  Middleware/Communication_Interface.cpp
-  Driver/usb_cdc/usb_cdc.cpp
-  Task/tsk_config_and_callback.cpp)
+file(GLOB_RECURSE SHARED_PACKAGE_SOURCES CONFIGURE_DEPENDS
+  Middleware/*.cpp
+  Driver/*.cpp
+  Task/*.cpp
+  Algorithm/*.cpp)
+add_library(shared_package SHARED ${SHARED_PACKAGE_SOURCES})
 target_compile_features(shared_package PUBLIC cxx_std_17)
 target_include_directories(shared_package PUBLIC
   $<BUILD_INTERFACE:${CMAKE_CURRENT_SOURCE_DIR}/Middleware>
@@ -38,13 +40,14 @@ install(TARGETS shared_package
   RUNTIME DESTINATION bin)
 
 # 通信头（Middleware）+ 驱动头（Driver）+ 初始化接线头（Task）+ 算法头（Algorithm）+ 设备结构体头（Device）+ 工具头（Utils）
-install(FILES
-  Middleware/Communication_Interface.hpp
-  Driver/usb_cdc/usb_cdc.hpp
-  Task/tsk_config_and_callback.hpp
-  Algorithm/alg_crc.h
-  Device/motor_base.hpp
-  Utils/utils.hpp
+file(GLOB_RECURSE SHARED_PACKAGE_HEADERS CONFIGURE_DEPENDS
+  Middleware/*.hpp Middleware/*.h
+  Driver/*.hpp Driver/*.h
+  Task/*.hpp Task/*.h
+  Algorithm/*.hpp Algorithm/*.h
+  Device/*.hpp Device/*.h
+  Utils/*.hpp Utils/*.h)
+install(FILES ${SHARED_PACKAGE_HEADERS}
   DESTINATION include)
 
 ament_export_targets(export_${PROJECT_NAME} HAS_LIBRARY_TARGET)
