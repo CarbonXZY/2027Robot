@@ -1,4 +1,9 @@
-// Communication_Interface.cpp
+/**
+ * @file    Communication_Interface.cpp
+ * @author  Carbon
+ * @date    2026-10-04
+ * @brief   通信中间件实现：帧打包发送、收包解帧、CRC16 校验、按 id 分发
+ */
 #include "Communication_Interface.hpp"
 
 #include <cstring>

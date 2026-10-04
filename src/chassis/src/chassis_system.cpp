@@ -1,13 +1,18 @@
-// chassis_system.cpp
+/**
+ * @file    chassis_system.cpp
+ * @author  Carbon
+ * @date    2026-10-04
+ * @brief   麦克纳姆底盘硬件接口实现（ros2_control SystemInterface）
+ */
 #include "chassis/chassis_system.hpp"
 
 #include <string>
 
 #include <hardware_interface/types/hardware_interface_type_values.hpp>
+#include <mid_config.h>
 #include <pluginlib/class_list_macros.hpp>
 #include <rclcpp/rclcpp.hpp>
 #include <tsk_config_and_callback.hpp>
-#include <utils.hpp>
 
 namespace chassis
 {
@@ -22,9 +27,6 @@ namespace chassis
     {
       return CallbackReturn::ERROR;
     }
-
-    // 整个底盘一帧，id 与下位机固件约定
-    chassis_id_ = Utils::ReadParam<uint8_t>(info.hardware_parameters, "chassis_id", 1);
 
     // 按 URDF 关节声明顺序（前左/前右/后左/后右）存下关节名
     for (size_t i = 0; i < kWheelCount; ++i)
@@ -61,10 +63,12 @@ namespace chassis
     // 指向全局实例，整个底盘绑成一帧：下行 tx_buffer_，上行 rx_buffer_
     communication_interface_ = &Middleware::g_usb_communication_interface;
 
-    if (!communication_interface_->Register(chassis_id_, &tx_buffer_, &rx_buffer_,
-                                            sizeof(tx_buffer_), sizeof(rx_buffer_)))
+    if (!communication_interface_->Register(
+            static_cast<uint8_t>(Middleware::CommFrameId::kChassis),
+            &tx_buffer_, &rx_buffer_, sizeof(tx_buffer_), sizeof(rx_buffer_)))
     {
-      RCLCPP_ERROR(rclcpp::get_logger("ChassisSystem"), "绑定帧 id=%u 失败", chassis_id_);
+      RCLCPP_ERROR(rclcpp::get_logger("ChassisSystem"), "绑定帧 id=%u 失败",
+                   static_cast<uint8_t>(Middleware::CommFrameId::kChassis));
       return CallbackReturn::ERROR;
     }
 
@@ -75,7 +79,7 @@ namespace chassis
     }
 
     RCLCPP_INFO(rclcpp::get_logger("ChassisSystem"), "已绑定底盘帧 id=%u（tx %zu 字节 / rx %zu 字节）",
-                chassis_id_, sizeof(tx_buffer_), sizeof(rx_buffer_));
+                static_cast<uint8_t>(Middleware::CommFrameId::kChassis), sizeof(tx_buffer_), sizeof(rx_buffer_));
     return CallbackReturn::SUCCESS;
   }
 

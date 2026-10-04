@@ -1,4 +1,9 @@
-// Communication_Interface.hpp
+/**
+ * @file    Communication_Interface.hpp
+ * @author  Carbon
+ * @date    2026-10-04
+ * @brief   通信中间件：算法 <-> 通信，定长帧的打包 / 解包 / CRC16 / 按 id 分发
+ */
 #pragma once
 
 #include <cstddef>

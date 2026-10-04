@@ -48,7 +48,7 @@ struct MotorFeedbackFrame {
 
 | 方向 | 帧 id | 载荷 |
 |------|-------|------|
-| 下行 tx | `chassis_id`（默认 1） | `ChassisTx`，16 字节 |
+| 下行 tx | `CommFrameId::kChassis`（=1） | `ChassisTx`，16 字节 |
 | 上行 rx | 同上 | `ChassisRx`，32 字节 |
 
 线上每帧是 `[id][data][crc16]`，所以实际下发 19 字节、回传 35 字节，
@@ -64,7 +64,7 @@ struct MotorFeedbackFrame {
 两个结构体都带 `#pragma pack(push, 1)`。线格式没有长度字段，收发两侧的尺寸必须严格
 一致，一旦有填充字节就会整体错位。
 
-`chassis_id` 可在 URDF 的 `<param name="chassis_id">` 里改，需与下位机固件约定一致。
+帧 id 取自 `shared_package/Middleware/mid_config.h` 的 `CommFrameId::kChassis`，需与下位机固件约定一致。
 
 ## 控制器
 

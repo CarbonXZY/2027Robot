@@ -1,6 +1,8 @@
 /**
- * @file telecontrol_system.hpp
- * @brief 遥控链路：MCU 上行的遥控帧 → state interface → ROS2 话题
+ * @file    telecontrol_system.hpp
+ * @author  Carbon
+ * @date    2026-10-04
+ * @brief   遥控链路：MCU 上行的遥控帧 → state interface → ROS2 话题
  *
  * 分两层，和 leg / chassis 的分工一致：
  * - TelecontrolSystem：SensorInterface，只读。绑定 CommunicationInterface 的帧 id=5，
@@ -32,9 +34,6 @@ namespace Telecontrol
 {
 
 /* Exported types ------------------------------------------------------------*/
-
-// 与下位机固件约定的遥控帧 id（chassis=1、leg=3）
-constexpr uint8_t kDefaultFrameId = 5U;
 
 #pragma pack(push, 1)
 /**
@@ -94,8 +93,6 @@ public:
     hardware_interface::return_type read(const rclcpp::Time & time, const rclcpp::Duration & period) override;
 
 private:
-    // URDF <param name="frame_id">，需与下位机固件约定一致
-    uint8_t frame_id_ = kDefaultFrameId;
     // URDF <sensor name="...">，state interface 的前缀
     std::string sensor_name_;
 

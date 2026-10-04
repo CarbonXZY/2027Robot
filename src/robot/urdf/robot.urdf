@@ -98,8 +98,6 @@
   <ros2_control name="ChassisSystem" type="system">
     <hardware>
       <plugin>chassis/ChassisSystem</plugin>
-      <!-- 整个底盘一帧，id 与下位机固件约定 -->
-      <param name="chassis_id">1</param>
     </hardware>
 
     <joint name="front_left_wheel_joint">
@@ -162,8 +160,6 @@
   <ros2_control name="LegSystem" type="system">
     <hardware>
       <plugin>leg/LegSystem</plugin>
-      <!-- 四条腿一帧，id 与下位机固件约定 -->
-      <param name="leg_id">3</param>
     </hardware>
 
     <joint name="front_left_leg_joint">
@@ -191,8 +187,6 @@
   <ros2_control name="TelecontrolSystem" type="sensor">
     <hardware>
       <plugin>telecontrol/TelecontrolSystem</plugin>
-      <!-- 遥控帧 id 与下位机固件约定 -->
-      <param name="frame_id">5</param>
     </hardware>
 
     <sensor name="rc">

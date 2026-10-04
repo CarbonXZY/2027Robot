@@ -54,7 +54,7 @@ R2 机器人的**上位机（PC 端）控制框架**，基于 ROS 2 Humble + `ro
 | 3 | 双向 | 腿 | `LegTx` 4 腿目标位置 / `LegRx` 4 腿速度+位置 | tx 16 / rx 32 |
 | 5 | 仅收 | 遥控 | `TelecontrolRx` 摇杆/开关/链路状态 | rx 29 |
 
-id 各自可在 `robot/urdf/robot.urdf` 的 `<param>` 里改，需与下位机固件约定一致。
+id 集中在 `shared_package/Middleware/mid_config.h` 的 `CommFrameId`，需与下位机固件约定一致。
 
 ## 构建 / 运行
 

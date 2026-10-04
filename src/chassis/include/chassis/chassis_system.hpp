@@ -1,4 +1,9 @@
-// chassis_system.hpp
+/**
+ * @file    chassis_system.hpp
+ * @author  Carbon
+ * @date    2026-10-04
+ * @brief   麦克纳姆底盘硬件接口：4 轮速度指令下发 + 电机反馈回传，帧收发交给 CommunicationInterface
+ */
 #pragma once
 
 #include <array>
@@ -56,9 +61,6 @@ public:
 private:
   // 按 URDF 关节声明顺序（前左/前右/后左/后右）存下来的关节名
   std::array<std::string, kWheelCount> joint_names_{};
-
-  // 整个底盘绑成一帧，id 来自 URDF 的 chassis_id
-  uint8_t chassis_id_ = 1;
 
   // ros2_control 侧（double）
   std::array<double, kWheelCount> target_velocity_{};

@@ -1,12 +1,15 @@
 /**
- * @file telecontrol_system.cpp
- * @brief 遥控链路实现：SensorInterface（收帧→state interface）+ ControllerInterface（→话题）
+ * @file    telecontrol_system.cpp
+ * @author  Carbon
+ * @date    2026-10-04
+ * @brief   遥控链路实现：SensorInterface（收帧→state interface）+ ControllerInterface（→话题）
  */
 
 #include "telecontrol/telecontrol_system.hpp"
 
 #include <pluginlib/class_list_macros.hpp>
 
+#include "mid_config.h"
 #include "tsk_config_and_callback.hpp"
 #include "utils.hpp"
 
@@ -26,8 +29,6 @@ CallbackReturn TelecontrolSystem::on_init(const hardware_interface::HardwareInfo
     {
         return CallbackReturn::ERROR;
     }
-
-    frame_id_ = Utils::ReadParam<uint8_t>(info.hardware_parameters, "frame_id", kDefaultFrameId);
 
     if (info.sensors.empty())
     {
@@ -60,9 +61,12 @@ CallbackReturn TelecontrolSystem::on_configure(const rclcpp_lifecycle::State &)
     // 指向全局实例；只收不发，所以 tx 传 nullptr、tx_size 传 0
     communication_interface_ = &Middleware::g_usb_communication_interface;
 
-    if (!communication_interface_->Register(frame_id_, nullptr, &rx_buffer_, 0, sizeof(rx_buffer_)))
+    if (!communication_interface_->Register(
+            static_cast<uint8_t>(Middleware::CommFrameId::kTelecontrol),
+            nullptr, &rx_buffer_, 0, sizeof(rx_buffer_)))
     {
-        RCLCPP_ERROR(rclcpp::get_logger("TelecontrolSystem"), "绑定遥控帧 id=%u 失败", frame_id_);
+        RCLCPP_ERROR(rclcpp::get_logger("TelecontrolSystem"), "绑定遥控帧 id=%u 失败",
+                     static_cast<uint8_t>(Middleware::CommFrameId::kTelecontrol));
         return CallbackReturn::ERROR;
     }
 
@@ -73,7 +77,7 @@ CallbackReturn TelecontrolSystem::on_configure(const rclcpp_lifecycle::State &)
     }
 
     RCLCPP_INFO(rclcpp::get_logger("TelecontrolSystem"), "已绑定遥控帧 id=%u（rx %zu 字节）",
-                frame_id_, sizeof(rx_buffer_));
+                static_cast<uint8_t>(Middleware::CommFrameId::kTelecontrol), sizeof(rx_buffer_));
     return CallbackReturn::SUCCESS;
 }
 

@@ -102,9 +102,6 @@ private:
     // 按 URDF 关节声明顺序（前左/前右/后左/后右）存下来的关节名
     std::array<std::string, kLegCount> joint_names_{};
 
-    // 四条腿绑成一帧，id 来自 URDF 的 leg_id
-    uint8_t leg_id_ = 3;
-
     // ros2_control 侧（double）
     std::array<double, kLegCount> target_position_{};
     std::array<double, kLegCount> now_position_{};
