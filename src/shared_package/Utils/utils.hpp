@@ -107,13 +107,17 @@ enum class Mode
     Refresh,  // 表格更新式：回到行首原地刷新，不滚动
 };
 
+// 每个窗口的输出模式（默认 Stream），全局变量，跨翻译单元共享
+inline std::unordered_map<std::string, Mode> g_window_modes;
+
 /**
- * @brief 当前输出模式（默认 Stream）
+ * @brief 设置某个窗口的输出模式
+ * @param windows_name 窗口标识符
+ * @param mode 输出模式（Stream / Refresh）
  */
-inline Mode& CurrentMode()
+inline void SetMode(const std::string& windows_name, Mode mode)
 {
-    static Mode mode = Mode::Stream;
-    return mode;
+    g_window_modes[windows_name] = mode;
 }
 
 /**
@@ -234,7 +238,8 @@ inline void Print(const std::string& windows_name, const char* fmt, Args... args
     }
     SpawnWindow(windows_name);
 
-    if (CurrentMode() == Mode::Refresh)
+    const auto it = g_window_modes.find(windows_name);
+    if (it != g_window_modes.end() && it->second == Mode::Refresh)
     {
         std::fprintf(f, "\033[1A\r\033[K");  // 上移一行并清行，配合末尾换行实现原地刷新
     }

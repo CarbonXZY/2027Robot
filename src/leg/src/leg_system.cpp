@@ -100,7 +100,7 @@ namespace leg
     }
 
     // 调试：表格更新式打印四条腿位置（windows_name "leg"，首次调用会自动弹独立窗口）
-    Utils::Debug_Log::CurrentMode() = Utils::Debug_Log::Mode::Refresh;
+    Utils::Debug_Log::SetMode("leg", Utils::Debug_Log::Mode::Refresh);
     Utils::Debug_Log::Print("leg", "pos = %.3f %.3f %.3f %.3f",
         Rx_Buffer.motor[0].position, Rx_Buffer.motor[1].position,
         Rx_Buffer.motor[2].position, Rx_Buffer.motor[3].position);
@@ -110,20 +110,11 @@ namespace leg
 
   hardware_interface::return_type LegSystem::write(const rclcpp::Time &, const rclcpp::Duration &)
   {
-    // 测试：第一条腿位置每拍 +0.01，到 1.0 后回卷，供下位机验证下行链路是否收到
-    static float test_pos = 0.0f;
-    test_pos += 0.01f;
-    if (test_pos > 1.0f)
-    {
-      test_pos = 0.0f;
-    }
-
-    // 只写 tx 结构体；Send() 不在这里调 —— 它会把所有已注册的帧打成一包，
+    // 测试：每条腿位置恒为 0 下发，供下位机验证下行链路是否收到
     for (size_t i = 0; i < Leg_Count; ++i)
     {
-      Tx_Buffer.position[i] = static_cast<float>(Target_Position[i]);
+      Tx_Buffer.position[i] = 0.0f;
     }
-    Tx_Buffer.position[0] = test_pos;  // 第一条腿覆盖为递增测试值
 
     Task::Task_Loop();
     return hardware_interface::return_type::OK;
