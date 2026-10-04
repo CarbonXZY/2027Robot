@@ -7,8 +7,8 @@
  *         速度环目标，走速度模式。
  *   上行：把各轮电机的反馈（速度 / 位置）填进 rx_buffer_，由通信中间件打包回传。
  *
- * id=1 的两帧在本类 Init() 里自注册，注意中间件 Register() 的 tx/rx 是站在
- * 本板视角，与结构体名的电机视角是反的，别接错：
+ * 底盘帧（id 见 Middleware/mid_config.h 的 CommFrameId::kChassis）在本类 Init() 里自注册，
+ * 注意中间件 Register() 的 tx/rx 是站在本板视角，与结构体名的电机视角是反的，别接错：
  *   本板发（tx）= rx_buffer_（反馈，32B）
  *   本板收（rx）= tx_buffer_（指令，16B）
  */
@@ -19,15 +19,10 @@
 #include <cstdint>
 
 #include "Communication_Interface.hpp"
+#include "mid_config.h"
 
 namespace Module
 {
-namespace
-{
-// 底盘帧 id，须与上位机 URDF 的 chassis_id 一致（robot.urdf: <param name="chassis_id">1</param>）。
-// 同一 id 只能注册一次，别处若也注册 id=1 会被 first-match-wins 遮住。
-constexpr uint8_t kIdChassis = 1;
-} // namespace
 
 Chassis::Chassis(std::array<Device::MotorBase *, kChassisCount> chassis_motor)
     : chassis_motor_(chassis_motor)
@@ -52,7 +47,7 @@ void Chassis::Init(const Parameters &parameters)
     }
 
     Middleware::g_usb_communication_interface.Register(
-        kIdChassis,
+        static_cast<uint8_t>(Middleware::CommFrameId::kChassis),
         &rx_buffer_, &tx_buffer_,
         static_cast<uint8_t>(sizeof(rx_buffer_)), static_cast<uint8_t>(sizeof(tx_buffer_)));
 }
