@@ -15,6 +15,7 @@
 #include <cstdint>
 
 #include "Communication_Interface.hpp"
+#include "drv_bsp.h"
 #include "drv_can.h"
 #include "drv_tim.h"
 #include "drv_uart.h"
@@ -38,6 +39,7 @@ namespace
 
 uint8_t g_mod_alive_motor = 0;
 uint16_t g_mod_alive_pc = 0;
+uint8_t g_usb_send_mod = 0;
 
 // 底层 USB 收到一包就进来，转发给战车层（存活计数也在里面）
 void UsbRxCallback(uint8_t *data, uint16_t length)
@@ -117,6 +119,15 @@ void Tim1msCallback()
 
     g_chariot.TimCalculatePeriodElapsedCallback();
 
+    // 入队分频到 100Hz：一包 64 字节装不下腿+底盘+遥控三帧，Send() 内部会拆成
+    // 3 包；USB 每 ms 只抽 1 包（1000Hz），若每 ms 都入队就是 3000 包/s 灌进来，
+    // 环里恒满，排在最后的遥控帧永远被丢。压到 100Hz 后入队 300 包/s << 1000 包/s。
+    if (++g_usb_send_mod >= 10)
+    {
+        g_usb_send_mod = 0;
+        Middleware::g_usb_communication_interface.Send();
+    }
+
     // 推一下 USB 发送环形缓冲，把上行帧真正发出去
     Driver::TimUsbSendPeriodElapsedCallback();
 
@@ -139,6 +150,9 @@ void Tim1msCallback()
 
 void TaskInit()
 {
+    // 板级上电：打开 DC5(5V) 给 CRSF 接收机供电，两路 DC24 保持关闭
+    Driver::BspInit(Driver::kDc24LOff | Driver::kDc24ROff | Driver::kDc5On, 0.0f, 0.0f);
+
     // 驱动层初始化：使能 DWT 周期计数器（堵转消抖等计时靠它）
     Device::DwtInit();
 

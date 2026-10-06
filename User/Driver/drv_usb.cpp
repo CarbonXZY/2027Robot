@@ -149,7 +149,8 @@ USB_Status UsbResetBlocked(uint32_t delay_ms)
  */
 void TimUsbSendPeriodElapsedCallback()
 {
-	std::array<uint8_t, 64> tx_buffer = {};
+	// CDC_Transmit_HS 只存指针, USB DMA 异步读, 返回后缓冲区必须仍有效, 故用 static
+	static std::array<uint8_t, 64> tx_buffer = {};
 
 	// 先看发送缓冲区有没有数据
 	if (g_tx_buffer.Pop(tx_buffer) == false) return;

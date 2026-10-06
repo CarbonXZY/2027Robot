@@ -110,6 +110,9 @@ uint8_t CDC_Transmit_HS(uint8_t* Buf, uint16_t Len);
 
 /* USER CODE BEGIN EXPORTED_FUNCTIONS */
 
+void HAL_CDC_TxCpltCallback(void);
+void HAL_CDC_RxCpltCallback(uint8_t* pRxData, uint16_t Length);
+
 /* USER CODE END EXPORTED_FUNCTIONS */
 
 /**

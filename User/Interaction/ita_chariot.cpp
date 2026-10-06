@@ -56,24 +56,22 @@ void Chariot::TimCalculatePeriodElapsedCallback()
     calibration_finished_ = leg_.IsCalibrated();
 
     // 校准期间整机不动：底盘不跟上位机下发的轮速，只有腿自己去找零点
-    if (calibration_finished_)
-    {
+    // if (calibration_finished_)
+    // {
         chassis_.TimCalculatePeriodElapsedCallback();
-    }
+    // }
 
     // 实际发帧由 Driver::Tim1msCanPeriodElapsedCallback() 统一做
     Driver::Tim1msCanPeriodElapsedCallback();
 
     // 校准没完成前不回传：腿反馈是没意义的，连带遥控帧也先不发，
     // 免得上位机拿到的是一堆假的关节位置
-    if (!calibration_finished_)
-    {
-        return;
-    }
+    // if (!calibration_finished_)
+    // {
+    //     return;
+    // }
 
     telecontrol_.TimCalculatePeriodElapsedCallback();
-
-    Middleware::g_usb_communication_interface.Send();
 }
 
 void Chariot::Tim100msAlivePeriodElapsedCallback()

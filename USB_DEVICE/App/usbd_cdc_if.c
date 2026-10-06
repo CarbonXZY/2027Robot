@@ -264,6 +264,10 @@ static int8_t CDC_Control_HS(uint8_t cmd, uint8_t* pbuf, uint16_t length)
 static int8_t CDC_Receive_HS(uint8_t* Buf, uint32_t *Len)
 {
   /* USER CODE BEGIN 11 */
+  // 先把整包交给应用层(回调里立刻拷走), 再重新 arm 端点,
+  // 免得下一包在本回调还在解析时就把 RxBuffer 覆盖掉
+  HAL_CDC_RxCpltCallback(Buf, (uint16_t)(*Len));
+
   USBD_CDC_SetRxBuffer(&hUsbDeviceHS, &Buf[0]);
   USBD_CDC_ReceivePacket(&hUsbDeviceHS);
   return (USBD_OK);
@@ -310,11 +314,30 @@ static int8_t CDC_TransmitCplt_HS(uint8_t *Buf, uint32_t *Len, uint8_t epnum)
   UNUSED(Buf);
   UNUSED(Len);
   UNUSED(epnum);
+
+  // 通知应用层发送完成(清发送忙标志)
+  HAL_CDC_TxCpltCallback();
   /* USER CODE END 14 */
   return result;
 }
 
 /* USER CODE BEGIN PRIVATE_FUNCTIONS_IMPLEMENTATION */
+
+/**
+  * @brief 接收完成回调, 弱定义, 由 drv_usb.cpp 覆盖
+  */
+__weak void HAL_CDC_RxCpltCallback(uint8_t* pRxData, uint16_t Length)
+{
+  UNUSED(pRxData);
+  UNUSED(Length);
+}
+
+/**
+  * @brief 发送完成回调, 弱定义, 由 drv_usb.cpp 覆盖
+  */
+__weak void HAL_CDC_TxCpltCallback(void)
+{
+}
 
 /* USER CODE END PRIVATE_FUNCTIONS_IMPLEMENTATION */
 
