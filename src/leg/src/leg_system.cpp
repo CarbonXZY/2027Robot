@@ -148,11 +148,11 @@ hardware_interface::return_type LegSystem::read(const rclcpp::Time &, const rclc
         now_velocity_[i] = static_cast<double>(rx_buffer_.motor[i].velocity);
     }
 
-    // 调试：表格更新式打印四条腿位置（windows_name "leg"，首次调用会自动弹独立窗口）
-    Utils::Debug_Log::SetMode("leg", Utils::Debug_Log::Mode::Refresh);
-    Utils::Debug_Log::Print("leg", "pos = %.3f %.3f %.3f %.3f",
-                            rx_buffer_.motor[0].position, rx_buffer_.motor[1].position,
-                            rx_buffer_.motor[2].position, rx_buffer_.motor[3].position);
+    // // 调试：表格更新式打印四条腿位置（windows_name "leg"，首次调用会自动弹独立窗口）
+    // Utils::Debug_Log::SetMode("leg", Utils::Debug_Log::Mode::Refresh);
+    // Utils::Debug_Log::Print("leg", "pos = %.3f %.3f %.3f %.3f",
+    //                         rx_buffer_.motor[0].position, rx_buffer_.motor[1].position,
+    //                         rx_buffer_.motor[2].position, rx_buffer_.motor[3].position);
 
     return hardware_interface::return_type::OK;
 }

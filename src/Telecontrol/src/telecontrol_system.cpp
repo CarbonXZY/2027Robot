@@ -112,6 +112,24 @@ hardware_interface::return_type TelecontrolSystem::read(const rclcpp::Time &, co
     state_[12] = static_cast<double>(rx_buffer_.snr);
     state_[13] = static_cast<double>(rx_buffer_.failsafe);
 
+    // 调试：表格更新式打印遥控器各字段（windows_name "rc"，首次调用会自动弹独立窗口）
+    Utils::Debug_Log::SetMode("rc", Utils::Debug_Log::Mode::Refresh);
+    Utils::Debug_Log::Print("rc",
+                            "right_x:%.3f right_y:%.3f left_x:%.3f left_y:%.3f s1:%.1f "
+                            "sa:%u sb:%u sc:%u sd:%u se:%u rssi:%u link_q:%u snr:%d failsafe:%u",
+                            rx_buffer_.right_x, rx_buffer_.right_y,
+                            rx_buffer_.left_x, rx_buffer_.left_y,
+                            rx_buffer_.s1,
+                            static_cast<unsigned>(rx_buffer_.sa),
+                            static_cast<unsigned>(rx_buffer_.sb),
+                            static_cast<unsigned>(rx_buffer_.sc),
+                            static_cast<unsigned>(rx_buffer_.sd),
+                            static_cast<unsigned>(rx_buffer_.se),
+                            static_cast<unsigned>(rx_buffer_.rssi),
+                            static_cast<unsigned>(rx_buffer_.link_quality),
+                            static_cast<int>(rx_buffer_.snr),
+                            static_cast<unsigned>(rx_buffer_.failsafe));
+
     return hardware_interface::return_type::OK;
 }
 

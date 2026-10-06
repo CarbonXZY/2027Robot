@@ -94,7 +94,7 @@ inline std::string& FilePrefix()
  */
 inline std::string& Terminal()
 {
-    static std::string cmd = "x-terminal-emulator -e tail -f ";
+    static std::string cmd = "x-terminal-emulator -geometry 160x10 -e tail -f ";
     return cmd;
 }
 

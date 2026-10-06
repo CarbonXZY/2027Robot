@@ -109,7 +109,7 @@ private:
 /**
  * @brief 遥控链路广播器（ros2_control ControllerInterface）
  *
- * 认领 TelecontrolSystem 导出的 rc/* state interface，每拍打包成
+ * 认领 TelecontrolSystem 导出的 rc/ * state interface，每拍打包成
  * telecontrol_msgs/RcState 发到话题上。
  */
 class TelecontrolBroadcaster : public controller_interface::ControllerInterface
