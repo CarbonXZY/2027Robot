@@ -1,6 +1,12 @@
-// Communication_Interface.cpp
+/**
+ * @file    Communication_Interface.cpp
+ * @author  Carbon
+ * @date    2026-10-04
+ * @brief   通信中间件实现：帧打包发送、收包解帧、CRC16 校验、按 id 分发
+ */
 #include "Communication_Interface.hpp"
 
+#include <cassert>
 #include <cstring>
 
 #include "alg_crc.h"
@@ -18,14 +24,17 @@ bool CommunicationInterface::Register(uint8_t id, const void *tx, void *rx, uint
 {
     if (tx == nullptr && rx == nullptr)
     {
+        assert(false);
         return false;
     }
     if (tx_size == 0 && rx_size == 0)
     {
+        assert(false);
         return false;
     }
-    if (Find(id) != nullptr)  // id 不允许重复注册，否则 Find() 是 first-match-wins，后面的永远被遮住
+    if (Find(id) != nullptr)
     {
+        assert(false);
         return false;
     }
     if (count_ >= kMaxFrames)

@@ -6,7 +6,8 @@
  *   收：UART7 上的 CRSF 原始字节交给 Class_CRSF 解包成摇杆/开关/链路状态
  *   发：每 1ms 把解包结果刷进 tx_buffer_，由通信中间件打包回传上位机
  *
- * id=5 的上行帧在本类 Init() 里自注册。只上行，所以 Register() 的 rx 传 nullptr，
+ * 遥控帧（id 见 Middleware/mid_config.h 的 CommFrameId::kTelecontrol）在本类 Init() 里自注册。
+ * 只上行，所以 Register() 的 rx 传 nullptr，
  * 注意 Register() 的 tx/rx 是站在本板视角，与结构体名的「本板视角」是一致的。
  */
 
@@ -16,22 +17,17 @@
 #include <cstdint>
 
 #include "Communication_Interface.hpp"
+#include "mid_config.h"
 
 namespace Module
 {
-namespace
-{
-// 遥控帧 id，须与上位机 URDF 的 frame_id 一致。
-// 同一 id 只能注册一次，别处若也注册 id=5 会被 first-match-wins 遮住。
-constexpr uint8_t kIdTelecontrol = 5;
-} // namespace
 
 void Telecontrol::Init(const Parameters &parameters)
 {
     crsf_.Init(parameters.crsf_uart);
 
     Middleware::g_usb_communication_interface.Register(
-        kIdTelecontrol,
+        static_cast<uint8_t>(Middleware::CommFrameId::kTelecontrol),
         &tx_buffer_, nullptr,
         static_cast<uint8_t>(sizeof(tx_buffer_)), 0);
 }

@@ -17,6 +17,7 @@
 #include <cstdint>
 
 #include "Communication_Interface.hpp"
+#include "drv_bsp.h"
 #include "drv_can.h"
 #include "drv_tim.h"
 #include "drv_uart.h"
@@ -35,13 +36,12 @@ bool g_init_finished = false;
 
 Chariot g_chariot;
 
-Module::Gripper g_gripper(Device::g_motor_clamp);
-
 namespace
 {
 
 uint8_t g_mod_alive_motor = 0;
 uint16_t g_mod_alive_pc = 0;
+uint8_t g_usb_send_mod = 0;
 
 // 底层 USB 收到一包就进来，转发给战车层（存活计数也在里面）
 void UsbRxCallback(uint8_t *data, uint16_t length)
@@ -112,19 +112,6 @@ void Fdcan1Callback(Driver::FdcanRxBuffer *FDCAN_RxMessage)
     }
 }
 
-void Fdcan2Callback(Driver::FdcanRxBuffer *FDCAN_RxMessage)
-{
-    switch (FDCAN_RxMessage->Header.Identifier)
-    {
-    case 0x201:
-        Device::g_motor_clamp.FdcanRxCpltCallback(nullptr);
-        break;
-
-    default:
-        break;
-    }
-}
-
 /**
  * @brief TIM5 1ms 回调，周期分频都在这
  */
@@ -132,11 +119,16 @@ void Tim1msCallback()
 {
     Device::DwtUpdate();
 
-    // g_chariot.TimCalculatePeriodElapsedCallback();
-    g_gripper.TimCalculate1msCallback();
+    g_chariot.TimCalculatePeriodElapsedCallback();
 
-    // 发送CAN帧
-    Driver::Tim1msCanPeriodElapsedCallback();
+    // 入队分频到 100Hz：一包 64 字节装不下腿+底盘+遥控三帧，Send() 内部会拆成
+    // 3 包；USB 每 ms 只抽 1 包（1000Hz），若每 ms 都入队就是 3000 包/s 灌进来，
+    // 环里恒满，排在最后的遥控帧永远被丢。压到 100Hz 后入队 300 包/s << 1000 包/s。
+    if (++g_usb_send_mod >= 10)
+    {
+        g_usb_send_mod = 0;
+        Middleware::g_usb_communication_interface.Send();
+    }
 
     // 推一下 USB 发送环形缓冲，把上行帧真正发出去
     Driver::TimUsbSendPeriodElapsedCallback();
@@ -144,14 +136,13 @@ void Tim1msCallback()
     if (++g_mod_alive_motor >= 100)
     {
         g_mod_alive_motor = 0;
-        // g_chariot.Tim100msAlivePeriodElapsedCallback();
-        g_gripper.TimAlive100msCallback();
+        g_chariot.Tim100msAlivePeriodElapsedCallback();
     }
 
     if (++g_mod_alive_pc >= 1000)
     {
         g_mod_alive_pc = 0;
-        // g_chariot.Tim1000msAlivePeriodElapsedCallback();
+        g_chariot.Tim1000msAlivePeriodElapsedCallback();
     }
 }
 
@@ -161,7 +152,8 @@ void Tim1msCallback()
 
 void TaskInit()
 {
-    HAL_Delay(1000);
+    // 板级上电：打开 DC5(5V) 给 CRSF 接收机供电，两路 DC24 保持关闭
+    Driver::BspInit(Driver::kDc24LOff | Driver::kDc24ROff | Driver::kDc5On, 0.0f, 0.0f);
 
     // 驱动层初始化：使能 DWT 周期计数器（堵转消抖等计时靠它）
     Device::DwtInit();
@@ -171,8 +163,7 @@ void TaskInit()
     // 通信中间件绑上 USB 发送通道
     Middleware::g_usb_communication_interface.Init(Task::UsbSendCallback);
 
-    // Task::g_chariot.Init();
-    Task::g_gripper.Init();
+    Task::g_chariot.Init();
 
     // 绑定 CRSF 串口回调
     UART_Init(&huart7, Task::CrsfUart7Callback, 64);
