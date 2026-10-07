@@ -46,7 +46,7 @@ double Robot::ApplyDeadzone(double value, double deadzone) const
     }
 
     const double sign = (value > 0.0) ? 1.0 : -1.0;
-    return sign * (value - deadzone) / (1.0 - deadzone);
+    return sign * (std::abs(value) - deadzone) / (1.0 - deadzone);
 }
 
 void Robot::OnRcState(const telecontrol_msgs::msg::RcState &msg)
@@ -64,8 +64,8 @@ void Robot::OnRcState(const telecontrol_msgs::msg::RcState &msg)
         else
         {
             twist.linear.x = ApplyDeadzone(msg.right_y, deadzone_) * max_linear_x_;
-            twist.linear.y = ApplyDeadzone(msg.right_x, deadzone_) * max_linear_y_;
-            twist.angular.z = ApplyDeadzone(msg.left_x, deadzone_) * max_angular_z_;
+            twist.linear.y = -ApplyDeadzone(msg.right_x, deadzone_) * max_linear_y_;
+            twist.angular.z = -ApplyDeadzone(msg.left_x, deadzone_) * max_angular_z_;
         }
     }
 
