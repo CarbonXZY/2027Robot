@@ -33,21 +33,21 @@ static const uint8_t CRSF_CRC8_TABLE[256] = {
 void Class_CRSF::Init(UART_HandleTypeDef *huart)
 {
     if (huart->Instance == USART1)
-        UART_Manage_Object = &UART1_Manage_Object;
+        UART_Manage_Object = &Driver::g_uart1_manage_object;
     else if (huart->Instance == USART2)
-        UART_Manage_Object = &UART2_Manage_Object;
+        UART_Manage_Object = &Driver::g_uart2_manage_object;
     else if (huart->Instance == USART3)
-        UART_Manage_Object = &UART3_Manage_Object;
+        UART_Manage_Object = &Driver::g_uart3_manage_object;
     else if (huart->Instance == UART4)
-        UART_Manage_Object = &UART4_Manage_Object;
+        UART_Manage_Object = &Driver::g_uart4_manage_object;
     else if (huart->Instance == UART5)
-        UART_Manage_Object = &UART5_Manage_Object;
+        UART_Manage_Object = &Driver::g_uart5_manage_object;
     else if (huart->Instance == USART6)
-        UART_Manage_Object = &UART6_Manage_Object;
+        UART_Manage_Object = &Driver::g_uart6_manage_object;
     else if (huart->Instance == UART7)
-        UART_Manage_Object = &UART7_Manage_Object;
+        UART_Manage_Object = &Driver::g_uart7_manage_object;
     else if (huart->Instance == UART8)
-        UART_Manage_Object = &UART8_Manage_Object;
+        UART_Manage_Object = &Driver::g_uart8_manage_object;
 
     Reset_Control_Data();
 }

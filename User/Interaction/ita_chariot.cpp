@@ -28,7 +28,9 @@ void Chariot::Init()
     leg_.Init(leg_param);
 
     // id=1 的底盘帧在 chassis_.Init() 里注册
-    Module::Chassis::Parameters chassis_param;
+    Module::Chassis::Parameters chassis_param = {
+        .direction_sign = {1, -1, 1, -1},
+    };
     chassis_.Init(chassis_param);
 
     // id=5 的遥控帧在 telecontrol_.Init() 里注册
@@ -58,7 +60,7 @@ void Chariot::TimCalculatePeriodElapsedCallback()
     // 校准期间整机不动：底盘不跟上位机下发的轮速，只有腿自己去找零点
     // if (calibration_finished_)
     // {
-        chassis_.TimCalculatePeriodElapsedCallback();
+    chassis_.TimCalculatePeriodElapsedCallback();
     // }
 
     // 实际发帧由 Driver::Tim1msCanPeriodElapsedCallback() 统一做

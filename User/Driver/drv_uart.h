@@ -1,7 +1,7 @@
 /**
  * @file drv_uart.h
  * @author Lucy (2478427315@qq.com)
- * @brief 
+ * @brief
  * @version 0.1
  * @date 2024-10-04
  *
@@ -17,32 +17,7 @@
 #include "stm32h7xx_hal.h"
 #include "string.h"
 
-/* Exported macros -----------------------------------------------------------*/
-
-// 缓冲区字节长度
-#define UART_BUFFER_SIZE 256
-
-/* Exported types ------------------------------------------------------------*/
-
-/**
- * @brief UART通信接收回调函数数据类型
- *
- */
-typedef void (*UART_Call_Back)(uint8_t *Buffer, uint16_t Length);
-
-/**
- * @brief UART通信处理结构体
- */
-struct Struct_UART_Manage_Object
-{
-    UART_HandleTypeDef *UART_Handler;
-    uint8_t Tx_Buffer[UART_BUFFER_SIZE];
-    uint8_t Rx_Buffer[UART_BUFFER_SIZE];
-    uint16_t Rx_Buffer_Length;
-    UART_Call_Back Callback_Function;
-};
-
-/* Exported variables --------------------------------------------------------*/
+/* CubeMX generated handles (global namespace) -------------------------------*/
 
 extern UART_HandleTypeDef huart1;
 extern UART_HandleTypeDef huart5;
@@ -51,27 +26,59 @@ extern UART_HandleTypeDef huart8;
 extern UART_HandleTypeDef huart9;
 extern UART_HandleTypeDef huart10;
 
-extern Struct_UART_Manage_Object UART1_Manage_Object;
-extern Struct_UART_Manage_Object UART2_Manage_Object;
-extern Struct_UART_Manage_Object UART3_Manage_Object;
-extern Struct_UART_Manage_Object UART4_Manage_Object;
-extern Struct_UART_Manage_Object UART5_Manage_Object;
-extern Struct_UART_Manage_Object UART6_Manage_Object;
-extern Struct_UART_Manage_Object UART7_Manage_Object;
-extern Struct_UART_Manage_Object UART8_Manage_Object;
-extern Struct_UART_Manage_Object UART9_Manage_Object;
-extern Struct_UART_Manage_Object UART10_Manage_Object;
+namespace Driver
+{
+
+/* Exported macros -----------------------------------------------------------*/
+
+// 缓冲区字节长度
+constexpr uint16_t kUartBufferSize = 256;
+
+/* Exported types ------------------------------------------------------------*/
+
+/**
+ * @brief UART通信接收回调函数数据类型
+ *
+ */
+using UartCallback = void (*)(uint8_t *buffer, uint16_t length);
+
+/**
+ * @brief UART通信处理结构体
+ */
+struct UartManageObject
+{
+    UART_HandleTypeDef *uart_handler_;
+    uint8_t tx_buffer_[kUartBufferSize];
+    uint8_t rx_buffer_[kUartBufferSize];
+    uint16_t rx_buffer_length_;
+    UartCallback callback_function_;
+};
+
+/* Exported variables --------------------------------------------------------*/
+
+extern UartManageObject g_uart1_manage_object;
+extern UartManageObject g_uart2_manage_object;
+extern UartManageObject g_uart3_manage_object;
+extern UartManageObject g_uart4_manage_object;
+extern UartManageObject g_uart5_manage_object;
+extern UartManageObject g_uart6_manage_object;
+extern UartManageObject g_uart7_manage_object;
+extern UartManageObject g_uart8_manage_object;
+extern UartManageObject g_uart9_manage_object;
+extern UartManageObject g_uart10_manage_object;
 
 /* Exported function declarations --------------------------------------------*/
 
-void UART_Init(UART_HandleTypeDef *huart, UART_Call_Back Callback_Function, uint16_t Rx_Buffer_Length);
+void UartInit(UART_HandleTypeDef *huart, UartCallback callback_function, uint16_t rx_buffer_length);
 
-void UART_Reinit(UART_HandleTypeDef *huart);
+void UartReinit(UART_HandleTypeDef *huart);
 
-uint8_t UART_Send_Data(UART_HandleTypeDef *huart, uint8_t *Data, uint16_t Length);
-char UART_Send_Char_Data(UART_HandleTypeDef *huart, char *Data, uint16_t Length);
+uint8_t UartSendData(UART_HandleTypeDef *huart, uint8_t *data, uint16_t length);
+char UartSendCharData(UART_HandleTypeDef *huart, char *data, uint16_t length);
 
-void TIM_1ms_UART_PeriodElapsedCallback();
+void Tim1msUartPeriodElapsedCallback();
+
+} // namespace Driver
 
 #endif
 

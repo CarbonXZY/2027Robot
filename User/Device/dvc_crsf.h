@@ -136,7 +136,7 @@ public:
     inline bool Get_Failsafe() { return Rx_Data.Failsafe; }
 
 protected:
-    Struct_UART_Manage_Object *UART_Manage_Object = nullptr;
+    Driver::UartManageObject *UART_Manage_Object = nullptr;
 
     Struct_CRSF_UART_Rx_Data Now_UART_Rx_Data;
     Struct_CRSF_UART_Rx_Data Pre_UART_Rx_Data;

@@ -164,7 +164,7 @@ void TaskInit()
     Task::g_chariot.Init();
 
     // 绑定 CRSF 串口回调
-    UART_Init(&huart7, Task::CrsfUart7Callback, 64);
+    Driver::UartInit(&huart7, Task::CrsfUart7Callback, 64);
 
     // 电机对象先绑好再开 CAN 中断：反过来的话，FdcanInit 激活 RX 中断的瞬间
     // 电调正推反馈，回调里 manage_object 还是空指针

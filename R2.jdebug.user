@@ -1,26 +1,26 @@
 
 
-OpenDocument="tsk_config_and_callback.cpp", FilePath="F:/Electronic_Control/R2_Embedded/User/Task/tsk_config_and_callback.cpp", Line=30
+OpenDocument="main.c", FilePath="F:/Electronic_Control/R2_Embedded/Core/Src/main.c", Line=56
 OpenDocument="drv_usb.cpp", FilePath="F:/Electronic_Control/R2_Embedded/User/Driver/drv_usb.cpp", Line=0
 OpenDocument="startup_stm32h723xx.s", FilePath="F:/Electronic_Control/R2_Embedded/startup_stm32h723xx.s", Line=46
-OpenDocument="main.c", FilePath="F:/Electronic_Control/R2_Embedded/Core/Src/main.c", Line=56
+OpenDocument="tsk_config_and_callback.cpp", FilePath="F:/Electronic_Control/R2_Embedded/User/Task/tsk_config_and_callback.cpp", Line=30
 OpenDocument="usbd_cdc.c", FilePath="F:/Electronic_Control/R2_Embedded/Middlewares/ST/STM32_USB_Device_Library/Class/CDC/Src/usbd_cdc.c", Line=0
 OpenDocument="usbd_conf.c", FilePath="F:/Electronic_Control/R2_Embedded/USB_DEVICE/Target/usbd_conf.c", Line=260
 OpenDocument="timespec.h", FilePath="d:/program files (x86)/arm gnu toolchain arm-none-eabi/12.3 rel1/arm-none-eabi/include/sys/timespec.h", Line=0
 OpenToolbar="Debug", Floating=0, x=0, y=0
-OpenWindow="Registers 1", DockArea=RIGHT, x=0, y=1, w=727, h=717, FilterBarShown=0, TotalValueBarShown=0, ToolBarShown=0, FilteredItems=[], RefreshRate=1
-OpenWindow="Source Files", DockArea=LEFT, x=0, y=1, w=1176, h=341, FilterBarShown=0, TotalValueBarShown=0, ToolBarShown=0
-OpenWindow="Disassembly", DockArea=RIGHT, x=0, y=0, w=727, h=375, FilterBarShown=0, TotalValueBarShown=0, ToolBarShown=0
+OpenWindow="Registers 1", DockArea=RIGHT, x=0, y=1, w=727, h=711, FilterBarShown=0, TotalValueBarShown=0, ToolBarShown=0, FilteredItems=[], RefreshRate=1
+OpenWindow="Source Files", DockArea=LEFT, x=0, y=1, w=1176, h=342, FilterBarShown=0, TotalValueBarShown=0, ToolBarShown=0
+OpenWindow="Disassembly", DockArea=RIGHT, x=0, y=0, w=727, h=381, FilterBarShown=0, TotalValueBarShown=0, ToolBarShown=0
 OpenWindow="Memory 1", DockArea=BOTTOM, x=1, y=0, w=1520, h=328, FilterBarShown=0, TotalValueBarShown=0, ToolBarShown=0, EditorAddress=0x200001E8
-OpenWindow="Watched Data 1", DockArea=LEFT, x=0, y=2, w=1176, h=488, FilterBarShown=0, TotalValueBarShown=0, ToolBarShown=0
-OpenWindow="Data Sampling", DockArea=LEFT, x=0, y=0, w=1176, h=262, FilterBarShown=0, TotalValueBarShown=0, ToolBarShown=0, VisibleTab=0, UniformSampleSpacing=0
+OpenWindow="Watched Data 1", DockArea=LEFT, x=0, y=2, w=1176, h=482, FilterBarShown=0, TotalValueBarShown=0, ToolBarShown=0
+OpenWindow="Data Sampling", DockArea=LEFT, x=0, y=0, w=1176, h=267, FilterBarShown=0, TotalValueBarShown=0, ToolBarShown=0, VisibleTab=0, UniformSampleSpacing=0
 OpenWindow="Console", DockArea=BOTTOM, x=0, y=0, w=1039, h=328, FilterBarShown=0, TotalValueBarShown=0, ToolBarShown=0
 SmartViewPlugin="", Page="", Toolbar="Hidden", Window="SmartView 1"
 TableHeader="Source Files", SortCol="File", SortOrder="ASCENDING", VisibleCols=["File";"Status";"Size";"#Insts";"Path"], ColWidths=[255;100;100;100;1214]
 TableHeader="Data Sampling Table", SortCol="None", SortOrder="ASCENDING", VisibleCols=["Index";"Time"], ColWidths=[100;100]
 TableHeader="Data Sampling Setup", SortCol="Value", SortOrder="ASCENDING", VisibleCols=["Expression";"Type";"Value";"Min";"Max";"Average";"# Changes";"Min. Change";"Max. Change"], ColWidths=[462;100;100;100;100;100;110;126;126]
 TableHeader="Power Sampling", SortCol="None", SortOrder="ASCENDING", VisibleCols=["Index";"Time";"Ch 0"], ColWidths=[100;100;100]
-TableHeader="Registers 1", SortCol="Name", SortOrder="ASCENDING", VisibleCols=["Name";"Value";"Description"], ColWidths=[100;144;483]
+TableHeader="Registers 1", SortCol="Name", SortOrder="ASCENDING", VisibleCols=["Name";"Value";"Description"], ColWidths=[100;144;457]
 TableHeader="Watched Data 1", SortCol="Expression", SortOrder="ASCENDING", VisibleCols=["Expression";"Value";"Location";"Refresh";"Access"], ColWidths=[478;275;478;100;100]
 TableHeader="RegisterSelectionDialog", SortCol="None", SortOrder="ASCENDING", VisibleCols=[], ColWidths=[]
 TableHeader="TargetExceptionDialog", SortCol="Name", SortOrder="ASCENDING", VisibleCols=["Name";"Value";"Address";"Description"], ColWidths=[200;100;100;340]
