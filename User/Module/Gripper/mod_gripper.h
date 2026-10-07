@@ -116,7 +116,7 @@ protected:
     {
         const float PITCH_RADIUS = 0.0225f;     // 分度圆半径, 单位米
         const int8_t DIRECTION_SIGN = -1;       // 方向符号
-        const float CLAMP_DISTANCE = 0.073f;     // 夹取的行程, 单位米
+        const float CLAMP_DISTANCE = 0.063f;     // 夹取的行程, 单位米
     } mechanical_;
 
     // 编码器偏移量

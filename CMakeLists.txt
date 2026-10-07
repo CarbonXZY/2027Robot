@@ -41,7 +41,11 @@ add_executable(${CMAKE_PROJECT_NAME}
     User/Device/test/motor_dji.cpp
     User/Device/test/motor_dji.h
     User/Algorithm/alg_mit.cpp
-    User/Algorithm/alg_mit.h)
+    User/Algorithm/alg_mit.h
+    User/Driver/drv_bsp.cpp
+    User/Driver/drv_bsp.h
+    User/Task/tsk_config_and_callback_xzy.cpp
+    User/Task/tsk_config_and_callback_lyh.cpp)
 
 # Add STM32CubeMX generated sources
 add_subdirectory(cmake/stm32cubemx)
@@ -98,6 +102,7 @@ target_compile_definitions(${CMAKE_PROJECT_NAME} PRIVATE
     ARM_MATH_CM7
     ARM_MATH_MATRIX_CHECK
     ARM_MATH_ROUNDING
+    DEBUG_XZY
 )
 
 set_target_properties(${CMAKE_PROJECT_NAME} PROPERTIES

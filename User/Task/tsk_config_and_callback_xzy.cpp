@@ -1,4 +1,4 @@
-#ifdef DUBUG_PUBLIC
+#ifdef DEBUG_XZY
 
 /**
  * @file tsk_config_and_callback.cpp
@@ -166,12 +166,11 @@ void TaskInit()
     Task::g_chariot.Init();
 
     // 绑定 CRSF 串口回调
-    Driver::UartInit(&huart7, Task::CrsfUart7Callback, 64);
+    UART_Init(&huart7, Task::CrsfUart7Callback, 64);
 
     // 电机对象先绑好再开 CAN 中断：反过来的话，FdcanInit 激活 RX 中断的瞬间
     // 电调正推反馈，回调里 manage_object 还是空指针
     Driver::FdcanInit(&hfdcan1, Task::Fdcan1Callback);
-    Driver::FdcanInit(&hfdcan2, Task::Fdcan2Callback);
 
     // 定时器初始化：TIM5 挂 1ms 调度回调
     Driver::TimInit(&htim5, Task::Tim1msCallback);
@@ -194,4 +193,3 @@ void TaskLoop()
 /************************ COPYRIGHT(C) NEUQ-RoboPioneers **************************/
 
 #endif
-
