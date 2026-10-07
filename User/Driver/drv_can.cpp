@@ -21,7 +21,6 @@
 
 namespace Driver
 {
-
 //定义FdcanManage结构体
 FdcanManageObject g_fdcan1_manage_object = {};
 FdcanManageObject g_fdcan2_manage_object = {};
@@ -65,7 +64,7 @@ uint8_t g_fdcan3_0x4fe_tx_data[8];
  * @param hfdcan CAN编号
  * @param callback_function 处理回调函数
  */
-void FdcanInit(FDCAN_HandleTypeDef *hfdcan, FdcanCallback callback_function)
+void FdcanInit(FDCAN_HandleTypeDef* hfdcan, FdcanCallback callback_function)
 {
     if (hfdcan->Instance == FDCAN1)
     {
@@ -82,7 +81,7 @@ void FdcanInit(FDCAN_HandleTypeDef *hfdcan, FdcanCallback callback_function)
         FdcanFilterMaskConfig(hfdcan, FdcanFilter(1) | kFdcanFifo1 | kFdcanExtId | kFdcanDataType, 0, 0);
         //FdcanFilterMaskConfig(hfdcan, FdcanFilter(15) | kFdcanFifo1 | kFdcanStdId | kFdcanDataType, 0, 0);
     }
-		else if (hfdcan->Instance == FDCAN3)
+    else if (hfdcan->Instance == FDCAN3)
     {
         g_fdcan3_manage_object.fdcan_handler_ = hfdcan;
         g_fdcan3_manage_object.callback_function_ = callback_function;
@@ -90,7 +89,7 @@ void FdcanInit(FDCAN_HandleTypeDef *hfdcan, FdcanCallback callback_function)
         FdcanFilterMaskConfig(hfdcan, FdcanFilter(1) | kFdcanFifo1 | kFdcanExtId | kFdcanDataType, 0, 0);
     }
 
-		HAL_FDCAN_Start(hfdcan);
+    HAL_FDCAN_Start(hfdcan);
 }
 
 /**
@@ -101,7 +100,7 @@ void FdcanInit(FDCAN_HandleTypeDef *hfdcan, FdcanCallback callback_function)
  * @param id ID
  * @param mask_id 屏蔽位(0x3ff, 0x1fffffff)
  */
-void FdcanFilterMaskConfig(FDCAN_HandleTypeDef *hfdcan, uint8_t object_para, uint32_t id, uint32_t mask_id)
+void FdcanFilterMaskConfig(FDCAN_HandleTypeDef* hfdcan, uint8_t object_para, uint32_t id, uint32_t mask_id)
 {
     FDCAN_FilterTypeDef fdcan_filter_init_structure;
 
@@ -109,24 +108,24 @@ void FdcanFilterMaskConfig(FDCAN_HandleTypeDef *hfdcan, uint8_t object_para, uin
     assert_param(hfdcan != NULL);
 
     //标准帧或拓展帧判断
-    if((object_para & 0x02) == 0)
+    if ((object_para & 0x02) == 0)
     {
         fdcan_filter_init_structure.IdType = FDCAN_STANDARD_ID;
     }
-		else if((object_para & 0x02) != 0)
-		{
-				fdcan_filter_init_structure.IdType = FDCAN_EXTENDED_ID;
-		}
+    else if ((object_para & 0x02) != 0)
+    {
+        fdcan_filter_init_structure.IdType = FDCAN_EXTENDED_ID;
+    }
     //设置滤波器编号
-    fdcan_filter_init_structure.FilterIndex = object_para >> 3;//object_para >> 3
+    fdcan_filter_init_structure.FilterIndex = object_para >> 3; //object_para >> 3
     //设置过滤器MASK模式
     fdcan_filter_init_structure.FilterType = FDCAN_FILTER_MASK;
     //设置FIFO
-    if((object_para & 0x04) == 0)
+    if ((object_para & 0x04) == 0)
     {
         fdcan_filter_init_structure.FilterConfig = FDCAN_FILTER_TO_RXFIFO0;
     }
-    else if((object_para & 0x04) != 0)
+    else if ((object_para & 0x04) != 0)
     {
         fdcan_filter_init_structure.FilterConfig = FDCAN_FILTER_TO_RXFIFO1;
     }
@@ -137,20 +136,20 @@ void FdcanFilterMaskConfig(FDCAN_HandleTypeDef *hfdcan, uint8_t object_para, uin
     //使用结构体进行初始化
     HAL_FDCAN_ConfigFilter(hfdcan, &fdcan_filter_init_structure);
     //启用全局过滤
-    if((object_para & 0x01) == 0)
+    if ((object_para & 0x01) == 0)
     {
         HAL_FDCAN_ConfigGlobalFilter(hfdcan, FDCAN_REJECT, FDCAN_REJECT, FDCAN_FILTER_REMOTE, FDCAN_FILTER_REMOTE);
     }
-    else if((object_para & 0x01) != 0)
+    else if ((object_para & 0x01) != 0)
     {
         HAL_FDCAN_ConfigGlobalFilter(hfdcan, FDCAN_REJECT, FDCAN_REJECT, ENABLE, ENABLE);
     }
     //打开FIFO区的新消息通知
-    if((object_para & 0x04) == 0)
+    if ((object_para & 0x04) == 0)
     {
         HAL_FDCAN_ActivateNotification(hfdcan, FDCAN_IT_RX_FIFO0_NEW_MESSAGE, 0);
     }
-    else if((object_para & 0x04) != 0)
+    else if ((object_para & 0x04) != 0)
     {
         HAL_FDCAN_ActivateNotification(hfdcan, FDCAN_IT_RX_FIFO1_NEW_MESSAGE, 0);
     }
@@ -165,84 +164,85 @@ void FdcanFilterMaskConfig(FDCAN_HandleTypeDef *hfdcan, uint8_t object_para, uin
  * @param fdcan_id_type 拓展ID标准ID选择变量，默认为标准ID
  * @return uint8_t 执行状态
  */
-uint8_t FdcanSendData(FDCAN_HandleTypeDef *hfdcan, uint32_t id, uint8_t *data, FdcanIdType fdcan_id_type, uint8_t data_length)
+uint8_t FdcanSendData(FDCAN_HandleTypeDef* hfdcan, uint32_t id, uint8_t* data, FdcanIdType fdcan_id_type,
+                      uint8_t data_length)
 {
     FDCAN_TxHeaderTypeDef tx_header;
 
     //检测传参是否正确
     assert_param(hfdcan != NULL);
 
-    tx_header.Identifier = id;                          //ID号
-		//标准拓展ID判断，默认为标准ID
-		if(fdcan_id_type == FdcanIdType::kStandard)
-		{
-				tx_header.IdType = FDCAN_STANDARD_ID;			      //标准ID
-		}
-    else if(fdcan_id_type == FdcanIdType::kExtended)
-		{
-				tx_header.IdType = FDCAN_EXTENDED_ID;
-		}
-    tx_header.TxFrameType = FDCAN_DATA_FRAME;		        //数据帧
-    switch(data_length)
+    tx_header.Identifier = id; //ID号
+    //标准拓展ID判断，默认为标准ID
+    if (fdcan_id_type == FdcanIdType::kStandard)
     {
-        case(1):
+        tx_header.IdType = FDCAN_STANDARD_ID; //标准ID
+    }
+    else if (fdcan_id_type == FdcanIdType::kExtended)
+    {
+        tx_header.IdType = FDCAN_EXTENDED_ID;
+    }
+    tx_header.TxFrameType = FDCAN_DATA_FRAME; //数据帧
+    switch (data_length)
+    {
+    case(1):
         {
-          tx_header.DataLength = FDCAN_DLC_BYTES_1;						//数据长度
+            tx_header.DataLength = FDCAN_DLC_BYTES_1; //数据长度
 
-          break;
+            break;
         }
-        case(2):
+    case(2):
         {
-          tx_header.DataLength = FDCAN_DLC_BYTES_2;						//数据长度
+            tx_header.DataLength = FDCAN_DLC_BYTES_2; //数据长度
 
-          break;
+            break;
         }
-        case(3):
+    case(3):
         {
-          tx_header.DataLength = FDCAN_DLC_BYTES_3;						//数据长度
+            tx_header.DataLength = FDCAN_DLC_BYTES_3; //数据长度
 
-          break;
+            break;
         }
-        case(4):
+    case(4):
         {
-          tx_header.DataLength = FDCAN_DLC_BYTES_4;						//数据长度
+            tx_header.DataLength = FDCAN_DLC_BYTES_4; //数据长度
 
-          break;
+            break;
         }
-        case(5):
+    case(5):
         {
-          tx_header.DataLength = FDCAN_DLC_BYTES_5;						//数据长度
+            tx_header.DataLength = FDCAN_DLC_BYTES_5; //数据长度
 
-          break;
+            break;
         }
-        case(6):
+    case(6):
         {
-          tx_header.DataLength = FDCAN_DLC_BYTES_6;						//数据长度
+            tx_header.DataLength = FDCAN_DLC_BYTES_6; //数据长度
 
-          break;
+            break;
         }
-        case(7):
+    case(7):
         {
-          tx_header.DataLength = FDCAN_DLC_BYTES_7;						//数据长度
+            tx_header.DataLength = FDCAN_DLC_BYTES_7; //数据长度
 
-          break;
+            break;
         }
-        case(8):
+    case(8):
         {
-          tx_header.DataLength = FDCAN_DLC_BYTES_8;						//数据长度
+            tx_header.DataLength = FDCAN_DLC_BYTES_8; //数据长度
 
-          break;
+            break;
         }
     }
 
 
     //以下是FDCAN相较于经典CAN配置有拓展的地方
 
-    tx_header.ErrorStateIndicator = FDCAN_ESI_ACTIVE;     //CAN发送错误提示（？）
-		tx_header.BitRateSwitch = FDCAN_BRS_OFF;              //波特率切换关闭
-    tx_header.FDFormat = FDCAN_CLASSIC_CAN;               //经典CAN模式
-    tx_header.TxEventFifoControl = FDCAN_NO_TX_EVENTS;    //不储存发送事件（？）
-    tx_header.MessageMarker = 0;	                        //消息标记0（？）
+    tx_header.ErrorStateIndicator = FDCAN_ESI_ACTIVE; //CAN发送错误提示（？）
+    tx_header.BitRateSwitch = FDCAN_BRS_OFF; //波特率切换关闭
+    tx_header.FDFormat = FDCAN_CLASSIC_CAN; //经典CAN模式
+    tx_header.TxEventFifoControl = FDCAN_NO_TX_EVENTS; //不储存发送事件（？）
+    tx_header.MessageMarker = 0; //消息标记0（？）
 
     return (HAL_FDCAN_AddMessageToTxFifoQ(hfdcan, &tx_header, data));
 }
@@ -253,8 +253,8 @@ uint8_t FdcanSendData(FDCAN_HandleTypeDef *hfdcan, uint32_t id, uint8_t *data, F
  */
 void Tim1msCanPeriodElapsedCallback()
 {
-		//如需使用拓展ID，切记第四个参数设为FdcanIdType::kExtended
-		//FdcanSendData(&hfdcan1, 0x1ff, g_fdcan1_0x1ff_tx_data, FdcanIdType::kExtended);
+    //如需使用拓展ID，切记第四个参数设为FdcanIdType::kExtended
+    //FdcanSendData(&hfdcan1, 0x1ff, g_fdcan1_0x1ff_tx_data, FdcanIdType::kExtended);
 
     // CAN1电机
     // 0x200 管 ID 0x201~0x204（腿 4 关节），0x1ff 管 ID 0x205~0x208（底盘 4 轮），
@@ -265,16 +265,15 @@ void Tim1msCanPeriodElapsedCallback()
     // FdcanSendData(&hfdcan1, 0x2ff, g_fdcan1_0x2ff_tx_data);
 
     // CAN2电机
-    // FdcanSendData(&hfdcan2, 0x1ff, g_fdcan2_0x1ff_tx_data);
-    // FdcanSendData(&hfdcan2, 0x200, g_fdcan2_0x200_tx_data);
+    FdcanSendData(&hfdcan2, 0x1ff, g_fdcan2_0x1ff_tx_data);
+    FdcanSendData(&hfdcan2, 0x200, g_fdcan2_0x200_tx_data);
     // FdcanSendData(&hfdcan2, 0x2ff, g_fdcan2_0x2ff_tx_data);
 
-		// CAN3电机
+    // CAN3电机
     // FdcanSendData(&hfdcan3, 0x1ff, g_fdcan3_0x1ff_tx_data);
     // FdcanSendData(&hfdcan3, 0x200, g_fdcan3_0x200_tx_data);
     // FdcanSendData(&hfdcan3, 0x2ff, g_fdcan3_0x2ff_tx_data);
 }
-
 } // namespace Driver
 
 /**
@@ -282,32 +281,35 @@ void Tim1msCanPeriodElapsedCallback()
  *
  * @param hfdcan CAN编号
  */
-void HAL_FDCAN_RxFifo0Callback(FDCAN_HandleTypeDef *hfdcan, uint32_t RxFifo0ITs)
+void HAL_FDCAN_RxFifo0Callback(FDCAN_HandleTypeDef* hfdcan, uint32_t RxFifo0ITs)
 {
     //选择回调函数
     if (hfdcan->Instance == FDCAN1)
     {
-        HAL_FDCAN_GetRxMessage(hfdcan, FDCAN_RX_FIFO0, &Driver::g_fdcan1_manage_object.rx_buffer_.Header, Driver::g_fdcan1_manage_object.rx_buffer_.Data);
-				if(Driver::g_fdcan1_manage_object.callback_function_ != nullptr)
-				{
-						Driver::g_fdcan1_manage_object.callback_function_(&Driver::g_fdcan1_manage_object.rx_buffer_);
-				}
+        HAL_FDCAN_GetRxMessage(hfdcan, FDCAN_RX_FIFO0, &Driver::g_fdcan1_manage_object.rx_buffer_.Header,
+                               Driver::g_fdcan1_manage_object.rx_buffer_.Data);
+        if (Driver::g_fdcan1_manage_object.callback_function_ != nullptr)
+        {
+            Driver::g_fdcan1_manage_object.callback_function_(&Driver::g_fdcan1_manage_object.rx_buffer_);
+        }
     }
     else if (hfdcan->Instance == FDCAN2)
     {
-        HAL_FDCAN_GetRxMessage(hfdcan, FDCAN_RX_FIFO0, &Driver::g_fdcan2_manage_object.rx_buffer_.Header, Driver::g_fdcan2_manage_object.rx_buffer_.Data);
-        if(Driver::g_fdcan2_manage_object.callback_function_ != nullptr)
-				{
-						Driver::g_fdcan2_manage_object.callback_function_(&Driver::g_fdcan2_manage_object.rx_buffer_);
-				}
+        HAL_FDCAN_GetRxMessage(hfdcan, FDCAN_RX_FIFO0, &Driver::g_fdcan2_manage_object.rx_buffer_.Header,
+                               Driver::g_fdcan2_manage_object.rx_buffer_.Data);
+        if (Driver::g_fdcan2_manage_object.callback_function_ != nullptr)
+        {
+            Driver::g_fdcan2_manage_object.callback_function_(&Driver::g_fdcan2_manage_object.rx_buffer_);
+        }
     }
-		else if (hfdcan->Instance == FDCAN3)
+    else if (hfdcan->Instance == FDCAN3)
     {
-        HAL_FDCAN_GetRxMessage(hfdcan, FDCAN_RX_FIFO0, &Driver::g_fdcan3_manage_object.rx_buffer_.Header, Driver::g_fdcan3_manage_object.rx_buffer_.Data);
-        if(Driver::g_fdcan3_manage_object.callback_function_ != nullptr)
-				{
-						Driver::g_fdcan3_manage_object.callback_function_(&Driver::g_fdcan3_manage_object.rx_buffer_);
-				}
+        HAL_FDCAN_GetRxMessage(hfdcan, FDCAN_RX_FIFO0, &Driver::g_fdcan3_manage_object.rx_buffer_.Header,
+                               Driver::g_fdcan3_manage_object.rx_buffer_.Data);
+        if (Driver::g_fdcan3_manage_object.callback_function_ != nullptr)
+        {
+            Driver::g_fdcan3_manage_object.callback_function_(&Driver::g_fdcan3_manage_object.rx_buffer_);
+        }
     }
 }
 
@@ -316,37 +318,37 @@ void HAL_FDCAN_RxFifo0Callback(FDCAN_HandleTypeDef *hfdcan, uint32_t RxFifo0ITs)
  *
  * @param hfdcan CAN编号
  */
-void HAL_FDCAN_RxFifo1Callback(FDCAN_HandleTypeDef *hfdcan, uint32_t RxFifo0ITs)
+void HAL_FDCAN_RxFifo1Callback(FDCAN_HandleTypeDef* hfdcan, uint32_t RxFifo0ITs)
 {
     //选择回调函数
     if (hfdcan->Instance == FDCAN1)
     {
-        HAL_FDCAN_GetRxMessage(hfdcan, FDCAN_RX_FIFO1, &Driver::g_fdcan1_manage_object.rx_buffer_.Header, Driver::g_fdcan1_manage_object.rx_buffer_.Data);
-				if(Driver::g_fdcan1_manage_object.callback_function_ != nullptr)
-				{
-						Driver::g_fdcan1_manage_object.callback_function_(&Driver::g_fdcan1_manage_object.rx_buffer_);
-				}
-
+        HAL_FDCAN_GetRxMessage(hfdcan, FDCAN_RX_FIFO1, &Driver::g_fdcan1_manage_object.rx_buffer_.Header,
+                               Driver::g_fdcan1_manage_object.rx_buffer_.Data);
+        if (Driver::g_fdcan1_manage_object.callback_function_ != nullptr)
+        {
+            Driver::g_fdcan1_manage_object.callback_function_(&Driver::g_fdcan1_manage_object.rx_buffer_);
+        }
     }
     else if (hfdcan->Instance == FDCAN2)
     {
-        HAL_FDCAN_GetRxMessage(hfdcan, FDCAN_RX_FIFO1, &Driver::g_fdcan2_manage_object.rx_buffer_.Header, Driver::g_fdcan2_manage_object.rx_buffer_.Data);
-        if(Driver::g_fdcan2_manage_object.callback_function_ != nullptr)
-				{
-						Driver::g_fdcan2_manage_object.callback_function_(&Driver::g_fdcan2_manage_object.rx_buffer_);
-				}
+        HAL_FDCAN_GetRxMessage(hfdcan, FDCAN_RX_FIFO1, &Driver::g_fdcan2_manage_object.rx_buffer_.Header,
+                               Driver::g_fdcan2_manage_object.rx_buffer_.Data);
+        if (Driver::g_fdcan2_manage_object.callback_function_ != nullptr)
+        {
+            Driver::g_fdcan2_manage_object.callback_function_(&Driver::g_fdcan2_manage_object.rx_buffer_);
+        }
     }
-		else if (hfdcan->Instance == FDCAN3)
+    else if (hfdcan->Instance == FDCAN3)
     {
-        HAL_FDCAN_GetRxMessage(hfdcan, FDCAN_RX_FIFO1, &Driver::g_fdcan3_manage_object.rx_buffer_.Header, Driver::g_fdcan3_manage_object.rx_buffer_.Data);
-        if(Driver::g_fdcan3_manage_object.callback_function_ != nullptr)
-				{
-						Driver::g_fdcan3_manage_object.callback_function_(&Driver::g_fdcan3_manage_object.rx_buffer_);
-				}
+        HAL_FDCAN_GetRxMessage(hfdcan, FDCAN_RX_FIFO1, &Driver::g_fdcan3_manage_object.rx_buffer_.Header,
+                               Driver::g_fdcan3_manage_object.rx_buffer_.Data);
+        if (Driver::g_fdcan3_manage_object.callback_function_ != nullptr)
+        {
+            Driver::g_fdcan3_manage_object.callback_function_(&Driver::g_fdcan3_manage_object.rx_buffer_);
+        }
     }
 }
-
-
 
 
 /************************ COPYRIGHT(C) ROBOPIONEER **************************/
