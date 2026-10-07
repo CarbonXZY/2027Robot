@@ -1,4 +1,10 @@
-#ifdef DUBUG_PUBLIC
+/**
+ * @file    tsk_config_and_callback_lyh.cpp
+ * @author  lyh
+ * @date    2026-10-07
+ * @brief   
+ */
+#ifdef DEBUG_LYH
 
 /**
  * @file tsk_config_and_callback.cpp
@@ -202,5 +208,5 @@ void TaskLoop()
 
 /************************ COPYRIGHT(C) NEUQ-RoboPioneers **************************/
 
-#endif
 
+#endif
