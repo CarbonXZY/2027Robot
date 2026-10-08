@@ -17,6 +17,7 @@
 #include <cstdint>
 
 #include "Communication_Interface.hpp"
+#include "Gripper/mod_gripper.h"
 #include "drv_bsp.h"
 #include "drv_can.h"
 #include "drv_tim.h"
@@ -26,7 +27,6 @@
 #include "dvc_motor_instances.h"
 #include "ita_chariot.h"
 #include "tsk_config_and_callback.h"
-#include "Gripper/mod_gripper.h"
 
 namespace Task
 {
@@ -69,42 +69,42 @@ void Fdcan1Callback(Driver::FdcanRxBuffer *FDCAN_RxMessage)
     {
         case 0x201:
         {
-            Device::g_leg_front_left.FdcanRxCpltCallback(FDCAN_RxMessage->Data);
+            Device::g_motor.leg_front_left.FdcanRxCpltCallback(FDCAN_RxMessage->Data);
             break;
         }
         case 0x202:
         {
-            Device::g_leg_front_right.FdcanRxCpltCallback(FDCAN_RxMessage->Data);
+            Device::g_motor.leg_front_right.FdcanRxCpltCallback(FDCAN_RxMessage->Data);
             break;
         }
         case 0x203:
         {
-            Device::g_leg_rear_left.FdcanRxCpltCallback(FDCAN_RxMessage->Data);
+            Device::g_motor.leg_rear_left.FdcanRxCpltCallback(FDCAN_RxMessage->Data);
             break;
         }
         case 0x204:
         {
-            Device::g_leg_rear_right.FdcanRxCpltCallback(FDCAN_RxMessage->Data);
+            Device::g_motor.leg_rear_right.FdcanRxCpltCallback(FDCAN_RxMessage->Data);
             break;
         }
         case 0x205:
         {
-            Device::g_chassis_front_left.FdcanRxCpltCallback(FDCAN_RxMessage->Data);
+            Device::g_motor.chassis_front_left.FdcanRxCpltCallback(FDCAN_RxMessage->Data);
             break;
         }
         case 0x206:
         {
-            Device::g_chassis_front_right.FdcanRxCpltCallback(FDCAN_RxMessage->Data);
+            Device::g_motor.chassis_front_right.FdcanRxCpltCallback(FDCAN_RxMessage->Data);
             break;
         }
         case 0x207:
         {
-            Device::g_chassis_rear_left.FdcanRxCpltCallback(FDCAN_RxMessage->Data);
+            Device::g_motor.chassis_rear_left.FdcanRxCpltCallback(FDCAN_RxMessage->Data);
             break;
         }
         case 0x208:
         {
-            Device::g_chassis_rear_right.FdcanRxCpltCallback(FDCAN_RxMessage->Data);
+            Device::g_motor.chassis_rear_right.FdcanRxCpltCallback(FDCAN_RxMessage->Data);
             break;
         }
         default:
@@ -166,8 +166,8 @@ void TaskInit()
     Task::g_chariot.Init();
 
     // 绑定 CRSF 串口回调
-    UART_Init(&huart7, Task::CrsfUart7Callback, 64);
-
+    Driver::UartInit(&huart7, Task::CrsfUart7Callback, 64);
+    
     // 电机对象先绑好再开 CAN 中断：反过来的话，FdcanInit 激活 RX 中断的瞬间
     // 电调正推反馈，回调里 manage_object 还是空指针
     Driver::FdcanInit(&hfdcan1, Task::Fdcan1Callback);

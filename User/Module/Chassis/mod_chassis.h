@@ -27,6 +27,15 @@ namespace Module
  */
 constexpr uint8_t kChassisCount = 4;
 
+/**
+ * @brief 底盘使能状态
+ */
+enum class ChassisStatus
+{
+    kDisable = 0,  // 失能：目标轮速给 0
+    kEnable,       // 使能：跟随上位机轮速
+};
+
 #pragma pack(push, 1)
 /**
  * @brief 底盘发送结构体（下发指令）：每个轮的目标速度
@@ -74,6 +83,11 @@ public:
     void Init(const Parameters &parameters);
 
     /**
+     * @brief 使能 / 失能底盘（失能时目标轮速给 0，PC 掉线保护用）
+     */
+    void SetState(ChassisStatus status);
+
+    /**
      * @brief 1ms 控制周期：目标轮速下发 + 反馈回传
      */
     void TimCalculatePeriodElapsedCallback();
@@ -87,6 +101,8 @@ private:
     std::array<Device::MotorBase *, kChassisCount> chassis_motor_{}; // 各轮电机
 
     Parameters param_{}; // 底盘控制参数
+
+    ChassisStatus status_ = ChassisStatus::kDisable;
 };
 
 } // namespace Module

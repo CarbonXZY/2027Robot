@@ -25,6 +25,15 @@ namespace Module
  */
 constexpr uint8_t kLegCount = 4;
 
+/**
+ * @brief 腿机构使能状态
+ */
+enum class LegStatus
+{
+    kDisable = 0,  // 失能：不再接受新指令，稳定在最后一帧目标位置
+    kEnable,       // 使能：跟随上位机指令
+};
+
 #pragma pack(push, 1)
 /**
  * @brief 腿发送结构体（下发指令）：每条腿的目标位置
@@ -86,6 +95,11 @@ public:
     void TimCalculatePeriodElapsedCallback();
 
     /**
+     * @brief kDisable 时不再接受新指令，稳定在最后一帧目标位置（PC 掉线保护）
+     */
+    void SetState(LegStatus status);
+
+    /**
      * @brief 四条腿是否都标定完成
      */
     bool IsCalibrated() const
@@ -111,6 +125,8 @@ private:
     Parameters param_{}; // 腿控制参数
 
     bool calibrated_ = false; // 校准标志位
+
+    LegStatus status_ = LegStatus::kDisable;
 
     void MoveToPosition();
 

@@ -52,6 +52,11 @@ void Chassis::Init(const Parameters &parameters)
         static_cast<uint8_t>(sizeof(rx_buffer_)), static_cast<uint8_t>(sizeof(tx_buffer_)));
 }
 
+void Chassis::SetState(ChassisStatus status)
+{
+    status_ = status;
+}
+
 void Chassis::TimCalculatePeriodElapsedCallback()
 {
     for (uint8_t i = 0; i < kChassisCount; ++i)
@@ -63,7 +68,16 @@ void Chassis::TimCalculatePeriodElapsedCallback()
 
         // 下行：上位机目标轮速 → 电机侧（乘方向）
         const float direction = (param_.direction_sign[i] < 0) ? -1.0f : 1.0f;
-        chassis_motor_[i]->SetTargetSpeed(direction * tx_buffer_.velocity[i]);
+
+        // 失能时给 0（PC 掉线保护）
+        if (status_ == ChassisStatus::kDisable)
+        {
+            chassis_motor_[i]->SetTargetSpeed(0.0f);
+        }
+        else
+        {
+            chassis_motor_[i]->SetTargetSpeed(direction * tx_buffer_.velocity[i]);
+        }
 
         // 反馈更新 → PID → 写 CAN 发送缓冲
         // 实际发帧由 Driver::Tim1msCanPeriodElapsedCallback() 统一做，不在这里发

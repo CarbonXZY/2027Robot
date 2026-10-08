@@ -69,42 +69,42 @@ void Fdcan1Callback(Driver::FdcanRxBuffer *FDCAN_RxMessage)
     {
         case 0x201:
         {
-            Device::g_leg_front_left.FdcanRxCpltCallback(FDCAN_RxMessage->Data);
+            Device::g_motor.leg_front_left.FdcanRxCpltCallback(FDCAN_RxMessage->Data);
             break;
         }
         case 0x202:
         {
-            Device::g_leg_front_right.FdcanRxCpltCallback(FDCAN_RxMessage->Data);
+            Device::g_motor.leg_front_right.FdcanRxCpltCallback(FDCAN_RxMessage->Data);
             break;
         }
         case 0x203:
         {
-            Device::g_leg_rear_left.FdcanRxCpltCallback(FDCAN_RxMessage->Data);
+            Device::g_motor.leg_rear_left.FdcanRxCpltCallback(FDCAN_RxMessage->Data);
             break;
         }
         case 0x204:
         {
-            Device::g_leg_rear_right.FdcanRxCpltCallback(FDCAN_RxMessage->Data);
+            Device::g_motor.leg_rear_right.FdcanRxCpltCallback(FDCAN_RxMessage->Data);
             break;
         }
         case 0x205:
         {
-            Device::g_chassis_front_left.FdcanRxCpltCallback(FDCAN_RxMessage->Data);
+            Device::g_motor.chassis_front_left.FdcanRxCpltCallback(FDCAN_RxMessage->Data);
             break;
         }
         case 0x206:
         {
-            Device::g_chassis_front_right.FdcanRxCpltCallback(FDCAN_RxMessage->Data);
+            Device::g_motor.chassis_front_right.FdcanRxCpltCallback(FDCAN_RxMessage->Data);
             break;
         }
         case 0x207:
         {
-            Device::g_chassis_rear_left.FdcanRxCpltCallback(FDCAN_RxMessage->Data);
+            Device::g_motor.chassis_rear_left.FdcanRxCpltCallback(FDCAN_RxMessage->Data);
             break;
         }
         case 0x208:
         {
-            Device::g_chassis_rear_right.FdcanRxCpltCallback(FDCAN_RxMessage->Data);
+            Device::g_motor.chassis_rear_right.FdcanRxCpltCallback(FDCAN_RxMessage->Data);
             break;
         }
         default:

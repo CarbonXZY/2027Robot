@@ -11,27 +11,32 @@
 namespace Device
 {
 
-// 腿 4 关节，与上位机 joints 一一对应
-extern MotorDjiC620 g_leg_front_left;
-extern MotorDjiC620 g_leg_front_right;
-extern MotorDjiC620 g_leg_rear_left;
-extern MotorDjiC620 g_leg_rear_right;
-
-extern MotorDjiC610 g_motor_clamp;
-
-// 底盘 4 轮，与上位机 joints 一一对应（前左/前右/后左/后右）
-extern MotorDjiC620 g_chassis_front_left;
-extern MotorDjiC620 g_chassis_front_right;
-extern MotorDjiC620 g_chassis_rear_left;
-extern MotorDjiC620 g_chassis_rear_right;
-
 /**
- * @brief 写入各电机的控制模式与 PID 参数
+ * @brief 全车电机实例集中结构体
  *
- * 放在设备层是为了让 Module::Leg / Module::Chassis 只依赖 MotorBase，
- * 不感知 C620 的具体参数结构，保持解耦。
+ * 成员保持具体类型，watch 一个 g_motor 即可展开全部电机状态。
  */
-void InitMotorInstances();
+struct MotorInstances
+{
+    // 腿 4 关节，与上位机 joints 一一对应
+    MotorDjiC620 leg_front_left {&hfdcan1, MotorDjiId::kId0x201};
+    MotorDjiC620 leg_front_right{&hfdcan1, MotorDjiId::kId0x202};
+    MotorDjiC620 leg_rear_left  {&hfdcan1, MotorDjiId::kId0x203};
+    MotorDjiC620 leg_rear_right {&hfdcan1, MotorDjiId::kId0x204};
+
+    // 底盘 4 轮，与上位机 joints 一一对应（前左/前右/后左/后右）
+    MotorDjiC620 chassis_front_left {&hfdcan1, MotorDjiId::kId0x205};
+    MotorDjiC620 chassis_front_right{&hfdcan1, MotorDjiId::kId0x206};
+    MotorDjiC620 chassis_rear_left  {&hfdcan1, MotorDjiId::kId0x207};
+    MotorDjiC620 chassis_rear_right {&hfdcan1, MotorDjiId::kId0x208};
+
+    // 夹爪（M2006），独立挂在 CAN2
+    MotorDjiC610 clamp{&hfdcan2, MotorDjiId::kId0x201};
+
+    void Init();
+};
+
+extern MotorInstances g_motor;
 
 } // namespace Device
 

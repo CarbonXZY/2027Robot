@@ -10,8 +10,8 @@
 #include "dvc_motor_instances.h"
 
 Chariot::Chariot()
-    : leg_({&Device::g_leg_front_left, &Device::g_leg_front_right, &Device::g_leg_rear_left, &Device::g_leg_rear_right}),
-      chassis_({&Device::g_chassis_front_left, &Device::g_chassis_front_right, &Device::g_chassis_rear_left, &Device::g_chassis_rear_right})
+    : leg_({&Device::g_motor.leg_front_left, &Device::g_motor.leg_front_right, &Device::g_motor.leg_rear_left, &Device::g_motor.leg_rear_right}),
+      chassis_({&Device::g_motor.chassis_front_left, &Device::g_motor.chassis_front_right, &Device::g_motor.chassis_rear_left, &Device::g_motor.chassis_rear_right})
 {
 }
 
@@ -21,7 +21,7 @@ void Chariot::Init()
     // 中间件的发送通道由 tsk 绑定
 
     // 电机控制模式与 PID 参数在设备层统一写入
-    Device::InitMotorInstances();
+    Device::g_motor.Init();
 
     // id=3 的腿帧在 leg_.Init() 里注册
     Module::Leg::Parameters leg_param;
@@ -80,19 +80,31 @@ void Chariot::Tim100msAlivePeriodElapsedCallback()
 {
     telecontrol_.Tim100msAlivePeriodElapsedCallback();
 
-    Device::g_leg_front_left.Tim100msAlivePeriodElapsedCallback();
-    Device::g_leg_front_right.Tim100msAlivePeriodElapsedCallback();
-    Device::g_leg_rear_left.Tim100msAlivePeriodElapsedCallback();
-    Device::g_leg_rear_right.Tim100msAlivePeriodElapsedCallback();
+    Device::g_motor.leg_front_left.Tim100msAlivePeriodElapsedCallback();
+    Device::g_motor.leg_front_right.Tim100msAlivePeriodElapsedCallback();
+    Device::g_motor.leg_rear_left.Tim100msAlivePeriodElapsedCallback();
+    Device::g_motor.leg_rear_right.Tim100msAlivePeriodElapsedCallback();
 
-    Device::g_chassis_front_left.Tim100msAlivePeriodElapsedCallback();
-    Device::g_chassis_front_right.Tim100msAlivePeriodElapsedCallback();
-    Device::g_chassis_rear_left.Tim100msAlivePeriodElapsedCallback();
-    Device::g_chassis_rear_right.Tim100msAlivePeriodElapsedCallback();
+    Device::g_motor.chassis_front_left.Tim100msAlivePeriodElapsedCallback();
+    Device::g_motor.chassis_front_right.Tim100msAlivePeriodElapsedCallback();
+    Device::g_motor.chassis_rear_left.Tim100msAlivePeriodElapsedCallback();
+    Device::g_motor.chassis_rear_right.Tim100msAlivePeriodElapsedCallback();
 }
 
 void Chariot::Tim1000msAlivePeriodElapsedCallback()
 {
     pc_is_alive_ = (alive_flag_ != pre_alive_flag_);
     pre_alive_flag_ = alive_flag_;
+
+    // PC 掉线保护：腿稳定在最后一帧目标位置，底盘轮速清零
+    if (pc_is_alive_)
+    {
+        leg_.SetState(Module::LegStatus::kEnable);
+        chassis_.SetState(Module::ChassisStatus::kEnable);
+    }
+    else
+    {
+        leg_.SetState(Module::LegStatus::kDisable);
+        chassis_.SetState(Module::ChassisStatus::kDisable);
+    }
 }

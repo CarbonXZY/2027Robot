@@ -53,6 +53,11 @@ void Leg::Init(const Parameters &parameters)
         static_cast<uint8_t>(sizeof(rx_buffer_)), static_cast<uint8_t>(sizeof(tx_buffer_)));
 }
 
+void Leg::SetState(LegStatus status)
+{
+    status_ = status;
+}
+
 void Leg::MoveToPosition()
 {
     for (uint8_t i = 0; i < kLegCount; ++i)
@@ -62,8 +67,11 @@ void Leg::MoveToPosition()
             continue;
         }
 
-        // 上位机下发的是关节侧目标位置 (rad)
-        target_position_[i] = tx_buffer_.position[i];
+        // 使能时才接受新指令，失能后沿用上一帧存下的目标位置
+        if (status_ == LegStatus::kEnable)
+        {
+            target_position_[i] = tx_buffer_.position[i];
+        }
 
         const float direction = (param_.direction_sign[i] < 0) ? -1.0f : 1.0f;
 

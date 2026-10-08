@@ -41,7 +41,7 @@ bool g_init_finished = false;
 
 Chariot g_chariot;
 
-Module::Gripper g_gripper(Device::g_motor_clamp);
+Module::Gripper g_gripper(Device::g_motor.clamp);
 
 namespace
 {
@@ -75,42 +75,42 @@ void Fdcan1Callback(Driver::FdcanRxBuffer *FDCAN_RxMessage)
     {
         case 0x201:
         {
-            Device::g_leg_front_left.FdcanRxCpltCallback(FDCAN_RxMessage->Data);
+            Device::g_motor.leg_front_left.FdcanRxCpltCallback(FDCAN_RxMessage->Data);
             break;
         }
         case 0x202:
         {
-            Device::g_leg_front_right.FdcanRxCpltCallback(FDCAN_RxMessage->Data);
+            Device::g_motor.leg_front_right.FdcanRxCpltCallback(FDCAN_RxMessage->Data);
             break;
         }
         case 0x203:
         {
-            Device::g_leg_rear_left.FdcanRxCpltCallback(FDCAN_RxMessage->Data);
+            Device::g_motor.leg_rear_left.FdcanRxCpltCallback(FDCAN_RxMessage->Data);
             break;
         }
         case 0x204:
         {
-            Device::g_leg_rear_right.FdcanRxCpltCallback(FDCAN_RxMessage->Data);
+            Device::g_motor.leg_rear_right.FdcanRxCpltCallback(FDCAN_RxMessage->Data);
             break;
         }
         case 0x205:
         {
-            Device::g_chassis_front_left.FdcanRxCpltCallback(FDCAN_RxMessage->Data);
+            Device::g_motor.chassis_front_left.FdcanRxCpltCallback(FDCAN_RxMessage->Data);
             break;
         }
         case 0x206:
         {
-            Device::g_chassis_front_right.FdcanRxCpltCallback(FDCAN_RxMessage->Data);
+            Device::g_motor.chassis_front_right.FdcanRxCpltCallback(FDCAN_RxMessage->Data);
             break;
         }
         case 0x207:
         {
-            Device::g_chassis_rear_left.FdcanRxCpltCallback(FDCAN_RxMessage->Data);
+            Device::g_motor.chassis_rear_left.FdcanRxCpltCallback(FDCAN_RxMessage->Data);
             break;
         }
         case 0x208:
         {
-            Device::g_chassis_rear_right.FdcanRxCpltCallback(FDCAN_RxMessage->Data);
+            Device::g_motor.chassis_rear_right.FdcanRxCpltCallback(FDCAN_RxMessage->Data);
             break;
         }
         default:
@@ -123,7 +123,7 @@ void Fdcan2Callback(Driver::FdcanRxBuffer *FDCAN_RxMessage)
     switch (FDCAN_RxMessage->Header.Identifier)
     {
     case 0x201:
-        Device::g_motor_clamp.FdcanRxCpltCallback(nullptr);
+        Device::g_motor.clamp.FdcanRxCpltCallback(nullptr);
         break;
 
     default:
