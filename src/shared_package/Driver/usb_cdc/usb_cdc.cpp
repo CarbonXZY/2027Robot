@@ -3,7 +3,10 @@
 #include <cerrno>
 #include <cstdio>
 #include <cstring>
+#include <filesystem>
+#include <fstream>
 #include <fcntl.h>
+#include <regex>
 #include <termios.h>
 #include <unistd.h>
 
@@ -205,6 +208,79 @@ void USB_CDC::TxThreadLoop()
         period = std::chrono::milliseconds(tx_period_ms_);
         next_wake_time += period;
     }
+}
+
+std::string FindDevice(const std::string & spec)
+{
+    namespace fs = std::filesystem;
+
+    if (spec.empty())
+    {
+        return "";
+    }
+
+    // 直连：以 '/' 开头就是设备路径，原样返回
+    if (spec.front() == '/')
+    {
+        return spec;
+    }
+
+    // 正则：按设备名匹配
+    std::regex pattern;
+    try
+    {
+        pattern = std::regex(spec);
+    }
+    catch (const std::regex_error &)
+    {
+        std::fprintf(stderr, "USB_CDC: invalid device regex: %s\n", spec.c_str());
+        return "";
+    }
+
+    // 1) 优先匹配 /dev/serial/by-id 的稳定名（如 usb-STMicroelectronics_STM32_...-if00）
+    std::error_code ec;
+    const fs::path by_id_dir("/dev/serial/by-id");
+    if (fs::is_directory(by_id_dir, ec))
+    {
+        for (const fs::directory_entry & entry : fs::directory_iterator(by_id_dir, ec))
+        {
+            if (!std::regex_search(entry.path().filename().string(), pattern))
+            {
+                continue;
+            }
+            ec.clear();
+            const fs::path real = fs::canonical(entry.path(), ec);
+            if (!ec)
+            {
+                return real.string();
+            }
+        }
+    }
+
+    // 2) 回退：直接扫 /dev/ttyACM*，匹配设备节点名或 sysfs 里的 product 字符串
+    ec.clear();
+    for (const fs::directory_entry & entry : fs::directory_iterator("/dev", ec))
+    {
+        const std::string name = entry.path().filename().string();
+        if (name.rfind("ttyACM", 0) != 0)
+        {
+            continue;
+        }
+
+        if (std::regex_search(name, pattern))
+        {
+            return (fs::path("/dev") / name).string();
+        }
+
+        std::ifstream in(fs::path("/sys/class/tty") / name / "device" / "product");
+        std::string product;
+        if (std::getline(in, product) && std::regex_search(product, pattern))
+        {
+            return (fs::path("/dev") / name).string();
+        }
+    }
+
+    return "";
 }
 
 } // namespace Driver

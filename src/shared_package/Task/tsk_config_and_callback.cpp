@@ -15,6 +15,7 @@
 #include <chrono>
 #include <cstdint>
 #include <memory>
+#include <string>
 
 #include "Communication_Interface.hpp"
 #include "usb_cdc.hpp"
@@ -115,8 +116,15 @@ bool TaskInit()
     // USB 可能还没枚举完成(刚上电/刚插拔), 打不开就忙等重试,
     // 而不是直接返回 false 让 on_configure 报错、把 ROS 整个带崩。
     Utils::RetryUntil(
-        [&] { g_usb_device = std::make_unique<Driver::USB_CDC>(Driver::USB_CDC_DEFAULT_DEVICE); },
-        [&] { return g_usb_device->IsOpen(); },
+        [&] {
+            const std::string device = Driver::FindDevice("^usb-STMicroelectronics_STM32_Virtual.*-if00$");
+            if (device.empty())
+            {
+                return;  // 设备还没枚举出来，保持为空，下一轮再找
+            }
+            g_usb_device = std::make_unique<Driver::USB_CDC>(device);
+        },
+        [&] { return g_usb_device != nullptr && g_usb_device->IsOpen(); },
         std::chrono::milliseconds(500));
 
     g_usb_device->RegisterRxCallback(McuRxCallback);

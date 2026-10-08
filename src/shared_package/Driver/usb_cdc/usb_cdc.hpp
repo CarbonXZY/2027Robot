@@ -140,7 +140,14 @@ private:
     std::mutex tx_write_mutex_;
 };
 
-constexpr char USB_CDC_DEFAULT_DEVICE[] = "/dev/ttyACM0";
+/**
+ * @brief 按选择串找 USB-CDC 设备路径。
+ *        选择串以 '/' 开头时当作设备路径直连；否则当作正则表达式，
+ *        在 /dev/serial/by-id 与 /dev/ttyACM* 里匹配设备名，返回第一个命中。
+ * @param spec 设备路径（如 "/dev/ttyACM0"）或正则表达式（如 "STM"）
+ * @return 匹配到的设备路径；找不到返回空串
+ */
+std::string FindDevice(const std::string & spec);
 
 } // namespace Driver
 
