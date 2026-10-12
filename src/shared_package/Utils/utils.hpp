@@ -24,23 +24,42 @@ namespace Utils
 {
 
 /**
+ * @brief 默认取消谓词：永不取消，即 RetryUntil 保持"一直重试到成功"的行为
+ */
+struct NeverCancel
+{
+    bool operator()() const { return false; }
+};
+
+/**
  * @brief 忙等重试：反复执行 action，直到 judge() 判定成功才返回 true
  * @tparam Action 每次重试要执行的动作（无返回值）
  * @tparam Judge 判定是否成功的谓词（返回 bool）
+ * @tparam Cancel 取消谓词（返回 bool），默认 NeverCancel（永不取消）
  * @param action 动作
  * @param judge 判定
  * @param wait_time 两次尝试之间的间隔
  * @param retry_times 最大尝试次数，0 表示无限重试
- * @return true 判定成功；false 重试次数耗尽仍未成功
+ * @param cancel 每轮 action 之前询问一次：返回 true 则立即放弃并返回 false。
+ *               用于让"无限重试"能被外部（如 Ctrl+C 触发的 shutdown）打断；
+ *               信号打断不了下面的 sleep_for，所以最坏响应延迟是一个 wait_time
+ * @return true 判定成功；false 被取消或重试次数耗尽仍未成功
  */
-template <typename Action, typename Judge>
+template <typename Action, typename Judge, typename Cancel = NeverCancel>
 inline bool RetryUntil(Action action, Judge judge,
                        std::chrono::milliseconds wait_time,
-                       uint32_t retry_times = 0)
+                       uint32_t retry_times = 0,
+                       Cancel cancel = Cancel{})
 {
     uint32_t attempt = 0;
     while (true)
     {
+        // 先问取消，被取消就不再执行 action，避免多开一次设备
+        if (cancel())
+        {
+            return false;
+        }
+
         action();
         if (judge())
         {

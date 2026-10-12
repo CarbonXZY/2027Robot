@@ -103,7 +103,9 @@ CallbackReturn LegSystem::on_configure(const rclcpp_lifecycle::State &)
         return CallbackReturn::ERROR;
     }
 
-    if (!Task::TaskInit())
+    // 传入"进程正在关闭"的谓词：设备不在时 ros2_control_node 会卡死在构造期，
+    // 收到 Ctrl+C 就据此结束等待并退出（详见 TaskInit 里的说明）
+    if (!Task::TaskInit([] { return !rclcpp::ok(); }))
     {
         RCLCPP_ERROR(rclcpp::get_logger("LegSystem"), "打开 USB-CDC 失败");
         return CallbackReturn::ERROR;
