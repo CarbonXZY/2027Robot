@@ -10,14 +10,20 @@
 
 #pragma once
 
+#include <functional>
+
 namespace Task
 {
 
 /**
  * @brief 打开 USB-CDC，并把 g_usb_communication_interface 的收发接到它上面
  * @note  打不开就忙等重试，直到打开成功才返回 true
+ * @param shutdown_requested 可选的"进程正在关闭"谓词（如 Ctrl+C 后即为假的 rclcpp::ok()）。
+ *               为真时放弃等待并直接结束进程：详见 .cpp 里为什么不能返回 false。
+ *               为空表示不响应关闭请求，保持原有"一直等到设备出现"的行为
+ * @return true 设备已打开（关闭请求期间不返回）
  */
-bool TaskInit();
+bool TaskInit(const std::function<bool()> & shutdown_requested = {});
 
 /**
  * @brief 下位机链路存活标志位
