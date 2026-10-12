@@ -28,11 +28,16 @@ public:
     static constexpr uint32_t kTxQueueSize = 64;
     // 发送线程轮询周期, 单位毫秒
     static constexpr uint32_t kTxPollIntervalMs = 10;
+    // 接收线程 poll 等待超时, 单位毫秒; 超时后回到循环检查 running_, 保证析构能退出
+    static constexpr uint32_t kRxPollTimeoutMs = 10;
     // 单帧最大长度, 单位字节
     static constexpr uint16_t kMaxFrameSize = 1024;
 
     // 接收回调函数指针类型
     using RxHandle = void (*)(uint8_t* data, uint16_t length);
+
+    // 断连回调函数指针类型, 设备拔出/异常断开时被调用
+    using DisconnectHandle = void (*)();
 
     /**
      * @brief 构造函数, 打开并配置指定的 USB-CDC 设备, 启动收发线程
@@ -54,6 +59,15 @@ public:
      * @param callback 回调函数指针, 参数为数据指针和数据长度
      */
     void RegisterRxCallback(RxHandle callback);
+
+    /**
+     * @brief 注册断连回调函数, 检测到设备断开(拔出/异常)时调用(用户主动断开不触发)
+     * @note 回调在接收线程中执行, 且此时设备已关闭(IsOpen() 为 false)。
+     *       不要在回调里直接调用 Connect/Disconnect, 否则会 join 当前线程导致死锁,
+     *       应置标志或转交其他线程后再重连。
+     * @param callback 回调函数指针, 无参数
+     */
+    void RegisterDisconnectCallback(DisconnectHandle callback);
 
     /**
      * @brief 同步发送函数, 立即调用系统接口发送数据
@@ -89,12 +103,23 @@ public:
      */
     void SetTxPeriodMs(uint32_t period_ms) { tx_period_ms_ = period_ms; }
 
+    void Disconnect();
+
+    bool IsRunning() const { return running_; }
+
+    bool Connect();
+
 private:
     /**
      * @brief 打开设备文件并配置 termios 参数(原始模式, 无校验, 无流控)
      * @return true 表示成功, false 表示失败
      */
     bool OpenDevice();
+
+    /**
+     * @brief 关闭设备文件描述符, 与写操作互斥; 可重复调用(已关闭则空操作)
+     */
+    void CloseDevice();
 
     /**
      * @brief 接收线程主循环, 阻塞读取设备数据, 写入环形缓冲区并触发回调
@@ -108,15 +133,15 @@ private:
 
     // 设备路径
     std::string device_path_;
-    // 设备文件描述符
-    int fd_;
+    // 设备文件描述符, 断连时会被接收线程关闭并置 -1, 故用原子量
+    std::atomic<int> fd_;
 
     // 接收线程
     std::thread rx_thread_;
     // 发送线程
     std::thread tx_thread_;
-    // 发送周期毫秒数
-    uint32_t tx_period_ms_ = 10;
+    // 发送周期毫秒数, 发送线程会读取, 故用原子量
+    std::atomic<uint32_t> tx_period_ms_ = 10;
     // 线程运行标志, 析构时置为 false 以停止线程
     std::atomic<bool> running_;
 
@@ -124,6 +149,11 @@ private:
     RxHandle rx_callback_;
     // 保护 rx_callback_ 的互斥锁
     std::mutex rx_callback_mutex_;
+
+    // 注册的断连回调函数指针
+    DisconnectHandle disconnect_callback_;
+    // 保护 disconnect_callback_ 的互斥锁
+    std::mutex disconnect_callback_mutex_;
 
     // 发送帧结构
     struct TxFrame
@@ -150,5 +180,7 @@ private:
 std::string FindDevice(const std::string & spec);
 
 } // namespace Driver
+
+inline constexpr char STM32_CDC[] = "^usb-STMicroelectronics_STM32_Virtual.*-if00$";
 
 #endif // USB_CDC_HPP
