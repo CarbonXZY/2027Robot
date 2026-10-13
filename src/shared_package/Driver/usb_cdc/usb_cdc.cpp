@@ -56,7 +56,19 @@ void USB_CDC::Disconnect()
 
     if (rx_thread_.joinable())
     {
-        rx_thread_.join();
+        // 自 join 保护: 断连回调就在接收线程上执行, 上层可能在回调里直接调 Connect()
+        // 重连, 此时本函数会跑在接收线程自己身上, join 自己必然死锁(join 要等线程
+        // 函数返回, 而它在等 join 返回). 这种情况改为 detach: 该线程在回调返回后
+        // 紧接着就会退出 RxThreadLoop, 不需要等待, 之后也能安全地给它赋新线程.
+        // 由调用者保证 detach 后回调能返回, 见头文件里对断连回调的说明.
+        if (rx_thread_.get_id() == std::this_thread::get_id())
+        {
+            rx_thread_.detach();
+        }
+        else
+        {
+            rx_thread_.join();
+        }
     }
 
     if (tx_thread_.joinable())
