@@ -20,7 +20,7 @@
 
 资源管理遵循 RAII. 析构函数会自动停止两个线程并关闭文件描述符, 使用者不需要手动调用停止接口. 拷贝构造与拷贝赋值被显式删除, 因为该类持有线程与文件描述符等独占资源.
 
-设备被拔出或发生异常时, 接收线程会检测到并立即关闭设备, 复位运行标志, 调用已注册的断连回调. 之后可以调用 `Connect` 重新连接.
+设备被拔出或发生异常时, 接收线程会检测到并立即关闭设备, 复位运行标志, 再调用已注册的断连回调. 因此回调被调用时设备资源已经归还: 文件描述符已关闭, 发送线程正在退出, 接收线程不会再触碰设备. 回调里可以直接调用 `Connect` 重连, 不会因为 join 当前线程而死锁 —— `Disconnect` 对"在自己线程上被调用"做了保护, 这种情况改为 detach 该线程, 让它在回调返回后自行结束. 所以重连逻辑(含失败重试)可以直接写在回调里, 不必再置标志转交其他线程.
 
 ## 常量
 
@@ -39,13 +39,13 @@
 | `USB_CDC(const std::string& device, uint32_t tx_period_ms = 10)` | 打开设备并启动收发线程. 打开失败不抛异常, 只向 `stderr` 打印错误, 需要用 `IsOpen` 检查 |
 | `~USB_CDC()` | 停止线程, 等待线程退出, 关闭设备 |
 | `void RegisterRxCallback(RxHandle callback)` | 注册接收回调, 线程安全, 可运行中替换, 传 `nullptr` 可取消回调 |
-| `void RegisterDisconnectCallback(DisconnectHandle callback)` | 注册断连回调, 设备拔出或异常断开时被调用; 用户主动调用 `Disconnect` 不触发 |
+| `void RegisterDisconnectCallback(DisconnectHandle callback)` | 注册断连回调, 设备拔出或异常断开时被调用; 用户主动调用 `Disconnect` 不触发. 回调内可直接调用 `Connect` 重连 |
 | `uint8_t TransmitNow(uint8_t* data, uint16_t length)` | 同步发送, 立即写设备. 返回 1 表示整帧写完, 返回 0 表示失败 |
 | `uint8_t TransmitAdd(uint8_t* data, uint16_t length)` | 异步发送, 拷贝数据入队. 返回 1 表示入队成功, 返回 0 表示入队失败 |
 | `bool IsOpen() const` | 设备文件是否处于打开状态; 断连后变为 false |
 | `bool IsRunning() const` | 收发线程是否在运行; 断连后变为 false |
-| `bool Connect()` | 重新打开设备并启动收发线程. 幂等, 已连接时会先停下旧线程再重连, 失败返回 false |
-| `void Disconnect()` | 停止收发线程并关闭设备. 用户主动断开不触发断连回调 |
+| `bool Connect()` | 重新打开设备并启动收发线程. 幂等, 已连接时会先停下旧线程再重连, 失败返回 false. 可以在断连回调里直接调用 |
+| `void Disconnect()` | 停止收发线程并关闭设备. 用户主动断开不触发断连回调. 在接收线程(即回调)中调用时会 detach 该线程而非 join 它, 避免自 join 死锁 |
 | `uint32_t GetTxPeriodMs() const` | 读取异步发送周期 |
 | `void SetTxPeriodMs(uint32_t period_ms)` | 设置异步发送周期 |
 | `std::string FindDevice(const std::string& spec)` | 按设备路径或正则匹配设备节点, 见下 |
@@ -63,7 +63,8 @@
 ## 线程与并发
 
 - 接收回调在接收线程中被调用, 回调内部不能长时间阻塞, 否则会阻塞后续接收. 回调期间持有回调互斥锁, 所以不要在回调里再次调用 `RegisterRxCallback`, 否则会死锁.
-- 断连回调同样在接收线程中被调用, 且调用时设备已经关闭( `IsOpen()` 为 false ). 不要在断连回调里直接调用 `Connect` 或 `Disconnect`, 那会 join 当前线程导致死锁; 应该在回调里置标志, 或把重连动作转交其他线程.
+- 断连回调同样在接收线程中被调用, 且调用时设备已经关闭( `IsOpen()` 为 false ). 可以在回调里直接调用 `Connect` 重连: `Disconnect` 会识别出"当前就在接收线程上", 改为 detach 而不是 join. 两条约束要遵守: 回调**必须能返回**(被 detach 的线程在回调返回后才结束, 永久阻塞会悬挂一个线程); 回调返回后 `RxThreadLoop` 不能再触碰任何成员变量, 否则会踩到 `Connect` 换过代的新线程与新文件描述符.
+- 回调在重连前后是持久的. `Connect` 不会清掉已注册的接收回调与断连回调, 因此重连后不需要重新注册; 反过来, 如果改用"销毁对象再新建"的方式重连, 就必须重新注册, 否则重连后收不到数据.
 - 两个发送接口可以跨线程同时调用. 写设备由一把写锁保护, 每帧要么整帧写完要么整帧不写, 同步发送与异步发送线程不会交错写坏数据.
 - `TransmitNow` 会等待写锁. 发送线程使用 `try_to_lock` 尝试获取写锁, 取不到时会把该帧放回队首并休眠一个周期后重试.
 - 发送队列中的每一帧都是深拷贝, 调用方在 `TransmitAdd` 返回后可以立即复用或释放自己的缓冲区.
@@ -71,7 +72,8 @@
 ## 已知行为
 
 - 设备拔出或异常断开时, 接收线程会检测到 `POLLHUP` / `POLLERR`, 随即关闭设备, 复位运行标志并调用断连回调. 此后 `IsOpen()` 与 `IsRunning()` 均为 false.
-- 断连后不会自动重连. 设备重新插入后需要上层再次调用 `Connect`. 注意节点名可能变化, 可以先用 `FindDevice` 重新查找路径.
+- 断连后不会自动重连, 需要上层调用 `Connect`, 通常就写在断连回调里(可循环重试到成功). 注意 `Connect` 只会重新打开构造时绑定的那个路径, 设备重新枚举后节点号可能变化, 所以应优先使用 `/dev/serial/by-id` 下的稳定名( `FindDevice` 默认就优先匹配这里 ). 如果节点号确实会变, 就得在重试时用 `FindDevice` 重新查找并构造新的对象 —— 那种做法下回调需要重新注册.
+- 如果在断连回调里重连, 那个接收线程会被 detach 出去. 它会在回调返回后结束, 不参与后续的 join, 析构也不会等它; 因此回调一旦返回就必须不再访问对象(例如不要在回调里死循环且永不退出). 若对象需要在回调仍在执行时被销毁, 必须由上层自行保证回调已经返回.
 - 发送不做速率限制. 队列中有数据时会尽快连续发出, `tx_period_ms` 只影响队列空时的查询间隔, 抢锁失败后的重试间隔, 以及析构等待发送线程退出的上界.
 - 异步发送从入队到发出的延迟最坏为一个 `tx_period_ms` (默认 10 毫秒), 平均约为其一半. 对延迟敏感的数据应使用 `TransmitNow`.
 - 析构的等待时间上界约为 `max(kRxPollTimeoutMs, tx_period_ms)`, 设备空闲时也能正常返回, 不会挂在阻塞读上.
@@ -226,9 +228,11 @@ int main()
 
 ### 处理设备断开与重连
 
-断连回调运行在接收线程上, 不能在里面直接重连. 这里用标志位把重连动作交给主循环.
+断连回调里可以直接重连, 循环重试到成功为止. 回调所在的接收线程会被 detach, 因此这段等待不会阻塞其他任何东西 —— 收发线程此时本来就已经停了.
 
-注意 `USB_CDC` 在构造时就绑定了设备路径, `Connect` 只会重新打开同一个路径. 因此优先使用 `/dev/serial/by-id` 下的稳定名( `FindDevice` 默认就优先匹配这里 ), 这样设备重新插入后路径不变.
+需要一个"该放弃了吗"的出口, 否则进程退出时这个线程会一直重试下去. 下面的例子用回调注册时挂上的外部标志位(实际项目里可以接 `rclcpp::ok()` 之类的关闭信号).
+
+注意 `USB_CDC` 在构造时就绑定了设备路径, `Connect` 只会重新打开同一个路径. 因此优先使用 `/dev/serial/by-id` 下的稳定名( `FindDevice` 默认就优先匹配这里 ), 这样设备重新插入后路径不变; 若是节点号会变的场景, 要在重试循环里重新 `FindDevice` 并把新路径交给新的 `USB_CDC` 实例.
 
 ```cpp
 #include "usb_cdc.hpp"
@@ -241,13 +245,27 @@ int main()
 
 namespace
 {
-std::atomic<bool> g_disconnected{false};
+USB_CDC*              g_cdc = nullptr;                 // 回调里重连用
+std::atomic<bool>     g_stop_requested{false};         // 进程要关闭了, 别再无脑重试
 
 void OnDisconnect()
 {
-    // 注意: 本函数在接收线程中执行, 设备此时已关闭.
-    // 不要在这里调用 Connect/Disconnect, 只置标志.
-    g_disconnected = true;
+    // 本函数在接收线程中执行, 设备此时已关闭(IsOpen() 为 false).
+    // 这些资源都已归还, 所以可以直接在这里 Connect, 不会自 join 死锁.
+    std::printf("device lost, reconnecting...\n");
+
+    while (!g_stop_requested.load())
+    {
+        if (g_cdc->Connect())
+        {
+            std::printf("reconnected\n");
+            return;   // 回调必须能返回
+        }
+
+        // 设备还没插回来, 等一会儿再试. 注意这里不要用太长的间隔:
+        // 关闭请求最多要等这么久的 delay 才能生效
+        std::this_thread::sleep_for(std::chrono::milliseconds(500));
+    }
 }
 }  // namespace
 
@@ -261,23 +279,16 @@ int main()
     }
 
     USB_CDC cdc(path);
+    g_cdc = &cdc;
     cdc.RegisterDisconnectCallback(OnDisconnect);
 
-    while (true)
-    {
-        if (g_disconnected.exchange(false))
-        {
-            std::printf("device lost, reconnecting...\n");
+    // ... 主循环收发 ...
 
-            // 在非接收线程上重连是安全的, Connect 内部会先收敛旧线程
-            if (!cdc.Connect())
-            {
-                std::fprintf(stderr, "reconnect to %s failed\n", path.c_str());
-            }
-        }
-
-        std::this_thread::sleep_for(std::chrono::milliseconds(50));
-    }
+    // 退出前先让重连循环停止, 再销毁对象:
+    // 被 detach 的接收线程不会被析构 join, 所以不能让它还在跑的时候对象就没了
+    g_stop_requested = true;
+    std::this_thread::sleep_for(std::chrono::milliseconds(600));
+    return 0;
 }
 ```
 
@@ -328,7 +339,7 @@ make tsan     # 用 ThreadSanitizer 重编并运行, 检查数据竞争
 | 同步发送 | 3 | 字节精确、非法参数、断开后发送失败 |
 | 异步发送与队列 | 4 | 投递、FIFO 顺序、缓冲区深拷贝、队列容量 |
 | 接收回调 | 5 | 字节精确、分片累计、替换回调、注销回调、原始模式无字节转换 |
-| 断连检测 | 2 | 拔出触发回调且仅一次、主动断开不触发 |
+| 断连检测与重连 | 3 | 拔出触发回调且仅一次、主动断开不触发、在回调里直接 `Connect` 重连并验证新链路可用 |
 | 析构 | 3 | 空闲、队列有积压、拔出后均须及时返回 |
 | 并发 | 1 | 同步与异步同时发送时的帧完整性 |
 | 周期配置 | 1 | `GetTxPeriodMs` / `SetTxPeriodMs` |
@@ -339,10 +350,10 @@ make tsan     # 用 ThreadSanitizer 重编并运行, 检查数据竞争
 
 | 项目 | 结果 |
 | --- | --- |
-| 常规运行 | 29 用例通过, 0 失败; 168 次断言, 0 次失败 |
+| 常规运行 | 30 用例通过, 0 失败; 178 次断言, 0 次失败 |
 | 重复运行 | 连续 3 次运行, 逐用例结果一致 |
-| ThreadSanitizer | 27 用例通过, 0 失败; 146 次断言, 0 次失败; 无数据竞争报告(2 个计时用例在该模式下自动跳过) |
-| 变异测试 | 分别把接收线程的 `poll` 超时改坏、去掉发送线程的休眠、把一帧拆成两次 `write`, 对应用例均失败; 其余用例不受影响 |
+| ThreadSanitizer | 28 用例通过, 0 失败; 156 次断言, 0 次失败; 无数据竞争报告(2 个计时用例在该模式下自动跳过) |
+| 变异测试 | 分别把接收线程的 `poll` 超时改坏、去掉发送线程的休眠、把一帧拆成两次 `write`、去掉 `Disconnect` 的自 join 保护, 对应用例均失败; 其余用例不受影响 |
 
 ## 部署注意
 

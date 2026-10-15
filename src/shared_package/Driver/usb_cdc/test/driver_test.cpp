@@ -354,6 +354,25 @@ void DisconnectTrampoline()
     ++g_disconnect_calls;
 }
 
+// 在断连回调里直接重连的挂载点: 记录 Connect() 的返回值, 供用例判断是否卡死
+std::atomic<Driver::USB_CDC*> g_reconnect_cdc{nullptr};
+std::atomic<int>              g_reconnect_result{0};  // 0 未执行, 1 成功, -1 失败
+
+void ReconnectInCallbackTrampoline()
+{
+    ++g_disconnect_calls;
+
+    Driver::USB_CDC* cdc = g_reconnect_cdc.load();
+    if (cdc == nullptr)
+    {
+        g_reconnect_result = -1;
+        return;
+    }
+
+    // 这就是本次改动支持的用法: 回调里直接重连, 不会 join 当前线程而死锁
+    g_reconnect_result = cdc->Connect() ? 1 : -1;
+}
+
 // ============================================================================
 // 用例
 // ============================================================================
@@ -689,6 +708,53 @@ void Case_Manual_disconnect_does_not_notify()
     CHECK(!cdc.IsRunning());
 }
 
+// 断连回调里直接 Connect() 重连. 回调跑在接收线程上, 而 Connect 内部会先 Disconnect,
+// 所以这里验证的是自 join 保护: 卡住的话下面的 WaitUntil 永远等不到结果.
+// 设备路径用软链接当"稳定名" —— 拔出后 pty 号会变, 名字不变, 模拟真实的 by-id 路径.
+void Case_Reconnect_from_disconnect_callback()
+{
+    const std::string link = "/tmp/usb_cdc_test_link_" + std::to_string(getpid());
+
+    FakeDevice dev_old;
+    ::unlink(link.c_str());
+    CHECK(symlink(dev_old.Path().c_str(), link.c_str()) == 0);
+
+    Driver::USB_CDC cdc(link);
+    CHECK(cdc.IsOpen());
+
+    // 重新插入的"新设备": 先把稳定路径指过去, 制造设备重新枚举的效果
+    FakeDevice dev_new;
+    ::unlink(link.c_str());
+    CHECK(symlink(dev_new.Path().c_str(), link.c_str()) == 0);
+
+    RxRecorder recorder;
+    g_rx = &recorder;
+    // 回调在重连前注册, 重连后必须仍然有效(Connect 不会清掉已注册的回调)
+    cdc.RegisterRxCallback(&RxTrampoline);
+    g_disconnect_calls = 0;
+    g_reconnect_result = 0;
+    g_reconnect_cdc    = &cdc;
+    cdc.RegisterDisconnectCallback(&ReconnectInCallbackTrampoline);
+
+    dev_old.Unplug();   // 拔线, 回调里立刻重连
+
+    CHECK(WaitUntil([&] { return g_reconnect_result.load() != 0; }, 2000));
+    CHECK_EQ(g_reconnect_result.load(), 1);
+    CHECK_EQ(g_disconnect_calls.load(), 1);
+    CHECK(cdc.IsOpen());
+    CHECK(cdc.IsRunning());
+
+    // 重连后的新链路必须真的能用
+    const std::vector<uint8_t> frame = {0xAA, 0x5A, 0x55};
+    CHECK(dev_new.Send(frame));
+    CHECK(WaitUntil([&] { return recorder.Data() == frame; }, 1000));
+
+    g_reconnect_cdc = nullptr;
+    g_rx            = nullptr;   // 旧的接收线程已被 detach, 这里保证它不再解引用
+
+    ::unlink(link.c_str());
+}
+
 // ---- 析构 -----------------------------------------------------------------
 
 void Case_Destructor_returns_promptly_when_idle()
@@ -961,6 +1027,7 @@ const TestCase kCases[] = {
     {"Rx_raw_mode_has_no_byte_translation",     Case_Rx_raw_mode_has_no_byte_translation},
     {"Unplug_is_detected_and_reported",         Case_Unplug_is_detected_and_reported},
     {"Manual_disconnect_does_not_notify",       Case_Manual_disconnect_does_not_notify},
+    {"Reconnect_from_disconnect_callback",      Case_Reconnect_from_disconnect_callback},
     {"Destructor_returns_promptly_when_idle",   Case_Destructor_returns_promptly_when_idle},
     {"Destructor_returns_promptly_with_pending_frames",
                                                 Case_Destructor_returns_promptly_with_pending_frames},

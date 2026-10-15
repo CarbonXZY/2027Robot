@@ -1,5 +1,5 @@
 {
-    "cmake.sourceDirectory": "F:/Electronic_Control/2027Robot/src/chassis",
+    "cmake.sourceDirectory": "/home/lyh/2027Robot/src/shared_package",
     "C_Cpp.default.cppStandard": "c++17",
     "C_Cpp.default.includePath": [
         "${workspaceFolder}/src/chassis/include",

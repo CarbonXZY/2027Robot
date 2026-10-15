@@ -62,9 +62,16 @@ public:
 
     /**
      * @brief 注册断连回调函数, 检测到设备断开(拔出/异常)时调用(用户主动断开不触发)
-     * @note 回调在接收线程中执行, 且此时设备已关闭(IsOpen() 为 false)。
-     *       不要在回调里直接调用 Connect/Disconnect, 否则会 join 当前线程导致死锁,
-     *       应置标志或转交其他线程后再重连。
+     * @note 调用时设备资源已经归还: 文件描述符已关闭(IsOpen() 为 false)、运行标志已
+     *       复位、发送线程正在退出。可以在回调里直接调用 Connect() 重连——Disconnect()
+     *       带自 join 保护, 不会因为 join 当前线程而死锁。重连失败时可在回调里循环
+     *       重试, 直到成功或决定放弃。
+     *
+     *       两条约束:
+     *       1. 回调**必须能返回**。Connect() 会把回调所在的接收线程 detach(它返回后
+     *          随即结束), 所以回调不能永久阻塞, 否则那个线程会一直悬挂。
+     *       2. 回调返回后, RxThreadLoop 里不能再有任何触碰成员变量的语句(见 .cpp),
+     *          否则会踩到 Connect() 换过代的新线程/新 fd。
      * @param callback 回调函数指针, 无参数
      */
     void RegisterDisconnectCallback(DisconnectHandle callback);
@@ -103,10 +110,20 @@ public:
      */
     void SetTxPeriodMs(uint32_t period_ms) { tx_period_ms_ = period_ms; }
 
+    /**
+     * @brief 停止收发线程并关闭设备(用户主动断开不触发断连回调), 可重复调用
+     * @note 若在接收线程(即断连回调/接收回调)中调用, 会 detach 该线程而不是 join 它,
+     *       避免自 join 死锁; 此时线程在回调返回后自行结束
+     */
     void Disconnect();
 
     bool IsRunning() const { return running_; }
 
+    /**
+     * @brief 打开设备并启动收发线程; 幂等, 已连接时先收敛旧线程再重开
+     * @note 可以在断连回调里直接调用(见 RegisterDisconnectCallback 的说明)
+     * @return true 表示设备已打开且收发线程已启动
+     */
     bool Connect();
 
 private:
