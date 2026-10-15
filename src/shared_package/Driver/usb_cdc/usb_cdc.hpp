@@ -190,7 +190,9 @@ private:
 /**
  * @brief 按选择串找 USB-CDC 设备路径。
  *        选择串以 '/' 开头时当作设备路径直连；否则当作正则表达式，
- *        在 /dev/serial/by-id 与 /dev/ttyACM* 里匹配设备名，返回第一个命中。
+ *        先在 /dev/serial/by-id 里按设备名匹配（返回软链接本身，不解析目标，
+ *        保证重连时节点号变了也能跟到同一物理设备），找不到再回退扫描
+ *        /dev/ttyACM* 的节点名或 sysfs product 字符串，返回第一个命中。
  * @param spec 设备路径（如 "/dev/ttyACM0"）或正则表达式（如 "STM"）
  * @return 匹配到的设备路径；找不到返回空串
  */

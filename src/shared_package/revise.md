@@ -145,12 +145,10 @@ terminate called after throwing an instance of 'std::runtime_error'
 
 ## 已知限制
 
-- **节点号变了就重连不上。** `Connect` 只重开构造时绑定的那条路径，而
-  `FindDevice` 对正则返回的是 `fs::canonical` 之后的**真实路径**（`/dev/ttyACM0`），
-  不是 `/dev/serial/by-id` 里的稳定软链接。若重新枚举后节点号变了（例如 ACM0 被别的
-  设备占走），重连会一直失败。这种情况会在 `stderr` 打一行告警（同一条路径只打一次），
-  避免无声空转；要彻底解决得让 `FindDevice` 能返回 by-id 软链接本身而不是它的目标 —— 
-  这属于驱动接口改动，本次未做。
+- **节点号变了就重连不上。**（已修复：2026-10-15 起 `FindDevice` 对 by-id 返回软链接
+  本身，不再 `fs::canonical` 成 `/dev/ttyACM0`。`Connect` 重开的是这条稳定软链接，软链接
+  会跟着重新枚举后的新节点走，所以节点号变化也能跟到同一物理设备。仅当首次启动时 by-id
+  不可用、回退绑定到 `/dev/ttyACM0` 这种真实路径时，节点号变化才会重连失败。）
 - 只在驱动检测到 `POLLHUP`/`POLLERR` 时触发。下位机自己复位但 tty 没断（无 HUP）时
   回调不会触发，重连也就不会启动（此时 `g_mcu_alive` 会变 false，但不会重连）。
 

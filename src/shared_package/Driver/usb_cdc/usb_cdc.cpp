@@ -337,22 +337,18 @@ std::string FindDevice(const std::string & spec)
         return "";
     }
 
-    // 1) 优先匹配 /dev/serial/by-id 的稳定名（如 usb-STMicroelectronics_STM32_...-if00）
+    // 1) 优先匹配 /dev/serial/by-id 的稳定名（如 usb-STMicroelectronics_STM32_...-if00）。
+    //    直接返回软链接本身而不是 canonical 后的真实路径：open() 会跟随软链接指到
+    //    当前实际的 /dev/ttyACM*，这样设备重新枚举后节点号变了，重连也能跟到同一物理设备。
     std::error_code ec;
     const fs::path by_id_dir("/dev/serial/by-id");
     if (fs::is_directory(by_id_dir, ec))
     {
         for (const fs::directory_entry & entry : fs::directory_iterator(by_id_dir, ec))
         {
-            if (!std::regex_search(entry.path().filename().string(), pattern))
+            if (std::regex_search(entry.path().filename().string(), pattern))
             {
-                continue;
-            }
-            ec.clear();
-            const fs::path real = fs::canonical(entry.path(), ec);
-            if (!ec)
-            {
-                return real.string();
+                return entry.path().string();
             }
         }
     }
