@@ -102,13 +102,12 @@ ros2 topic pub /mecanum_drive_controller/reference_unstamped geometry_msgs/msg/T
 
 ## 人机交互仲裁（robot 包）
 
-`robot` 节点在遥控帧到达时决定底盘听谁：
+`robot` 节点定时（`timer_period_ms`）按 SA 两位开关仲裁底盘听谁：
 
-- 遥控链路失效（`failsafe`）或 SA 打到失能档 → 一律发零，底盘不动。
-- SD 打到上位机档 → 转发上位机最近一帧 `/cmd_vel`。
-- 否则听遥控器摇杆，经死区处理后映射到 Twist。
+- 遥控不在（无帧 / `failsafe`）→ 默认上位机模式：上位机活着就用上位机 Twist，否则发零。
+- 遥控健康时按 SA 区分：LOW = 遥控器摇杆；HIGH = 上位机（上位机失联则发零）；其余不存在档位一律发零。
 
-发布节奏跟着遥控帧走（~10 Hz）。详见 [robot.hpp](src/robot/include/robot/robot.hpp)。
+详见 [robot.hpp](src/robot/include/robot/robot.hpp)。
 
 ## 各模块文档
 

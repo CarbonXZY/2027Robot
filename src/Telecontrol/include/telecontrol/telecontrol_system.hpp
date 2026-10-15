@@ -35,6 +35,16 @@ namespace Telecontrol
 
 /* Exported types ------------------------------------------------------------*/
 
+/**
+ * @brief 遥控器三档开关档位，取值与 telecontrol_msgs/RcState.msg 的常量一致
+ */
+enum class RcSwitch : uint8_t
+{
+    kLow = 0,
+    kMiddle = 1,
+    kHigh = 2,
+};
+
 #pragma pack(push, 1)
 /**
  * @brief 遥控帧载荷（线格式，布局不能动）

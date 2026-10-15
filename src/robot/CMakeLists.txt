@@ -8,6 +8,7 @@ endif()
 find_package(ament_cmake REQUIRED)
 find_package(rclcpp REQUIRED)
 find_package(geometry_msgs REQUIRED)
+find_package(telecontrol REQUIRED)
 find_package(telecontrol_msgs REQUIRED)
 
 # 人机交互口子：遥控帧 → 底盘 Twist
@@ -19,6 +20,7 @@ target_include_directories(robot PUBLIC
 ament_target_dependencies(robot
   rclcpp
   geometry_msgs
+  telecontrol
   telecontrol_msgs)
 
 install(TARGETS robot DESTINATION lib/${PROJECT_NAME})

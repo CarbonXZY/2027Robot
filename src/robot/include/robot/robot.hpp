@@ -1,14 +1,13 @@
 /**
  * @file robot.hpp
- * @brief 人机交互口子：遥控 / 上位机 Twist 二选一，仲裁后发给底盘
+ * @brief 人机交互口子：按 SA 两位开关二选一（遥控器 / 上位机），定时打包成 Twist 发给底盘
  *
- * 仲裁规则：遥控帧的 SD 开关打到 pc_switch_value（默认 HIGH）就听上位机下发的
- * Twist，否则听遥控器摇杆。遥控链路失效（failsafe）、或 SA 打到 sa_disable_value
- * （默认 HIGH）时一律发零，底盘不动。
+ * 每个周期 OnTimer：先 ResolveControlSource() 判定这一拍听谁（kNone / kPc / kRc），
+ * 再 BuildTwist() 按信号源打包成 Twist 发布。
+ * 默认上位机模式（遥控不在、读不到 SA 时）。遥控健康（rc_alive_timeout 内有帧且无
+ * failsafe）时按 SA 区分：LOW = 遥控器，HIGH = 上位机（上位机失联则发零），其余
+ * 不存在档位一律失能（发零）。
  * 摇杆映射：left_x 自转，right_x 横移，right_y 前后。
- *
- * 发布节奏跟着遥控帧走（广播器 ~10 Hz，与 ros2_control update_rate 同档），
- * 上位机的 Twist 只做采样。
  */
 
 #pragma once
@@ -18,16 +17,17 @@
 #include <rclcpp/rclcpp.hpp>
 
 #include <geometry_msgs/msg/twist.hpp>
+#include <telecontrol/telecontrol_system.hpp>
 #include <telecontrol_msgs/msg/rc_state.hpp>
 
 /**
- * @brief 遥控器三档开关档位，取值与 telecontrol_msgs/RcState.msg 的常量一致
+ * @brief 底盘信号源：失能 / 上位机 / 遥控器
  */
-enum class RcSwitch : uint8_t
+enum class ControlMode : uint8_t
 {
-    kLow = 0,
-    kMiddle = 1,
-    kHigh = 2,
+    kNone = 0,  // 失能，发零
+    kPc = 1,    // 上位机 Twist
+    kRc = 2,    // 遥控器摇杆
 };
 
 class Robot : public rclcpp::Node
@@ -42,12 +42,27 @@ private:
     double ApplyDeadzone(double value, double deadzone) const;
 
     /**
-     * @brief 遥控帧到达：按 SD / SA 位置选信号源，打包成 Twist 发出去
+     * @brief 定时仲裁：判定信号源 → 打包 Twist → 发布
+     */
+    void OnTimer();
+
+    /**
+     * @brief 判定这一拍听谁，结果写进 control_mode_：遥控不在默认上位机；遥控健康时 SA=LOW 遥控、HIGH 上位机、其余失能
+     */
+    void ResolveControlSource();
+
+    /**
+     * @brief 按信号源打包对应 Twist 并发布
+     */
+    void BuildTwist(ControlMode source);
+
+    /**
+     * @brief 遥控帧到达：只记下最近一帧
      */
     void OnRcState(const telecontrol_msgs::msg::RcState &msg);
 
     /**
-     * @brief 上位机 Twist 到达：只记下最近一帧，等遥控帧那一拍再决定用不用
+     * @brief 上位机 Twist 到达：记下最近一帧与到达时刻
      */
     void OnPcTwist(const geometry_msgs::msg::Twist &msg);
 
@@ -56,14 +71,26 @@ private:
     double max_angular_z_ = 2.0;
     double deadzone_ = 0.05;
 
-    // SD 打到这一档就把底盘交给上位机
-    RcSwitch pc_switch_value_ = RcSwitch::kHigh;
-    // SA 打到这一档就失能底盘（发零）
-    RcSwitch sa_disable_value_ = RcSwitch::kHigh;
+    // 上位机超过这个时间没发 Twist 就算失联（上位机模式下发零保护）
+    double pc_alive_timeout_ = 0.5;
+    // 遥控超过这个时间没发帧就算不在，读不到 SA，默认上位机模式
+    double rc_alive_timeout_ = 0.5;
+    // 仲裁周期（毫秒）
+    int timer_period_ms_ = 100;
 
-    // 上位机最近一帧 Twist；还没收到过就是全零，正好当安全兜底
+    // 这一拍听谁，由 ResolveControlSource() 写入，BuildTwist() 读取
+    ControlMode control_mode_ = ControlMode::kNone;
+
+    // 遥控最近一帧；默认全零，正好当安全兜底
+    telecontrol_msgs::msg::RcState last_rc_state_{};
+    // 上位机最近一帧 Twist；还没收到过就是全零
     geometry_msgs::msg::Twist pc_twist_{};
+    // 上位机最近一次 Twist 到达时刻（默认 0，表示从未收到；显式 ROS 时钟，和 now() 同源）
+    rclcpp::Time last_pc_twist_time_{0, 0, RCL_ROS_TIME};
+    // 遥控最近一帧到达时刻（默认 0，表示从未收到；显式 ROS 时钟，和 now() 同源）
+    rclcpp::Time last_rc_time_{0, 0, RCL_ROS_TIME};
 
+    rclcpp::TimerBase::SharedPtr timer_;
     rclcpp::Subscription<telecontrol_msgs::msg::RcState>::SharedPtr rc_subscription_;
     rclcpp::Subscription<geometry_msgs::msg::Twist>::SharedPtr pc_subscription_;
     rclcpp::Publisher<geometry_msgs::msg::Twist>::SharedPtr publisher_;
