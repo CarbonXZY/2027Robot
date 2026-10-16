@@ -96,6 +96,14 @@ void Robot::ResolveControlSource()
 
 void Robot::BuildTwist(ControlMode source)
 {
+    // 麦轮控制器还没起来（还没订阅）就不发：发也白发，而且会在它 on_configure 还没
+    // 初始化完 input_ref_ 时触发它的 reference_unstamped_callback，撞空指针段错误。
+    // get_subscription_count 要等 DDS 发现完成才非 0，那时控制器早已配置完毕。
+    if (publisher_->get_subscription_count() == 0)
+    {
+        return;
+    }
+
     geometry_msgs::msg::Twist twist;
 
     switch (source)
