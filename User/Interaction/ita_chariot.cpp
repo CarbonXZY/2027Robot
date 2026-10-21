@@ -7,11 +7,32 @@
 
 #include "Communication_Interface.hpp"
 #include "drv_can.h"
-#include "mod_leg_instance.h"
 #include "dvc_motor_instances.h"
 
+namespace
+{
+// 齿轮齿条机械参数, 下标顺序 lf, rf, lr, rr
+constexpr Module::Leg::Mechanical kLegMechanical = {
+    .equivalent_radius = {0.025f, 0.025f, 0.025f, 0.025f},
+    .direction_sign = {1, -1, -1, 1},
+    .max_height = {0.3f, 0.3f},
+};
+
+// 主动找限位参数
+constexpr Module::Leg::Homing kLegHoming = {
+    .speed = 0.05f,
+    .speed_threshold = 0.001f,
+    .debounce_ms = 20,
+};
+} // namespace
+
 Chariot::Chariot()
-    : leg_(&Module::g_legs),
+    : leg_(Module::Leg::MotorGroup{
+          .lf = &Device::g_motor.leg_front_left,
+          .rf = &Device::g_motor.leg_front_right,
+          .lr = &Device::g_motor.leg_rear_left,
+          .rr = &Device::g_motor.leg_rear_right,
+          }, kLegMechanical),
       chassis_({&Device::g_motor.chassis_front_left, &Device::g_motor.chassis_front_right, &Device::g_motor.chassis_rear_left, &Device::g_motor.chassis_rear_right})
 {
 }
@@ -25,7 +46,7 @@ void Chariot::Init()
     Device::g_motor.Init();
 
     // id=3 的腿帧在 leg_.Init() 里注册
-    leg_->Init(0.3f, Module::g_legs_homing);
+    leg_.Init(0.3f, kLegHoming);
 
     // id=1 的底盘帧在 chassis_.Init() 里注册
     Module::Chassis::Parameters chassis_param = {
@@ -53,7 +74,7 @@ void Chariot::CrsfRxCallback(uint8_t *data, uint16_t length)
 
 void Chariot::TimCalculatePeriodElapsedCallback()
 {
-    leg_->Timer1msCalculateCallback();
+    leg_.TimCalculatePeriodElapsedCallback();
     
     // 校准期间整机不动：底盘不跟上位机下发的轮速，只有腿自己去找零点
     // if (calibration_finished_)
@@ -78,7 +99,7 @@ void Chariot::Tim100msAlivePeriodElapsedCallback()
 {
     telecontrol_.Tim100msAlivePeriodElapsedCallback();
 
-    leg_->Timer1msCalculateCallback();
+    leg_.Tim100msAlivePeriodElapsedCallback();
 
     Device::g_motor.chassis_front_left.Tim100msAlivePeriodElapsedCallback();
     Device::g_motor.chassis_front_right.Tim100msAlivePeriodElapsedCallback();

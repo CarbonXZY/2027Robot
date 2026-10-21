@@ -81,7 +81,7 @@ output_                 发给 4 台电机的位置目标与速度前馈
 ## 3. 1ms 控制流程
 
 ```text
-Timer1msCalculateCallback()
+TimCalculatePeriodElapsedCallback()
         │
         ├─ 状态机                kInit → kCalibrate（主动找下限位）→ kRunning
         ├─ UpdateData()          电机角度 → 高度；组内平均得到 now_height_
@@ -223,7 +223,7 @@ speed_kff[i]     = master_speed · ratio
 ### 4.7 100ms 回调
 
 ```cpp
-Timer100msAliveCallback();
+Tim100msAlivePeriodElapsedCallback();
 ```
 
 循环 4 台电机调用 `Tim100msAlivePeriodElapsedCallback()`，负责电机掉线检测。必须放在 100ms 分频里调用。
@@ -289,7 +289,7 @@ void TaskInit()
 
 void Tim1msCallback()
 {
-    g_leg.Timer1msCalculateCallback();
+    g_leg.TimCalculatePeriodElapsedCallback();
     Driver::Tim1msCanPeriodElapsedCallback();
     // 其余 1ms 任务...
 
@@ -297,7 +297,7 @@ void Tim1msCallback()
     if (++mod_alive >= 100)
     {
         mod_alive = 0;
-        g_leg.Timer100msAliveCallback();
+        g_leg.Tim100msAlivePeriodElapsedCallback();
     }
 }
 ```

@@ -22,6 +22,35 @@
 namespace Module
 {
 
+/**
+ * @brief 腿帧结构, id=3, 与上位机 R2_PC 的 leg_system 配对
+ *
+ * 上下行结构体名按「电机视角」命名: Tx = 下发给电机的指令, Rx = 电机回传的反馈。
+ * 下行: 上位机 → 本板 [id=3][4×float 关节位置(rad)]     16B
+ * 上行: 本板 → 上位机 [id=3][4×{velocity,position}]      32B
+ */
+#pragma pack(push, 1)
+struct LegTx
+{
+    // 关节侧位置 (rad), 与上位机 URDF 关节角一致
+    float position[4];
+};
+
+struct LegRx
+{
+    Device::MotorFeedbackFrame motor[4];
+};
+#pragma pack(pop)
+
+/**
+ * @brief 上位机链路的使能状态 (掉线保护)
+ */
+enum class LegStatus
+{
+    kDisable = 0,  // 失能: 不再接受新目标, 保持最后一帧目标
+    kEnable,       // 使能: 跟随上位机下发的目标
+};
+
 class Leg
 {
 public:
@@ -141,8 +170,18 @@ public:
     bool GetCrossCoupeEnable() const { return cross_couple_enable_; }
     bool GetMotorAllEnabled() const;
 
-    void Timer1msCalculateCallback();
-    void Timer100msAliveCallback();
+    // 上位机掉线保护: 失能后保持最后一帧目标, 不再接受新指令
+    void SetState(LegStatus status) { enable_status_ = status; }
+
+    // 和 Chassis 相同的一拍入口
+    void TimCalculatePeriodElapsedCallback();
+    void Tim100msAlivePeriodElapsedCallback();
+
+    // 通信缓冲: 通信中间件直接读写
+    // 下行: 上位机下发的关节目标位置
+    LegTx tx_buffer_{};
+    // 上行: 回传给上位机的电机反馈
+    LegRx rx_buffer_{};
 
 protected:
     //
@@ -195,6 +234,8 @@ protected:
     bool homing_done_[kMotorNum] = {};
     // 交叉耦合控制开关
     bool cross_couple_enable_ = true;
+    // 上位机链路使能状态
+    LegStatus enable_status_ = LegStatus::kDisable;
 
     void LimitOutput();
 

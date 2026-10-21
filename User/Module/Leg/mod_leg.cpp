@@ -6,9 +6,12 @@
 *
 */
 #include "mod_leg.h"
-#include "drv_math.h"
 
 #include <cmath>
+
+#include "Communication_Interface.hpp"
+#include "drv_math.h"
+#include "mid_config.h"
 
 namespace
 {
@@ -26,13 +29,6 @@ constexpr Device::MotorDjiC620::Parameters kRunningParams = {
     },
     .pid_omega = {
         .k_p = 2.5F, .k_i = 0.0F, .k_d = 0.0F
-    },
-};
-
-// 找限位阶段: 只用速度环
-constexpr Device::MotorDjiC620::Parameters kHomingParams = {
-    .pid_omega = {
-        .k_p = 2.0F, .k_i = 0.0F, .k_d = 0.0F
     },
 };
 
@@ -86,10 +82,16 @@ void Leg::Init(float average_speed, const Homing& homing,
     cross_couple_front_.Init(kGroupMotorNum);
     cross_couple_rear_.Init(kGroupMotorNum);
 
+    // 注意 Register() 的 tx/rx 是本板视角: 本板发反馈, 收指令
+    Middleware::g_usb_communication_interface.Register(
+        static_cast<uint8_t>(Middleware::CommFrameId::kLeg),
+        &rx_buffer_, &tx_buffer_,
+        static_cast<uint8_t>(sizeof(rx_buffer_)), static_cast<uint8_t>(sizeof(tx_buffer_)));
+
     status_ = Status::kInit;
 }
 
-void Leg::Timer1msCalculateCallback()
+void Leg::TimCalculatePeriodElapsedCallback()
 {
     ParamValidation();
     FiniteStateMachine();
@@ -140,11 +142,6 @@ void Leg::EnterCalibrate()
         homing_done_[i] = false;
     }
     ResetMotion();
-
-    for (uint32_t i = 0; i < kMotorNum; i++)
-    {
-        motor_group_[i]->Init(Device::MotorControlMethod::kSpeed, kHomingParams);
-    }
 
     status_ = Status::kCalibrate;
 }
@@ -240,11 +237,34 @@ void Leg::RunningStep()
         return;
     }
 
+    // 下行: 只有使能时才接受上位机目标, 失能时保持最后一帧目标
+    if (enable_status_ == LegStatus::kEnable)
+    {
+        // 上位机下发关节侧正值, 符号由本侧按 direction_sign 加
+        // 关节位置 (rad) → 腿高 (m), 组内两条腿取平均作为本组目标
+        const float height[kMotorNum] = {
+            tx_buffer_.position[0] * mechanical_.equivalent_radius[0],
+            tx_buffer_.position[1] * mechanical_.equivalent_radius[1],
+            tx_buffer_.position[2] * mechanical_.equivalent_radius[2],
+            tx_buffer_.position[3] * mechanical_.equivalent_radius[3],
+        };
+        SetTarget(0.5f * (height[0] + height[1]), 0.5f * (height[2] + height[3]));
+    }
+
     UpdateData();
     NewTargetHandler();
     CalculateOutput();
     LimitOutput();
     OutputToMotor();
+
+    // 上行: 回传关节侧正值, 已按 direction_sign 归一, 由通信中间件打包
+    for (uint32_t i = 0; i < kMotorNum; i++)
+    {
+        const float direction = static_cast<float>(mechanical_.direction_sign[i]);
+        rx_buffer_.motor[i].position =
+            direction * (motor_group_[i]->GetNowAngle() - offset_[i]);
+        rx_buffer_.motor[i].velocity = direction * motor_group_[i]->GetNowOmega();
+    }
 }
 
 // 进入故障状态: 先退出速度模式并以当前位置保持, 再锁存
@@ -492,7 +512,7 @@ void Leg::LimitOutput()
     }
 }
 
-void Leg::Timer100msAliveCallback()
+void Leg::Tim100msAlivePeriodElapsedCallback()
 {
     for (uint32_t i = 0; i < kMotorNum; i++)
     {
@@ -506,7 +526,7 @@ void Leg::SetGravityComp(const std::array<float, kMotorNum>& current)
     {
         gravity_comp[i] = current[i];
     }
-    
+
 }
 
 } // namespace Module
