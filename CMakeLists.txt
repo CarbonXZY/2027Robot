@@ -34,6 +34,15 @@ set(CMAKE_CXX_STANDARD 20)
 set(CMAKE_CXX_STANDARD_REQUIRED ON)
 set(CMAKE_CXX_EXTENSIONS ON)
 
+# Quiet common noise from STM32 HAL / CubeMX generated code and C-style
+# designated initializers. These come after -Wall -Wextra, so they win.
+# Remove any line below if you want that warning back for your own code.
+add_compile_options(
+    -Wno-missing-field-initializers   # struct init leaving members zeroed by default
+    -Wno-unused-parameter             # HAL callbacks with unused args
+    -Wno-sign-compare                 # int/int32 loop counters vs uint32_t lengths
+)
+
 # Create an executable object type
 add_executable(${CMAKE_PROJECT_NAME}
     User/Module/Gripper/mod_gripper.cpp
@@ -45,7 +54,9 @@ add_executable(${CMAKE_PROJECT_NAME}
     User/Driver/drv_bsp.cpp
     User/Driver/drv_bsp.h
     User/Task/tsk_config_and_callback_xzy.cpp
-    User/Task/tsk_config_and_callback_lyh.cpp)
+    User/Task/tsk_config_and_callback_lyh.cpp
+    User/Algorithm/alg_interpolator.h
+    User/Algorithm/alg_interpolator.cpp)
 
 # Add STM32CubeMX generated sources
 add_subdirectory(cmake/stm32cubemx)
@@ -79,6 +90,8 @@ file(GLOB_RECURSE USER_SOURCES CONFIGURE_DEPENDS
 
 target_sources(${CMAKE_PROJECT_NAME} PRIVATE
     ${USER_SOURCES}
+    User/Module/Leg/mod_leg.cpp
+    User/Module/Leg/mod_leg_instance.cpp
 )
 
 # Add include paths

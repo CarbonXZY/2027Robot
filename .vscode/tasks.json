@@ -1,0 +1,26 @@
+{
+    "version": "2.0.0",
+    "tasks": [
+        {
+            // 只烧录, 不编译。烧之前请先跑 "CMake: Build (Debug)"。
+            "label": "JLink: Flash (Debug)",
+            "type": "shell",
+            "command": "${env:HOME}/.jlink/jlink-flash",
+            "args": [
+                "-d",
+                "STM32H723VG",
+                "-f",
+                "build/Debug/H723VGT6.elf"
+            ],
+            "options": {
+                "cwd": "${workspaceFolder}"
+            },
+            "problemMatcher": [],
+            "presentation": {
+                "reveal": "always",
+                "panel": "shared",
+                "clear": true
+            }
+        }
+    ]
+}
