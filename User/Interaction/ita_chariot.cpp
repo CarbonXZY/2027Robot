@@ -7,10 +7,11 @@
 
 #include "Communication_Interface.hpp"
 #include "drv_can.h"
+#include "mod_leg_instance.h"
 #include "dvc_motor_instances.h"
 
 Chariot::Chariot()
-    : leg_({&Device::g_motor.leg_front_left, &Device::g_motor.leg_front_right, &Device::g_motor.leg_rear_left, &Device::g_motor.leg_rear_right}),
+    : leg_(&Module::g_legs),
       chassis_({&Device::g_motor.chassis_front_left, &Device::g_motor.chassis_front_right, &Device::g_motor.chassis_rear_left, &Device::g_motor.chassis_rear_right})
 {
 }
@@ -24,8 +25,7 @@ void Chariot::Init()
     Device::g_motor.Init();
 
     // id=3 的腿帧在 leg_.Init() 里注册
-    Module::Leg::Parameters leg_param;
-    leg_.Init(leg_param);
+    leg_->Init(0.3f, Module::g_legs_homing);
 
     // id=1 的底盘帧在 chassis_.Init() 里注册
     Module::Chassis::Parameters chassis_param = {
@@ -53,10 +53,8 @@ void Chariot::CrsfRxCallback(uint8_t *data, uint16_t length)
 
 void Chariot::TimCalculatePeriodElapsedCallback()
 {
-    leg_.TimCalculatePeriodElapsedCallback();
-
-    calibration_finished_ = leg_.IsCalibrated();
-
+    leg_->Timer1msCalculateCallback();
+    
     // 校准期间整机不动：底盘不跟上位机下发的轮速，只有腿自己去找零点
     // if (calibration_finished_)
     // {
@@ -80,10 +78,7 @@ void Chariot::Tim100msAlivePeriodElapsedCallback()
 {
     telecontrol_.Tim100msAlivePeriodElapsedCallback();
 
-    Device::g_motor.leg_front_left.Tim100msAlivePeriodElapsedCallback();
-    Device::g_motor.leg_front_right.Tim100msAlivePeriodElapsedCallback();
-    Device::g_motor.leg_rear_left.Tim100msAlivePeriodElapsedCallback();
-    Device::g_motor.leg_rear_right.Tim100msAlivePeriodElapsedCallback();
+    leg_->Timer1msCalculateCallback();
 
     Device::g_motor.chassis_front_left.Tim100msAlivePeriodElapsedCallback();
     Device::g_motor.chassis_front_right.Tim100msAlivePeriodElapsedCallback();

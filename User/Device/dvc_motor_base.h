@@ -31,8 +31,8 @@ enum class MotorStatus
 #pragma pack(push, 1)
 struct MotorFeedbackFrame
 {
-    float velocity = 0.0f;  // 速度 (rad/s)
-    float position = 0.0f;  // 位置 (rad)
+    float velocity = 0.0f;  // 速度
+    float position = 0.0f;  // 位置
 };
 #pragma pack(pop)
 

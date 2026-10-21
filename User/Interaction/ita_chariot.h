@@ -19,7 +19,7 @@ class Chariot
 public:
     Chariot();
 
-    Module::Leg leg_;
+    Module::Leg *leg_;
     Module::Chassis chassis_;
     Module::Telecontrol telecontrol_;
 
