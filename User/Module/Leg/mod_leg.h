@@ -26,13 +26,14 @@ namespace Module
  * @brief 腿帧结构, id=3, 与上位机 R2_PC 的 leg_system 配对
  *
  * 上下行结构体名按「电机视角」命名: Tx = 下发给电机的指令, Rx = 电机回传的反馈。
- * 下行: 上位机 → 本板 [id=3][4×float 关节位置(rad)]     16B
+ * 下行: 上位机 → 本板 [id=3][4×float 腿高(m)]           16B
  * 上行: 本板 → 上位机 [id=3][4×{velocity,position}]      32B
+ *   velocity: 线速度 (m/s), position: 腿高 (m), 均向上为正
  */
 #pragma pack(push, 1)
 struct LegTx
 {
-    // 关节侧位置 (rad), 与上位机 URDF 关节角一致
+    // 腿高 (m), 向上为正
     float position[4];
 };
 
@@ -191,7 +192,7 @@ protected:
     // 电机编码器偏移量, 下标 lf, rf, lr, rr
     float offset_[kMotorNum] = {};
     // 校准完成（下限位）时对应的高度值, 必须非正; 进入 kRunning 时零点按此平移
-    float initial_height = -0.01f;
+    float initial_height = 0.0f;
     // 电机电流重力补偿, 下标 lf, rf, lr, rr
     std::array<float, kMotorNum> gravity_comp = {};
 

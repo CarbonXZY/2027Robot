@@ -75,22 +75,14 @@ void Chariot::CrsfRxCallback(uint8_t *data, uint16_t length)
 void Chariot::TimCalculatePeriodElapsedCallback()
 {
     leg_.TimCalculatePeriodElapsedCallback();
-    
-    // 校准期间整机不动：底盘不跟上位机下发的轮速，只有腿自己去找零点
-    // if (calibration_finished_)
-    // {
+
+    // 校准完成标志：腿状态机进入 kRunning 即认为全车校准完成
+    calibration_finished_ = (leg_.GetStatus() == Module::Leg::Status::kRunning);
+
     chassis_.TimCalculatePeriodElapsedCallback();
-    // }
 
     // 实际发帧由 Driver::Tim1msCanPeriodElapsedCallback() 统一做
     Driver::Tim1msCanPeriodElapsedCallback();
-
-    // 校准没完成前不回传：腿反馈是没意义的，连带遥控帧也先不发，
-    // 免得上位机拿到的是一堆假的关节位置
-    // if (!calibration_finished_)
-    // {
-    //     return;
-    // }
 
     telecontrol_.TimCalculatePeriodElapsedCallback();
 }

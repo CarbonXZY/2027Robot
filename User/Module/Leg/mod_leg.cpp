@@ -240,15 +240,9 @@ void Leg::RunningStep()
     // 下行: 只有使能时才接受上位机目标, 失能时保持最后一帧目标
     if (enable_status_ == LegStatus::kEnable)
     {
-        // 上位机下发关节侧正值, 符号由本侧按 direction_sign 加
-        // 关节位置 (rad) → 腿高 (m), 组内两条腿取平均作为本组目标
-        const float height[kMotorNum] = {
-            tx_buffer_.position[0] * mechanical_.equivalent_radius[0],
-            tx_buffer_.position[1] * mechanical_.equivalent_radius[1],
-            tx_buffer_.position[2] * mechanical_.equivalent_radius[2],
-            tx_buffer_.position[3] * mechanical_.equivalent_radius[3],
-        };
-        SetTarget(0.5f * (height[0] + height[1]), 0.5f * (height[2] + height[3]));
+        // 上位机直接下发腿高 (m), 向上为正; 组内两条腿取平均作为本组目标
+        SetTarget(0.5f * (tx_buffer_.position[0] + tx_buffer_.position[1]),
+                  0.5f * (tx_buffer_.position[2] + tx_buffer_.position[3]));
     }
 
     UpdateData();
@@ -257,13 +251,14 @@ void Leg::RunningStep()
     LimitOutput();
     OutputToMotor();
 
-    // 上行: 回传关节侧正值, 已按 direction_sign 归一, 由通信中间件打包
+    // 上行: 回传腿高 (m) 与线速度 (m/s), 向上为正, 由通信中间件打包
     for (uint32_t i = 0; i < kMotorNum; i++)
     {
         const float direction = static_cast<float>(mechanical_.direction_sign[i]);
+        const float radius   = mechanical_.equivalent_radius[i];
         rx_buffer_.motor[i].position =
-            direction * (motor_group_[i]->GetNowAngle() - offset_[i]);
-        rx_buffer_.motor[i].velocity = direction * motor_group_[i]->GetNowOmega();
+            direction * (motor_group_[i]->GetNowAngle() - offset_[i]) * radius;
+        rx_buffer_.motor[i].velocity = direction * motor_group_[i]->GetNowOmega() * radius;
     }
 }
 
