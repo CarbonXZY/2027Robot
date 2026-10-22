@@ -41,6 +41,7 @@ add_compile_options(
     -Wno-missing-field-initializers   # struct init leaving members zeroed by default
     -Wno-unused-parameter             # HAL callbacks with unused args
     -Wno-sign-compare                 # int/int32 loop counters vs uint32_t lengths
+    $<$<COMPILE_LANGUAGE:CXX>:-Wno-volatile>  # C++20 deprecated volatile compound assign in CMSIS/ST headers
 )
 
 # Create an executable object type
