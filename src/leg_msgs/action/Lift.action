@@ -1,0 +1,12 @@
+# 抬腿动作：切换腿状态并执行到位
+# 取值见下方常量，对应 leg 里的 LegStatus 枚举
+uint8 status
+
+uint8 INIT=0
+uint8 LIFT_FRONT=1
+uint8 LIFT_BACK=2
+uint8 LIFT_ALL=3
+---
+bool success
+string message
+---

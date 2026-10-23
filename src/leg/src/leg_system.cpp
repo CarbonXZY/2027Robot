@@ -13,8 +13,10 @@
 
 #include "leg/leg_system.hpp"
 
+#include <chrono>
 #include <cmath>
 #include <string>
+#include <thread>
 
 #include <hardware_interface/types/hardware_interface_type_values.hpp>
 #include <mid_config.h>
@@ -186,6 +188,8 @@ hardware_interface::return_type LegSystem::write(const rclcpp::Time &, const rcl
 controller_interface::CallbackReturn LegController::on_init()
 {
     joint_names_ = auto_declare<std::vector<std::string>>("joints", {});
+    lift_action_name_ = auto_declare<std::string>("lift_action_name", lift_action_name_);
+    lift_timeout_s_ = auto_declare<double>("lift_timeout", lift_timeout_s_);
     now_position_.assign(joint_names_.size(), 0.0);
     now_velocity_.assign(joint_names_.size(), 0.0);
     target_position_.assign(joint_names_.size(), 0.0);
@@ -193,6 +197,43 @@ controller_interface::CallbackReturn LegController::on_init()
     fsm_leg_.controller_ = this;
     fsm_leg_.Init(static_cast<uint8_t>(LegStatus::kCount), static_cast<uint8_t>(LegStatus::kInit));
 
+    return controller_interface::CallbackReturn::SUCCESS;
+}
+
+/**
+ * @brief 建抬腿 Action 服务端：导航发 goal 切状态，到位后回 result
+ *
+ * @return controller_interface::CallbackReturn 结果
+ */
+controller_interface::CallbackReturn LegController::on_configure(const rclcpp_lifecycle::State &)
+{
+    lift_action_server_ = rclcpp_action::create_server<leg_msgs::action::Lift>(
+        get_node(), lift_action_name_,
+        [this](const rclcpp_action::GoalUUID &uuid, std::shared_ptr<const leg_msgs::action::Lift::Goal> goal)
+        { return HandleGoal(uuid, goal); },
+        [this](const std::shared_ptr<LiftGoalHandle> goal_handle)
+        { return HandleCancel(goal_handle); },
+        [this](const std::shared_ptr<LiftGoalHandle> goal_handle)
+        { HandleAccepted(goal_handle); });
+
+    RCLCPP_INFO(get_node()->get_logger(), "抬腿动作 %s", lift_action_name_.c_str());
+    return controller_interface::CallbackReturn::SUCCESS;
+}
+
+/**
+ * @brief 停掉监控线程并释放 Action 服务端，方便重配置
+ *
+ * @return controller_interface::CallbackReturn 结果
+ */
+controller_interface::CallbackReturn LegController::on_cleanup(const rclcpp_lifecycle::State &)
+{
+    shutdown_.store(true);
+    if (monitor_thread_.joinable())
+    {
+        monitor_thread_.join();
+    }
+    lift_action_server_.reset();
+    shutdown_.store(false);
     return controller_interface::CallbackReturn::SUCCESS;
 }
 
@@ -242,6 +283,13 @@ controller_interface::return_type LegController::update(const rclcpp::Time &, co
         return controller_interface::return_type::OK;
     }
 
+    // 应用 goal 请求的状态切换（在实时线程里改状态机，避免与 goal 回调线程竞争）
+    const uint8_t pending = pending_status_.exchange(static_cast<uint8_t>(LegStatus::kCount));
+    if (pending != static_cast<uint8_t>(LegStatus::kCount))
+    {
+        fsm_leg_.SetStatus(pending);
+    }
+
     // INDIVIDUAL 下 state_interfaces_ 的顺序 = state_interface_configuration() 里 names 的顺序
     for (size_t i = 0; i < joint_names_.size(); ++i)
     {
@@ -251,6 +299,12 @@ controller_interface::return_type LegController::update(const rclcpp::Time &, co
     }
 
     fsm_leg_.TimStatusPeriodElapsedCallback();
+
+    // 有 goal 在跑，且腿已到位 → 通知监控线程
+    if (busy_.load() && IsActionFinished())
+    {
+        lift_done_.store(true);
+    }
 
     return controller_interface::return_type::OK;
 }
@@ -289,36 +343,100 @@ bool LegController::IsActionFinished()
 }
 
 /**
+ * @brief goal 回调：校验 + 防重入 + 写 pending，立刻返回
+ */
+rclcpp_action::GoalResponse LegController::HandleGoal(const rclcpp_action::GoalUUID &, std::shared_ptr<const leg_msgs::action::Lift::Goal> goal)
+{
+    // 越界丢弃，防止 SetStatus 写到状态数组外
+    if (goal->status >= static_cast<uint8_t>(LegStatus::kCount))
+    {
+        RCLCPP_WARN(rclcpp::get_logger("LegController"), "收到非法腿状态 %u", goal->status);
+        return rclcpp_action::GoalResponse::REJECT;
+    }
+
+    // 防重入：正在执行时拒绝新 goal
+    if (busy_.exchange(true))
+    {
+        return rclcpp_action::GoalResponse::REJECT;
+    }
+
+    // 开始新动作：清上次结果，把目标状态交给 update() 的实时线程
+    lift_done_.store(false);
+    pending_status_.store(goal->status);
+
+    return rclcpp_action::GoalResponse::ACCEPT_AND_EXECUTE;
+}
+
+/**
+ * @brief cancel 回调：第一版不支持中途取消
+ */
+rclcpp_action::CancelResponse LegController::HandleCancel(const std::shared_ptr<LiftGoalHandle>)
+{
+    return rclcpp_action::CancelResponse::REJECT;
+}
+
+/**
+ * @brief accepted 回调：起一个监控线程等结果，不阻塞 executor
+ */
+void LegController::HandleAccepted(const std::shared_ptr<LiftGoalHandle> goal_handle)
+{
+    // 上一条 goal 的监控线程此时已结束（busy_ 已释放），先回收再起新的；
+    // 否则给 joinable 的 std::thread 赋新值会触发 std::terminate
+    if (monitor_thread_.joinable())
+    {
+        monitor_thread_.join();
+    }
+    monitor_thread_ = std::thread([this, goal_handle]() { MonitorGoal(goal_handle); });
+}
+
+/**
+ * @brief 监控线程体：等到位（带超时）后回 result
+ */
+void LegController::MonitorGoal(const std::shared_ptr<LiftGoalHandle> goal_handle)
+{
+    const auto deadline = std::chrono::steady_clock::now() +
+                          std::chrono::duration<double>(lift_timeout_s_);
+
+    while (!lift_done_.load() && !shutdown_.load() && rclcpp::ok() &&
+           std::chrono::steady_clock::now() < deadline)
+    {
+        std::this_thread::sleep_for(std::chrono::milliseconds(50));
+    }
+
+    // 关闭中：直接放弃，别回 result
+    if (shutdown_.load() || !rclcpp::ok())
+    {
+        busy_.store(false);
+        return;
+    }
+
+    // 取走结果并清零（收到即清除），释放 busy
+    const bool done = lift_done_.exchange(false);
+    busy_.store(false);
+
+    auto result = std::make_shared<leg_msgs::action::Lift::Result>();
+    result->success = done;
+    result->message = done ? "done" : "timeout";
+
+    if (done)
+    {
+        goal_handle->succeed(result);
+    }
+    else
+    {
+        goal_handle->abort(result);
+    }
+}
+
+/**
  * @brief 状态机周期回调，节奏由 launch 的 update_rate 决定（10 Hz）
  */
 void LegFsm::TimStatusPeriodElapsedCallback()
 {
     status_[now_status_serial_].count_time++;
 
-    switch (now_status_serial_)
-    {
-        case static_cast<uint8_t>(LegStatus::kInit):
-        {
-            controller_->MoveToPosition();
-
-            if (controller_->IsActionFinished())
-            {
-                SetStatus(static_cast<uint8_t>(LegStatus::kLift));
-            }
-            break;
-        }
-
-        case static_cast<uint8_t>(LegStatus::kLift):
-        {
-            controller_->MoveToPosition();
-
-            if (controller_->IsActionFinished())
-            {
-                SetStatus(static_cast<uint8_t>(LegStatus::kInit));
-            }
-            break;
-        }
-    }
+    // 只按当前状态刷新目标位置；状态切换由外部指令驱动
+    controller_->MoveToPosition();
 }
 
 } // namespace leg

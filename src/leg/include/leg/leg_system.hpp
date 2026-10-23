@@ -14,14 +14,19 @@
 /* Includes ------------------------------------------------------------------*/
 
 #include <array>
+#include <atomic>
 #include <cstdint>
 #include <string>
+#include <thread>
 #include <vector>
 
 #include <controller_interface/controller_interface.hpp>
 #include <hardware_interface/system_interface.hpp>
 #include <hardware_interface/types/hardware_interface_return_values.hpp>
+#include <rclcpp/rclcpp.hpp>
+#include <rclcpp_action/rclcpp_action.hpp>
 #include <rclcpp_lifecycle/state.hpp>
+#include <leg_msgs/action/lift.hpp>
 
 #include "alg_fsm.h"
 #include "motor_base.hpp"
@@ -63,7 +68,9 @@ struct LegRx
 enum class LegStatus
 {
     kInit = 0,
-    kLift,
+    kLift_Front,
+    kLift_Back,
+    kLift_All,
 
     kCount,
 };
@@ -124,6 +131,8 @@ class LegController : public controller_interface::ControllerInterface
 public:
     // ControllerInterfaceBase 的四个纯虚，必须实现
     controller_interface::CallbackReturn on_init() override;
+    controller_interface::CallbackReturn on_configure(const rclcpp_lifecycle::State &previous_state) override;
+    controller_interface::CallbackReturn on_cleanup(const rclcpp_lifecycle::State &previous_state) override;
     controller_interface::InterfaceConfiguration command_interface_configuration() const override;
     controller_interface::InterfaceConfiguration state_interface_configuration() const override;
     controller_interface::return_type update(const rclcpp::Time &time, const rclcpp::Duration &period) override;
@@ -139,21 +148,50 @@ private:
 
     LegFsm fsm_leg_;
 
+    // 抬腿动作名 / 到位超时（秒），launch 可覆盖
+    std::string lift_action_name_ = "/leg/lift";
+    double lift_timeout_s_ = 8.0;
+    // Action 服务端：导航发 goal 切状态，到位后回 result
+    rclcpp_action::Server<leg_msgs::action::Lift>::SharedPtr lift_action_server_;
+    // 监控 goal 的线程：等到位后回 result（不卡 executor）
+    std::thread monitor_thread_;
+    std::atomic<bool> shutdown_{false};
+    // 待切换的状态请求（kCount 表示无请求），goal 回调写、update() 消费
+    std::atomic<uint8_t> pending_status_{static_cast<uint8_t>(LegStatus::kCount)};
+    // RT 线程置位：请求的状态已到位；监控线程取走后清零
+    std::atomic<bool> lift_done_{false};
+    // 防重入：正在执行时拒绝新 goal
+    std::atomic<bool> busy_{false};
+
     // 到位判定阈值：四条腿的速度、位置误差都要小于它才算到
-    const float velocity_approach_threshold_ = 0.1f;
-    const float distance_approach_threshold_ = 0.1f;
+    const float velocity_approach_threshold_ = 0.01f;
+    const float distance_approach_threshold_ = 0.01f;
 
     // 每个状态的目标位置，按 LegStatus 索引
     const float approach_target_[static_cast<size_t>(LegStatus::kCount)][kLegCount] = {
         {0.0f, 0.0f, 0.0f, 0.0f}, // Init
-        {1.0f, 1.0f, 1.0f, 1.0f}, // Lift
+        {0.2f, 0.2f, 0.0f, 0.0f}, // Lift_Front
+        {0.0f, 0.0f, 0.2f, 0.2f}, // Lift_Back
+        {0.2f, 0.2f, 0.2f, 0.2f}, // Lift_All
     };
 
     // 按当前状态把目标位置刷进 target_position_
     void MoveToPosition();
 
-    // 四条腿是否都到位
+    // 四条腿是否都到位（后续用来给导航报告抬腿完成，不参与状态切换）
     bool IsActionFinished();
+
+    using LiftGoalHandle = rclcpp_action::ServerGoalHandle<leg_msgs::action::Lift>;
+
+    // goal 回调：校验 + 防重入 + 写 pending，立刻返回 ACCEPT/REJECT
+    rclcpp_action::GoalResponse HandleGoal(const rclcpp_action::GoalUUID &uuid,
+                                           std::shared_ptr<const leg_msgs::action::Lift::Goal> goal);
+    // cancel 回调：第一版不支持中途取消
+    rclcpp_action::CancelResponse HandleCancel(const std::shared_ptr<LiftGoalHandle> goal_handle);
+    // accepted 回调：起监控线程
+    void HandleAccepted(const std::shared_ptr<LiftGoalHandle> goal_handle);
+    // 监控线程体：等 lift_done_（带超时）后回 result
+    void MonitorGoal(const std::shared_ptr<LiftGoalHandle> goal_handle);
 };
 
 } // namespace leg

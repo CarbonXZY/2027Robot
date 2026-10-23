@@ -7,10 +7,12 @@ endif()
 
 find_package(ament_cmake REQUIRED)
 find_package(rclcpp REQUIRED)
+find_package(rclcpp_action REQUIRED)
 find_package(rclcpp_lifecycle REQUIRED)
 find_package(hardware_interface REQUIRED)
 find_package(controller_interface REQUIRED)
 find_package(pluginlib REQUIRED)
+find_package(leg_msgs REQUIRED)
 find_package(shared_package REQUIRED)
 
 # ros2_control 硬件接口插件（编译成动态库，由 pluginlib 加载）
@@ -21,10 +23,12 @@ target_include_directories(leg_hardware PUBLIC
   $<INSTALL_INTERFACE:include>)
 ament_target_dependencies(leg_hardware
   rclcpp
+  rclcpp_action
   rclcpp_lifecycle
   hardware_interface
   controller_interface
   pluginlib
+  leg_msgs
   shared_package)
 
 # 注册为 hardware_interface / controller_interface 插件（同一个 xml，两类基类各一条）
@@ -41,6 +45,6 @@ install(DIRECTORY include/ DESTINATION include)
 install(DIRECTORY config DESTINATION share/${PROJECT_NAME})
 
 ament_export_targets(export_${PROJECT_NAME} HAS_LIBRARY_TARGET)
-ament_export_dependencies(rclcpp rclcpp_lifecycle hardware_interface controller_interface pluginlib shared_package)
+ament_export_dependencies(rclcpp rclcpp_action rclcpp_lifecycle hardware_interface controller_interface pluginlib leg_msgs shared_package)
 
 ament_package()
