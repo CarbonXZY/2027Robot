@@ -59,6 +59,8 @@ struct LegTx
 struct LegRx
 {
     Device::MotorFeedbackFrame motor[kLegCount];
+    uint8_t front_completion_flag;
+    uint8_t back_completion_flag;
 };
 #pragma pack(pop)
 
@@ -113,6 +115,8 @@ private:
     std::array<double, kLegCount> target_position_{};
     std::array<double, kLegCount> now_position_{};
     std::array<double, kLegCount> now_velocity_{};
+    // 到位标志（0/1）：前两条腿（0/1）共享 front 标志，后两条（2/3）共享 back 标志
+    std::array<double, kLegCount> completion_{};
 
     // 绑定到 CommunicationInterface 的两个结构体：发 / 收
     LegTx tx_buffer_{};
@@ -145,6 +149,8 @@ private:
     std::vector<double> now_position_;
     std::vector<double> now_velocity_;
     std::vector<double> target_position_;
+    // 到位标志（double，0/1）：前两条（0/1）=front，后两条（2/3）=back
+    std::vector<double> completion_;
 
     LegFsm fsm_leg_;
 
@@ -163,10 +169,6 @@ private:
     // 防重入：正在执行时拒绝新 goal
     std::atomic<bool> busy_{false};
 
-    // 到位判定阈值：四条腿的速度、位置误差都要小于它才算到
-    const float velocity_approach_threshold_ = 0.01f;
-    const float distance_approach_threshold_ = 0.01f;
-
     // 每个状态的目标位置，按 LegStatus 索引
     const float approach_target_[static_cast<size_t>(LegStatus::kCount)][kLegCount] = {
         {0.0f, 0.0f, 0.0f, 0.0f}, // Init
@@ -178,7 +180,7 @@ private:
     // 按当前状态把目标位置刷进 target_position_
     void MoveToPosition();
 
-    // 四条腿是否都到位（后续用来给导航报告抬腿完成，不参与状态切换）
+    // 当前状态要动的那组腿是否到位：直接读下位机回传的 completion 标志
     bool IsActionFinished();
 
     using LiftGoalHandle = rclcpp_action::ServerGoalHandle<leg_msgs::action::Lift>;

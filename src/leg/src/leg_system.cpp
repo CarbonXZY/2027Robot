@@ -56,7 +56,7 @@ CallbackReturn LegSystem::on_init(const hardware_interface::HardwareInfo &info)
 }
 
 /**
- * @brief 借出四条腿的 position/velocity 状态接口
+ * @brief 借出四条腿的 position/velocity/completion 状态接口
  *
  * @return std::vector<hardware_interface::StateInterface> 状态接口
  */
@@ -67,6 +67,7 @@ std::vector<hardware_interface::StateInterface> LegSystem::export_state_interfac
     {
         ifs.emplace_back(joint_names_[i], HW_IF_POSITION, &now_position_[i]);
         ifs.emplace_back(joint_names_[i], HW_IF_VELOCITY, &now_velocity_[i]);
+        ifs.emplace_back(joint_names_[i], "completion", &completion_[i]);
     }
     return ifs;
 }
@@ -150,6 +151,10 @@ hardware_interface::return_type LegSystem::read(const rclcpp::Time &, const rclc
     {
         now_position_[i] = static_cast<double>(rx_buffer_.motor[i].position);
         now_velocity_[i] = static_cast<double>(rx_buffer_.motor[i].velocity);
+        // 前两条腿（0/1）共享 front 标志，后两条（2/3）共享 back 标志
+        const uint8_t flag = (i < kLegCount / 2) ? rx_buffer_.front_completion_flag
+                                                  : rx_buffer_.back_completion_flag;
+        completion_[i] = static_cast<double>(flag);
     }
 
     // // 调试：表格更新式打印四条腿位置（windows_name "leg"，首次调用会自动弹独立窗口）
@@ -193,6 +198,7 @@ controller_interface::CallbackReturn LegController::on_init()
     now_position_.assign(joint_names_.size(), 0.0);
     now_velocity_.assign(joint_names_.size(), 0.0);
     target_position_.assign(joint_names_.size(), 0.0);
+    completion_.assign(joint_names_.size(), 0.0);
 
     fsm_leg_.controller_ = this;
     fsm_leg_.Init(static_cast<uint8_t>(LegStatus::kCount), static_cast<uint8_t>(LegStatus::kInit));
@@ -254,7 +260,7 @@ controller_interface::InterfaceConfiguration LegController::command_interface_co
 }
 
 /**
- * @brief 认领四条腿的 position/velocity 状态接口
+ * @brief 认领四条腿的 position/velocity/completion 状态接口
  *
  * @return controller_interface::InterfaceConfiguration 配置
  */
@@ -266,6 +272,7 @@ controller_interface::InterfaceConfiguration LegController::state_interface_conf
     {
         cfg.names.push_back(name + "/" + HW_IF_POSITION);
         cfg.names.push_back(name + "/" + HW_IF_VELOCITY);
+        cfg.names.push_back(name + "/completion");
     }
     return cfg;
 }
@@ -293,8 +300,9 @@ controller_interface::return_type LegController::update(const rclcpp::Time &, co
     // INDIVIDUAL 下 state_interfaces_ 的顺序 = state_interface_configuration() 里 names 的顺序
     for (size_t i = 0; i < joint_names_.size(); ++i)
     {
-        now_position_[i] = state_interfaces_[2 * i].get_value();
-        now_velocity_[i] = state_interfaces_[2 * i + 1].get_value();
+        now_position_[i] = state_interfaces_[3 * i].get_value();
+        now_velocity_[i] = state_interfaces_[3 * i + 1].get_value();
+        completion_[i]   = state_interfaces_[3 * i + 2].get_value();
         command_interfaces_[i].set_value(target_position_[i]);
     }
 
@@ -323,23 +331,30 @@ void LegController::MoveToPosition()
 }
 
 /**
- * @brief 四条腿是否都到位：速度小于速度阈值，位置误差小于距离阈值
+ * @brief 当前状态要动的腿是否到位：直接读下位机回传的 completion 标志
  *
- * @return true 都到位
- * @return false 还有腿没到
+ * @return true 到位
+ * @return false 还没到
  */
 bool LegController::IsActionFinished()
 {
-    for (size_t i = 0; i < joint_names_.size(); ++i)
-    {
-        if (std::abs(now_velocity_[i]) >= velocity_approach_threshold_ ||
-            std::abs(now_position_[i] - target_position_[i]) >= distance_approach_threshold_)
-        {
-            return false;
-        }
-    }
+    // 前两条腿（0/1）共享 front 标志，后两条（2/3）共享 back 标志，各取一个即可
+    const bool front_done = completion_[0] > 0.5;
+    const bool back_done  = completion_[2] > 0.5;
 
-    return true;
+    // 只判断本状态实际要动的那组腿，避免另一组残留的旧标志误判
+    switch (fsm_leg_.GetNowStatusSerial())
+    {
+    case static_cast<uint8_t>(LegStatus::kLift_Front):
+        return front_done;
+    case static_cast<uint8_t>(LegStatus::kLift_Back):
+        return back_done;
+    case static_cast<uint8_t>(LegStatus::kInit):
+    case static_cast<uint8_t>(LegStatus::kLift_All):
+        return front_done && back_done;
+    default:
+        return true;
+    }
 }
 
 /**
