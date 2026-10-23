@@ -92,6 +92,7 @@ file(GLOB_RECURSE USER_SOURCES CONFIGURE_DEPENDS
 target_sources(${CMAKE_PROJECT_NAME} PRIVATE
     ${USER_SOURCES}
     User/Module/Leg/mod_leg.cpp
+    User/Driver/drv_math.cpp
 )
 
 # Add include paths

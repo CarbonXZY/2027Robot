@@ -58,7 +58,7 @@ public:
     // 获取插值进度, 取值范围[0, 1]
     float GetProgress() const { return (static_cast<float>(count_) / static_cast<float>(step_)); }
     // 获取插值是否结束
-    bool IsFinished() const { return (count_ >= step_); }
+    bool IsFinished() const { return is_finished_; }
     // 获取曲线类型
     Type GetType() const { return (type_); }
 
@@ -100,6 +100,8 @@ protected:
     float now_ = 0.0f;
     // 上一次插值结果
     float prev_ = 0.0f;
+
+    bool is_finished_ = true;
 
     // 内部函数
 

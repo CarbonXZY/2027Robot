@@ -107,12 +107,12 @@ void Chariot::Tim1000msAlivePeriodElapsedCallback()
     // PC 掉线保护：腿稳定在最后一帧目标位置，底盘轮速清零
     if (pc_is_alive_)
     {
-        leg_.SetState(Module::LegStatus::kEnable);
+        // leg_.SetState(Module::LegStatus::kEnable);
         chassis_.SetState(Module::ChassisStatus::kEnable);
     }
     else
     {
-        leg_.SetState(Module::LegStatus::kDisable);
+        // leg_.SetState(Module::LegStatus::kDisable);
         chassis_.SetState(Module::ChassisStatus::kDisable);
     }
 }

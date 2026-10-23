@@ -5,7 +5,7 @@
             // 只烧录, 不编译。烧之前请先跑 "CMake: Build (Debug)"。
             "label": "JLink: Flash (Debug)",
             "type": "shell",
-            "command": "${env:HOME}/.jlink/jlink-flash",
+            "command": "jlink-flash",
             "args": [
                 "-d",
                 "STM32H723VG",

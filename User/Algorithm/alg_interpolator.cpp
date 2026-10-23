@@ -68,6 +68,10 @@ float Interpolator::Ease(float progress, Type type)
 void Interpolator::Calculate()
 {
     now_ = start_ + (end_ - start_) * Ease(static_cast<float>(count_) / static_cast<float>(step_), type_);
+    if ((count_ >= step_))
+    {
+        is_finished_ = true;
+    }
 }
 
 /**
@@ -86,6 +90,7 @@ void Interpolator::Reset(float start, float end, uint32_t step, Type type)
     step_ = (step == 0) ? 1 : step;
     type_ = type;
     count_ = 0;
+    is_finished_ = false;
     Calculate();
 }
 
