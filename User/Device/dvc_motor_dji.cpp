@@ -120,7 +120,8 @@ void MotorDjiC610::Init(MotorControlMethod method, const Parameters &parameters)
         return;
     }
 
-    param_ = parameters;
+    external_feedback_.position = parameters.external_feedback.position;
+    external_feedback_.speed = parameters.external_feedback.speed;
 
     control_method_ = method;
 
@@ -256,6 +257,29 @@ uint8_t *AllocateTxData(
 
 
 
+void MotorDjiC610::ZeroEncoder()
+{
+    if(external_feedback_.position)
+    {
+        position_offset_ = feedback_position_;
+        feedback_position_ = 0;
+    }
+    else
+    {
+        rx_data_.total_round = 0;
+        // 偏移量是当前值
+        position_offset_ = 
+            float(rx_data_.pre_encoder) /
+            float(encoder_num_per_round_) *
+            kTwoPi / 
+            gearbox_rate_;
+        // 清除当前值
+        rx_data_.now_angle = 0;
+        feedback_position_ = 0;
+    }
+
+}
+
 /**
  * @brief 更新反馈值到 MotorBase 统一接口
  *
@@ -270,16 +294,19 @@ void MotorDjiC610::UpdateFeedback()
     }
 
     feedback_current_ = rx_data_.now_current;
-    feedback_speed_ = rx_data_.now_omega;
 
     /*
      * 舵轮建议使用外置绝对编码器位置反馈。
      * 如果 use_external_position_feedback = true，
      * 则 feedback_position_ 由 SetFeedbackPosition() 写入，不在这里覆盖。
      */
-    if (!param_.use_external_position_feedback)
+    if (!external_feedback_.position)
     {
         feedback_position_ = rx_data_.now_angle;
+    }
+    if (!external_feedback_.speed)
+    {
+        feedback_speed_ = rx_data_.now_omega;
     }
 }
 
@@ -333,7 +360,6 @@ void MotorDjiC610::PidCalculate()
         /*
          * 速度 PID 输出电流目标。
          */
-        feedback_speed_ = rx_data_.now_omega;
         pid_omega.SetTarget(target_speed_ + feedforward_speed_);
         pid_omega.SetNow(feedback_speed_);
         pid_omega.TimCalculatePeriodElapsedCallback();
@@ -344,20 +370,6 @@ void MotorDjiC610::PidCalculate()
 
     case MotorControlMethod::kPosition:
     {
-        /*
-         * 舵向位置模式：
-         * 位置外环使用 feedback_position_。
-         * 若 use_external_position_feedback = true，
-         * 该值来自外置绝对编码器。
-         */
-        if (!param_.use_external_position_feedback)
-        {
-            feedback_position_ = rx_data_.now_angle;
-        }
-        feedback_speed_ = rx_data_.now_omega;
-
-
-
         pid_position.SetTarget(target_position_);
         pid_position.SetNow(feedback_position_);
         pid_position.TimCalculatePeriodElapsedCallback();
@@ -542,7 +554,8 @@ void MotorDjiC610::DataProcess()
         (float)rx_data_.total_encoder /
         (float)encoder_num_per_round_ *
         kTwoPi /
-        gearbox_rate_;
+        gearbox_rate_ -
+        position_offset_;
 
     rx_data_.now_omega =
         (float)tmp_omega *

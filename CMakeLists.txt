@@ -93,6 +93,7 @@ target_sources(${CMAKE_PROJECT_NAME} PRIVATE
     ${USER_SOURCES}
     User/Module/Leg/mod_leg.cpp
     User/Driver/drv_math.cpp
+    User/Module/Leg/mod_leg_instance.cpp
 )
 
 # Add include paths

@@ -112,19 +112,24 @@ namespace Device
     class MotorDjiC610 : public MotorBase
     {
     public:
+        //
+
+        /**
+         * 外部反馈使用情况
+         * false 表示使用电调内部反馈
+         * true 表示依赖外部赋值
+         */ 
+        struct ExternalFeedback
+        {
+            bool position = false;
+            bool speed = false;
+        };
+
         struct Parameters
         {
             Algorithm::PidParameters pid_position;
-
             Algorithm::PidParameters pid_omega;
-
-            /*
-             * true:
-             *   POSITION 模式使用外部绝对编码器反馈 feedback_position_
-             * false:
-             *   POSITION 模式使用 C610 自身编码器反馈 rx_data_.now_angle
-             */
-            bool use_external_position_feedback = false;
+            ExternalFeedback external_feedback = {};
         };
 
 
@@ -215,6 +220,9 @@ namespace Device
         inline float GetTargetCurrentInternal() const;
         inline float GetTargetOmegaInternal() const;
         inline float GetOutput() const;
+        inline float GetPositionOffset() const;
+
+        void ZeroEncoder();
 
         /**
          * @brief 速度前馈 — 叠加到速度环目标，LimitOutput() 中自动清零
@@ -252,9 +260,12 @@ namespace Device
         /*
          * MotorBase 统一控制层
          */
-        Parameters param_;
+        ExternalFeedback external_feedback_ = {};
         MotorStatus motor_status_ = MotorStatus::kDisable;
         MotorControlMethod control_method_ = MotorControlMethod::kCurrent;
+
+        // 位置零点
+        float position_offset_ = 0;
 
         float target_current_ = 0.0f;  // A, 上层目标电流
         float target_speed_ = 0.0f;    // rad/s, 上层目标速度
@@ -331,6 +342,11 @@ namespace Device
     inline float MotorDjiC610::GetOutput() const
     {
         return out_;
+    }
+
+    float MotorDjiC610::GetPositionOffset() const
+    {
+        return position_offset_;
     }
 
     /* ===== inline 实现：前馈写入（含 NaN/Inf 防护） ===== */

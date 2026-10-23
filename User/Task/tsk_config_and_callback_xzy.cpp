@@ -27,6 +27,7 @@
 #include "dvc_motor_instances.h"
 #include "ita_chariot.h"
 #include "tsk_config_and_callback.h"
+#include "mod_leg_instance.h"
 
 namespace Task
 {
@@ -120,6 +121,7 @@ void Tim1msCallback()
     Device::DwtUpdate();
 
     g_chariot.TimCalculatePeriodElapsedCallback();
+    // Module::g_legs.TimCalculatePeriodElapsedCallback();
 
     // 入队分频到 100Hz：一包 64 字节装不下腿+底盘+遥控三帧，Send() 内部会拆成
     // 3 包；USB 每 ms 只抽 1 包（1000Hz），若每 ms 都入队就是 3000 包/s 灌进来，
@@ -137,10 +139,13 @@ void Tim1msCallback()
     // 推一下 USB 发送环形缓冲，把上行帧真正发出去
     Driver::TimUsbSendPeriodElapsedCallback();
 
+    Driver::Tim1msCanPeriodElapsedCallback();
+
     if (++g_mod_alive_motor >= 100)
     {
         g_mod_alive_motor = 0;
         g_chariot.Tim100msAlivePeriodElapsedCallback();
+        // Module::g_legs.Tim100msAlivePeriodElapsedCallback();
     }
 
     if (++g_mod_alive_pc >= 1000)
@@ -156,6 +161,8 @@ void Tim1msCallback()
 
 void TaskInit()
 {
+    HAL_Delay(1000);
+
     // 板级上电：打开 DC5(5V) 给 CRSF 接收机供电，两路 DC24 保持关闭
     Driver::BspInit(Driver::kDc24LOff | Driver::kDc24ROff | Driver::kDc5On, 0.0f, 0.0f);
 
@@ -168,6 +175,7 @@ void TaskInit()
     Middleware::g_usb_communication_interface.Init(Task::UsbSendCallback);
 
     Task::g_chariot.Init();
+    // Module::g_legs.Init(0.1f, Module::g_legs_homing);
 
     // 绑定 CRSF 串口回调
     Driver::UartInit(&huart7, Task::CrsfUart7Callback, 64);

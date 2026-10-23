@@ -11,7 +11,7 @@
 #include <cstdint>
 
 #include "mod_chassis.h"
-#include "mod_leg.h"
+#include "mod_leg_instance.h"
 #include "mod_telecontrol.h"
 
 class Chariot
@@ -19,7 +19,7 @@ class Chariot
 public:
     Chariot();
 
-    Module::LegInteract leg_;
+    Module::LegInteract *leg_;
     Module::Chassis chassis_;
     Module::Telecontrol telecontrol_;
 

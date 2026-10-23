@@ -95,6 +95,14 @@ public:
         uint32_t debounce_ms = 150;     // 堵转消抖时间, ms
     };
 
+    // struct State
+    // {
+    //     Status status = Status::kInit;
+    //     Height now_height = {};
+    //     bool enable = false;
+    // };
+    
+
     // 4 台电机的统一管理者, 顺序 lf, rf, lr, rr
     struct MotorGroup
     {
@@ -189,7 +197,7 @@ protected:
     // 电机编码器偏移量, 下标 lf, rf, lr, rr
     float offset_[kMotorNum] = {};
     // 校准完成（下限位）时对应的高度值, 必须非正; 进入 kRunning 时零点按此平移
-    float initial_height = 0.0f;
+    float initial_height = -0.01f;
     // 电机电流重力补偿, 下标 lf, rf, lr, rr
     std::array<float, kMotorNum> gravity_comp = {};
 
@@ -205,7 +213,7 @@ protected:
     Algorithm::CrossCouple<kGroupMotorNum> cross_couple_rear_;
 
     // 运行时点到点的平均速度 (单位: m/s)
-    float average_speed_ = 1.0f;
+    float average_speed_ = 0.1f;
 
     // 机械参数
     Mechanical mechanical_;
@@ -226,6 +234,8 @@ protected:
 
     // 状态机
     Status status_ = Status::kInit;
+    // 各自的位置
+    float leg_height_[4] = {};
     // 主动找限位参数
     Homing homing_ = {};
     // 各电机是否已完成找限位
@@ -251,11 +261,7 @@ protected:
     void CalculateOutput();
     void OutputToMotor();
 
-    bool IsMasterAxisDone() const
-    {
-        return front_master_axis_.IsFinished() &&
-            rear_master_axis_.IsFinished();
-    }
+    bool IsMasterAxisDone() const;
 };
 
 class LegInteract : public Leg
@@ -270,7 +276,7 @@ public:
 
     void Init(float average_speed, const Homing& homing,
         Algorithm::Interpolator::Type interpolator_type = Algorithm::Interpolator::Type::kPolynomial,
-        float cross_couple_kp = 0);
+        float cross_couple_kp = 40);
 
     // 上位机掉线保护: 失能后保持最后一帧目标, 不再接受新指令
     void SetState(LegStatus status) { enable_status_ = status; }
@@ -288,6 +294,9 @@ protected:
     LegRx rx_buffer_{};
     // 上位机链路使能状态
     LegStatus enable_status_ = LegStatus::kDisable;
+
+    uint32_t delta_time_us_ = 0;
+    uint32_t prev_time_us_ = 0;
 
     void UsbRegister();
     void UsbSetTarget();
