@@ -58,6 +58,11 @@ int32_t MathFloatToInt(float x, float float_1, float float_2, int32_t int_1, int
 
 float MathIntToFloat(int32_t x, int32_t int_1, int32_t int_2, float float_1, float float_2);
 
+inline bool MathIsFloatEqual(float x1, float x2, float epsilon = 0.001f)
+{
+    return (std::abs(x1 - x2) < epsilon) ? true : false;
+}
+
 /**
  * @brief 限幅函数
  *

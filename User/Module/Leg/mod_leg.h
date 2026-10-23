@@ -67,7 +67,7 @@ public:
     {
         kInit,       // 上电后等待 4 台电机全部在线, 期间不输出
         kCalibrate,  // 主动向下找机械限位, 记录各电机零点
-        kRunning,    // 正常跟踪前/后目标高度
+        kRunning,    // 正常跟踪目标高度
         kError,      // 故障锁存, 停止更新目标
     };
 
@@ -127,7 +127,7 @@ public:
 
     void Init(float average_speed, const Homing& homing,
         Algorithm::Interpolator::Type interpolator_type = Algorithm::Interpolator::Type::kPolynomial,
-        float cross_couple_kp = 100);
+        float cross_couple_kp = 40);
 
     // 目标高度: 前组/后组各自独立, 也可同时设置
     void SetTargetFront(float target) { target_.front = target; new_target_flag_ = true; }
@@ -171,18 +171,15 @@ public:
     bool GetCrossCoupeEnable() const { return cross_couple_enable_; }
     bool GetMotorAllEnabled() const;
 
-    // 上位机掉线保护: 失能后保持最后一帧目标, 不再接受新指令
-    void SetState(LegStatus status) { enable_status_ = status; }
-
     // 和 Chassis 相同的一拍入口
     void TimCalculatePeriodElapsedCallback();
     void Tim100msAlivePeriodElapsedCallback();
 
-    // 通信缓冲: 通信中间件直接读写
-    // 下行: 上位机下发的关节目标位置
-    LegTx tx_buffer_{};
-    // 上行: 回传给上位机的电机反馈
-    LegRx rx_buffer_{};
+    // // 通信缓冲: 通信中间件直接读写
+    // // 下行: 上位机下发的关节目标位置
+    // LegTx tx_buffer_{};
+    // // 上行: 回传给上位机的电机反馈
+    // LegRx rx_buffer_{};
 
 protected:
     //
@@ -234,9 +231,7 @@ protected:
     // 各电机是否已完成找限位
     bool homing_done_[kMotorNum] = {};
     // 交叉耦合控制开关
-    bool cross_couple_enable_ = true;
-    // 上位机链路使能状态
-    LegStatus enable_status_ = LegStatus::kDisable;
+    bool cross_couple_enable_ = false;
 
     void LimitOutput();
 
@@ -255,6 +250,50 @@ protected:
     void NewTargetHandler();
     void CalculateOutput();
     void OutputToMotor();
+
+    bool IsMasterAxisDone() const
+    {
+        return front_master_axis_.IsFinished() &&
+            rear_master_axis_.IsFinished();
+    }
+};
+
+class LegInteract : public Leg
+{
+public:
+    //
+    
+    using Leg::Leg;
+
+    LegInteract() = delete;
+    LegInteract& operator=(const LegInteract&) = delete;
+
+    void Init(float average_speed, const Homing& homing,
+        Algorithm::Interpolator::Type interpolator_type = Algorithm::Interpolator::Type::kPolynomial,
+        float cross_couple_kp = 0);
+
+    // 上位机掉线保护: 失能后保持最后一帧目标, 不再接受新指令
+    void SetState(LegStatus status) { enable_status_ = status; }
+
+    void TimCalculatePeriodElapsedCallback();
+
+protected:
+    //
+    
+
+    // 通信缓冲: 通信中间件直接读写
+    // 下行: 上位机下发的关节目标位置
+    LegTx tx_buffer_{};
+    // 上行: 回传给上位机的电机反馈
+    LegRx rx_buffer_{};
+    // 上位机链路使能状态
+    LegStatus enable_status_ = LegStatus::kDisable;
+
+    void UsbRegister();
+    void UsbSetTarget();
+    void UsbFeedback();
+
+    
 };
 
 } // namespace Module

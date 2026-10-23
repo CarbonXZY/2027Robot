@@ -82,11 +82,11 @@ void Leg::Init(float average_speed, const Homing& homing,
     cross_couple_front_.Init(kGroupMotorNum);
     cross_couple_rear_.Init(kGroupMotorNum);
 
-    // 注意 Register() 的 tx/rx 是本板视角: 本板发反馈, 收指令
-    Middleware::g_usb_communication_interface.Register(
-        static_cast<uint8_t>(Middleware::CommFrameId::kLeg),
-        &rx_buffer_, &tx_buffer_,
-        static_cast<uint8_t>(sizeof(rx_buffer_)), static_cast<uint8_t>(sizeof(tx_buffer_)));
+    // // 注意 Register() 的 tx/rx 是本板视角: 本板发反馈, 收指令
+    // Middleware::g_usb_communication_interface.Register(
+    //     static_cast<uint8_t>(Middleware::CommFrameId::kLeg),
+    //     &rx_buffer_, &tx_buffer_,
+    //     static_cast<uint8_t>(sizeof(rx_buffer_)), static_cast<uint8_t>(sizeof(tx_buffer_)));
 
     status_ = Status::kInit;
 }
@@ -237,13 +237,13 @@ void Leg::RunningStep()
         return;
     }
 
-    // 下行: 只有使能时才接受上位机目标, 失能时保持最后一帧目标
-    if (enable_status_ == LegStatus::kEnable)
-    {
-        // 上位机直接下发腿高 (m), 向上为正; 组内两条腿取平均作为本组目标
-        SetTarget(0.5f * (tx_buffer_.position[0] + tx_buffer_.position[1]),
-                  0.5f * (tx_buffer_.position[2] + tx_buffer_.position[3]));
-    }
+    // // 下行: 只有使能时才接受上位机目标, 失能时保持最后一帧目标
+    // if (enable_status_ == LegStatus::kEnable)
+    // {
+    //     // 上位机直接下发腿高 (m), 向上为正; 组内两条腿取平均作为本组目标
+    //     SetTarget(0.5f * (tx_buffer_.position[0] + tx_buffer_.position[1]),
+    //               0.5f * (tx_buffer_.position[2] + tx_buffer_.position[3]));
+    // }
 
     UpdateData();
     NewTargetHandler();
@@ -251,15 +251,15 @@ void Leg::RunningStep()
     LimitOutput();
     OutputToMotor();
 
-    // 上行: 回传腿高 (m) 与线速度 (m/s), 向上为正, 由通信中间件打包
-    for (uint32_t i = 0; i < kMotorNum; i++)
-    {
-        const float direction = static_cast<float>(mechanical_.direction_sign[i]);
-        const float radius   = mechanical_.equivalent_radius[i];
-        rx_buffer_.motor[i].position =
-            direction * (motor_group_[i]->GetNowAngle() - offset_[i]) * radius;
-        rx_buffer_.motor[i].velocity = direction * motor_group_[i]->GetNowOmega() * radius;
-    }
+    // // 上行: 回传腿高 (m) 与线速度 (m/s), 向上为正, 由通信中间件打包
+    // for (uint32_t i = 0; i < kMotorNum; i++)
+    // {
+    //     const float direction = static_cast<float>(mechanical_.direction_sign[i]);
+    //     const float radius   = mechanical_.equivalent_radius[i];
+    //     rx_buffer_.motor[i].position =
+    //         direction * (motor_group_[i]->GetNowAngle() - offset_[i]) * radius;
+    //     rx_buffer_.motor[i].velocity = direction * motor_group_[i]->GetNowOmega() * radius;
+    // }
 }
 
 // 进入故障状态: 先退出速度模式并以当前位置保持, 再锁存
@@ -345,6 +345,11 @@ void Leg::UpdateData()
 
 void Leg::NewTargetHandler()
 {
+    using namespace Driver;
+
+    // 当前没完成目标，不管新目标
+    if (!IsMasterAxisDone()) return; 
+
     // 没有新目标, 本周期不规划
     if (!new_target_flag_) return;
     // 标志已消费, 避免同一目标重复规划
@@ -354,6 +359,7 @@ void Leg::NewTargetHandler()
 
     // 前组独立规划
     if (target_.front != prev_target_.front)
+    // if (!MathIsFloatEqual(target_.front, prev_target_.front, 0.001f))
     {
         // 总步数 = 行程 / 每 tick 的行程
         uint32_t total_step = std::ceil(std::abs(now_height_.front - target_.front) /
@@ -522,6 +528,61 @@ void Leg::SetGravityComp(const std::array<float, kMotorNum>& current)
         gravity_comp[i] = current[i];
     }
 
+}
+
+void LegInteract::Init(float average_speed, const Homing& homing,
+        Algorithm::Interpolator::Type interpolator_type,
+        float cross_couple_kp)
+{
+    Leg::Init(average_speed, homing, interpolator_type, cross_couple_kp);
+
+    UsbRegister();
+}
+
+void LegInteract::TimCalculatePeriodElapsedCallback()
+{
+    UsbSetTarget();
+    Leg::TimCalculatePeriodElapsedCallback();
+    UsbFeedback();
+
+}
+
+void LegInteract::UsbRegister()
+{
+    // 注意 Register() 的 tx/rx 是本板视角: 本板发反馈, 收指令
+    Middleware::g_usb_communication_interface.Register(
+        static_cast<uint8_t>(Middleware::CommFrameId::kLeg),
+        &rx_buffer_, &tx_buffer_,
+        static_cast<uint8_t>(sizeof(rx_buffer_)), static_cast<uint8_t>(sizeof(tx_buffer_)));
+}
+
+void LegInteract::UsbSetTarget()
+{
+    // 下行: 只有使能时才接受上位机目标, 失能时保持最后一帧目标
+    if (enable_status_ == LegStatus::kEnable)
+    {
+        // 上位机直接下发腿高 (m), 向上为正; 组内两条腿取平均作为本组目标
+        SetTarget(0.5f * (tx_buffer_.position[0] + tx_buffer_.position[1]),
+                  0.5f * (tx_buffer_.position[2] + tx_buffer_.position[3]));
+    }
+}
+
+void LegInteract::UsbFeedback()
+{
+    // 上行: 回传腿高 (m) 与线速度 (m/s), 向上为正, 由通信中间件打包
+    for (uint32_t i = 0; i < kMotorNum; i++)
+    {
+        const float direction = static_cast<float>(mechanical_.direction_sign[i]);
+        const float radius   = mechanical_.equivalent_radius[i];
+        rx_buffer_.motor[i].position =
+            direction * (motor_group_[i]->GetNowAngle() - offset_[i]) * radius;
+        rx_buffer_.motor[i].velocity = direction * motor_group_[i]->GetNowOmega() * radius;
+    }
+}
+
+void test()
+{
+    
 }
 
 } // namespace Module

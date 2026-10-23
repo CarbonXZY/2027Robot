@@ -41,6 +41,7 @@ add_compile_options(
     -Wno-missing-field-initializers   # struct init leaving members zeroed by default
     -Wno-unused-parameter             # HAL callbacks with unused args
     -Wno-sign-compare                 # int/int32 loop counters vs uint32_t lengths
+    $<$<COMPILE_LANGUAGE:CXX>:-Wno-volatile>  # C++20 deprecated volatile compound assign in CMSIS/ST headers
 )
 
 # Create an executable object type
@@ -91,6 +92,7 @@ file(GLOB_RECURSE USER_SOURCES CONFIGURE_DEPENDS
 target_sources(${CMAKE_PROJECT_NAME} PRIVATE
     ${USER_SOURCES}
     User/Module/Leg/mod_leg.cpp
+    User/Driver/drv_math.cpp
 )
 
 # Add include paths
