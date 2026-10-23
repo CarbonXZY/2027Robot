@@ -236,11 +236,11 @@ void Leg::EnterRunning()
 // 正常运行: 更新反馈 -> 规划 -> 计算输出
 void Leg::RunningStep()
 {
-    if (!GetMotorAllEnabled())
-    {
-        EnterError();
-        return;
-    }
+    // if (!GetMotorAllEnabled())
+    // {
+    //     EnterError();
+    //     return;
+    // }
 
     UpdateData();
     NewTargetHandler();
@@ -311,6 +311,8 @@ void Leg::UpdateData()
         // 电机转角换算成齿条直线高度 (m)
         const float height = (motor_group_[i]->GetNowAngle() - offset_[i]) *
             mechanical_.direction_sign[i] * mechanical_.equivalent_radius[i];
+
+        leg_height_[i] = height;
 
         // 前组 0/1, 后组重新编号为 0/1
         if (i < kGroupMotorNum)
@@ -469,8 +471,10 @@ void Leg::OutputToMotor()
         motor_group_[i]->SetFeedforwardCurrent(gravity_comp[i]);
 
         // 设置速度前馈
+        // debug
         motor_group_[i]->SetFeedforwardOmega(output_.speed_kff[i]);
-
+        // motor_group_[i]->pid_position.SetOutMax(std::abs(output_.speed_kff[i]));
+             
         // 设置位置目标
         motor_group_[i]->SetTargetPosition(output_.position_real[i]);
     }
@@ -514,10 +518,20 @@ void Leg::SetGravityComp(const std::array<float, kMotorNum>& current)
     
 }
 
+bool Leg::IsFrontMasterAxisDone() const
+{
+    return front_master_axis_.IsFinished();
+}
+
+bool Leg::IsRearMasterAxisDone() const
+{
+    return rear_master_axis_.IsFinished();
+}
+
 bool Leg::IsMasterAxisDone() const
 {
-    return front_master_axis_.IsFinished() &&
-        rear_master_axis_.IsFinished();
+    return IsFrontMasterAxisDone() &&
+        IsRearMasterAxisDone();
 }
 
 void LegInteract::Init(float average_speed, const Homing& homing,
@@ -570,6 +584,8 @@ void LegInteract::UsbFeedback()
             direction * (motor_group_[i]->GetNowAngle() - offset_[i]) * radius;
         rx_buffer_.motor[i].velocity = direction * motor_group_[i]->GetNowOmega() * radius;
     }
+    rx_buffer_.front_completion_flag = IsFrontMasterAxisDone();
+    rx_buffer_.rear_completion_flag = IsRearMasterAxisDone();
 }
 
 void test()

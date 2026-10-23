@@ -38,8 +38,10 @@ struct LegTx
 };
 
 struct LegRx
-{
+{    
     Device::MotorFeedbackFrame motor[4];
+    uint8_t front_completion_flag;
+    uint8_t rear_completion_flag;
 };
 #pragma pack(pop)
 
@@ -179,6 +181,10 @@ public:
     bool GetCrossCoupeEnable() const { return cross_couple_enable_; }
     bool GetMotorAllEnabled() const;
 
+    bool IsMasterAxisDone() const;
+    bool IsFrontMasterAxisDone() const;
+    bool IsRearMasterAxisDone() const;
+
     // 和 Chassis 相同的一拍入口
     void TimCalculatePeriodElapsedCallback();
     void Tim100msAlivePeriodElapsedCallback();
@@ -241,7 +247,7 @@ protected:
     // 各电机是否已完成找限位
     bool homing_done_[kMotorNum] = {};
     // 交叉耦合控制开关
-    bool cross_couple_enable_ = false;
+    bool cross_couple_enable_ = true;
 
     void LimitOutput();
 
@@ -260,8 +266,6 @@ protected:
     void NewTargetHandler();
     void CalculateOutput();
     void OutputToMotor();
-
-    bool IsMasterAxisDone() const;
 };
 
 class LegInteract : public Leg

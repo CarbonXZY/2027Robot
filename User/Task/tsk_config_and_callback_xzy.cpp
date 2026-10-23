@@ -15,6 +15,7 @@
 
 #include <cstddef>
 #include <cstdint>
+#include <memory>
 
 #include "Communication_Interface.hpp"
 #include "Gripper/mod_gripper.h"
@@ -27,7 +28,6 @@
 #include "dvc_motor_instances.h"
 #include "ita_chariot.h"
 #include "tsk_config_and_callback.h"
-#include "mod_leg_instance.h"
 
 namespace Task
 {
@@ -114,6 +114,16 @@ void Fdcan1Callback(Driver::FdcanRxBuffer *FDCAN_RxMessage)
 }
 
 /**
+ * @brief TIM2 1ms 回调
+ * @note Leg 规划对时序十分敏感，单开一个定时器专门给leg
+ * 
+ */
+void Tim1msLegCallback()
+{
+    g_chariot.leg_.TimCalculatePeriodElapsedCallback();
+}
+
+/**
  * @brief TIM5 1ms 回调，周期分频都在这
  */
 void Tim1msCallback()
@@ -121,7 +131,6 @@ void Tim1msCallback()
     Device::DwtUpdate();
 
     g_chariot.TimCalculatePeriodElapsedCallback();
-    // Module::g_legs.TimCalculatePeriodElapsedCallback();
 
     // 入队分频到 100Hz：一包 64 字节装不下腿+底盘+遥控三帧，Send() 内部会拆成
     // 3 包；USB 每 ms 只抽 1 包（1000Hz），若每 ms 都入队就是 3000 包/s 灌进来，
@@ -145,7 +154,6 @@ void Tim1msCallback()
     {
         g_mod_alive_motor = 0;
         g_chariot.Tim100msAlivePeriodElapsedCallback();
-        // Module::g_legs.Tim100msAlivePeriodElapsedCallback();
     }
 
     if (++g_mod_alive_pc >= 1000)
@@ -175,7 +183,6 @@ void TaskInit()
     Middleware::g_usb_communication_interface.Init(Task::UsbSendCallback);
 
     Task::g_chariot.Init();
-    // Module::g_legs.Init(0.1f, Module::g_legs_homing);
 
     // 绑定 CRSF 串口回调
     Driver::UartInit(&huart7, Task::CrsfUart7Callback, 64);
@@ -186,9 +193,11 @@ void TaskInit()
 
     // 定时器初始化：TIM5 挂 1ms 调度回调
     Driver::TimInit(&htim5, Task::Tim1msCallback);
+    Driver::TimInit(&htim2, Task::Tim1msLegCallback);
 
     // 使能调度时钟
     HAL_TIM_Base_Start_IT(&htim5);
+    HAL_TIM_Base_Start_IT(&htim2);
 
     // 标记初始化完成
     Task::g_init_finished = true;
