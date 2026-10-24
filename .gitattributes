@@ -1,0 +1,16 @@
+# 仓库内统一存 LF；checkout 也用 LF
+* text=auto eol=lf
+
+# 明确二进制，避免被当作文本处理
+*.bin binary
+*.hex binary
+*.elf binary
+*.srec binary
+*.a   binary
+*.o   binary
+*.d   binary
+*.pdf binary
+*.png binary
+*.jpg binary
+*.zip binary
+*.7z  binary

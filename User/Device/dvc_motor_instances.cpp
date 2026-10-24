@@ -26,10 +26,10 @@ MotorInstances g_motor;
 
 void MotorInstances::Init()
 {
-    leg_front_left.Init(MotorControlMethod::kSpeed, kLegParameters);
-    leg_front_right.Init(MotorControlMethod::kSpeed, kLegParameters);
-    leg_rear_left.Init(MotorControlMethod::kSpeed, kLegParameters);
-    leg_rear_right.Init(MotorControlMethod::kSpeed, kLegParameters);
+    // leg_front_left.Init(MotorControlMethod::kSpeed, kLegParameters);
+    // leg_front_right.Init(MotorControlMethod::kSpeed, kLegParameters);
+    // leg_rear_left.Init(MotorControlMethod::kSpeed, kLegParameters);
+    // leg_rear_right.Init(MotorControlMethod::kSpeed, kLegParameters);
 
     chassis_front_left.Init(MotorControlMethod::kSpeed, kChassisParameters);
     chassis_front_right.Init(MotorControlMethod::kSpeed, kChassisParameters);

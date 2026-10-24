@@ -15,6 +15,7 @@
 
 #include <cstddef>
 #include <cstdint>
+#include <memory>
 
 #include "Communication_Interface.hpp"
 #include "Gripper/mod_gripper.h"
@@ -113,6 +114,16 @@ void Fdcan1Callback(Driver::FdcanRxBuffer *FDCAN_RxMessage)
 }
 
 /**
+ * @brief TIM2 1ms 回调
+ * @note Leg 规划对时序十分敏感，单开一个定时器专门给leg
+ * 
+ */
+void Tim1msLegCallback()
+{
+    g_chariot.leg_.TimCalculatePeriodElapsedCallback();
+}
+
+/**
  * @brief TIM5 1ms 回调，周期分频都在这
  */
 void Tim1msCallback()
@@ -137,6 +148,8 @@ void Tim1msCallback()
     // 推一下 USB 发送环形缓冲，把上行帧真正发出去
     Driver::TimUsbSendPeriodElapsedCallback();
 
+    Driver::Tim1msCanPeriodElapsedCallback();
+
     if (++g_mod_alive_motor >= 100)
     {
         g_mod_alive_motor = 0;
@@ -156,6 +169,8 @@ void Tim1msCallback()
 
 void TaskInit()
 {
+    HAL_Delay(1000);
+
     // 板级上电：打开 DC5(5V) 给 CRSF 接收机供电，两路 DC24 保持关闭
     Driver::BspInit(Driver::kDc24LOff | Driver::kDc24ROff | Driver::kDc5On, 0.0f, 0.0f);
 
@@ -178,9 +193,11 @@ void TaskInit()
 
     // 定时器初始化：TIM5 挂 1ms 调度回调
     Driver::TimInit(&htim5, Task::Tim1msCallback);
+    Driver::TimInit(&htim2, Task::Tim1msLegCallback);
 
     // 使能调度时钟
     HAL_TIM_Base_Start_IT(&htim5);
+    HAL_TIM_Base_Start_IT(&htim2);
 
     // 标记初始化完成
     Task::g_init_finished = true;
