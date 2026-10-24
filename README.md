@@ -82,16 +82,15 @@ ros2 launch robot robot.launch
 
 `robot.launch` 会拉起：`robot_state_publisher`、`ros2_control_node`（update_rate 10 Hz）、
 以及 `joint_state_broadcaster` / `mecanum_drive_controller` / `leg_controller` /
-`telecontrol_broadcaster` 四个 spawner，最后启动人机交互仲裁节点。
+`telecontrol_broadcaster` 四个 spawner。
 
 ## 主要话题
 
 | 话题 | 类型 | 说明 |
 | ---- | ---- | ---- |
-| `/mecanum_drive_controller/reference_unstamped` | `geometry_msgs/Twist` | 底盘速度指令（vx 前后 / vy 横移 / wz 自转） |
-| `/mecanum_drive_controller/odom` | `nav_msgs/Odometry` | 底盘里程计 |
+| `/mecanum_drive_controller/reference_unstamped` | `geometry_msgs/Twist` | 底盘速度指令（vx 前后 / vy 横移 / wz 自转），上位机直接发这里 |
+| `/mecanum_drive_controller/odometry` | `nav_msgs/Odometry` | 底盘里程计 |
 | `/telecontrol/rc_state` | `telecontrol_msgs/RcState` | 遥控器状态（摇杆、开关、链路质量、failsafe） |
-| `/cmd_vel` | `geometry_msgs/Twist` | 上位机（导航等）下发的速度，经仲裁后转给底盘 |
 
 手动下发底盘速度：
 

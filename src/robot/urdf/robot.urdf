@@ -19,7 +19,7 @@
   </link>
 
   <!-- ========== 底盘 chassis：4 个轮子 ========== -->
-  <!-- 轮半径 0.05，轮心距中心 lx=0.2、ly=0.15（lx+ly=0.35），
+  <!-- 轮半径 0.05，轮心距中心 lx=0.27362、ly=0.213（lx+ly=0.48662），
        需与 config/chassis_controller.yaml 的 kinematics 参数保持一致。 -->
   <link name="front_left_wheel">
     <inertial>
@@ -73,25 +73,25 @@
   <joint name="front_left_wheel_joint" type="continuous">
     <parent link="base_link"/>
     <child link="front_left_wheel"/>
-    <origin xyz="0.2 0.15 -0.05" rpy="0 0 0"/>
+    <origin xyz="0.27362 0.213 -0.05" rpy="0 0 0"/>
     <axis xyz="0 1 0"/>
   </joint>
   <joint name="front_right_wheel_joint" type="continuous">
     <parent link="base_link"/>
     <child link="front_right_wheel"/>
-    <origin xyz="0.2 -0.15 -0.05" rpy="0 0 0"/>
+    <origin xyz="0.27362 -0.213 -0.05" rpy="0 0 0"/>
     <axis xyz="0 1 0"/>
   </joint>
   <joint name="rear_left_wheel_joint" type="continuous">
     <parent link="base_link"/>
     <child link="rear_left_wheel"/>
-    <origin xyz="-0.2 0.15 -0.05" rpy="0 0 0"/>
+    <origin xyz="-0.27362 0.213 -0.05" rpy="0 0 0"/>
     <axis xyz="0 1 0"/>
   </joint>
   <joint name="rear_right_wheel_joint" type="continuous">
     <parent link="base_link"/>
     <child link="rear_right_wheel"/>
-    <origin xyz="-0.2 -0.15 -0.05" rpy="0 0 0"/>
+    <origin xyz="-0.27362 -0.213 -0.05" rpy="0 0 0"/>
     <axis xyz="0 1 0"/>
   </joint>
 

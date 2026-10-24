@@ -14,7 +14,8 @@ mecanum_drive_controller:
     kinematics:
       wheels_radius: 0.05
       # = lx + ly（轮心到车体中心在 X/Y 轴投影之和），与 URDF 一致
-      sum_of_robot_center_projection_on_X_Y_axis: 0.35
+      # lx=0.27362（前后）、ly=0.213（左右），实测值
+      sum_of_robot_center_projection_on_X_Y_axis: 0.48662
       base_frame_offset:
         x: 0.0
         y: 0.0

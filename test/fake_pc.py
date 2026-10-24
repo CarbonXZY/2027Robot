@@ -3,22 +3,19 @@
 假装上位机：让机器人沿一个正方形走位（前→右→后→左），每个方向 1s、0.3 m/s，
 走回原点后循环。
 
-预期效果（对应 robot 节点的仲裁规则）：
-  - 遥控不在（无帧 / failsafe）或 SA = HIGH → 上位机模式，本程序生效，车按正方形走；
-  - 遥控健康且 SA = LOW → 遥控器模式，本程序被忽略，改听遥控器摇杆；
-  - Ctrl+C 停掉本程序后，/cmd_vel 停发，超过 pc_alive_timeout（默认 0.5s）上位机模式
-    判为失联，仲裁发零，车停（不会自动切回遥控器）。
+robot 仲裁节点已删，上位机直接往麦轮控制器的原生话题发 Twist 直达底盘，
+中间无任何转换。
 
 方向约定（REP103：x 前 / y 左）：
   - linear.x 正 = 前，负 = 后
   - linear.y 正 = 左横移，负 = 右横移
   如果你的车左右横移方向反了，把 SEGMENTS 里第二、第四段的 y 符号对调即可。
 
-注意：robot 节点的 pc_subscription 是 QoS(10).best_effort()，这里也必须 best_effort。
+注意：控制器订阅 reference_unstamped 用 reliable QoS，这里也必须默认可靠 QoS 发，
+否则 QoS 对不上会收不到。
 """
 import rclpy
 from rclpy.node import Node
-from rclpy.qos import qos_profile_sensor_data  # best_effort + keep_last(5)
 
 from geometry_msgs.msg import Twist
 
@@ -38,8 +35,8 @@ SEGMENT_NAMES = ["前进", "右横移", "后退", "左横移"]
 class FakePc(Node):
     def __init__(self):
         super().__init__("fake_pc")
-        # best_effort，和 robot 的 pc_subscription 匹配
-        self.pub = self.create_publisher(Twist, "/cmd_vel", qos_profile_sensor_data)
+        # 直接发到麦轮控制器原生话题；默认 QoS 即 reliable，和控制器订阅匹配
+        self.pub = self.create_publisher(Twist, "/mecanum_drive_controller/reference_unstamped", 10)
         self.timer = self.create_timer(0.05, self.publish)  # 20Hz，远小于 0.5s 超时
         self.start_time = self.get_clock().now()
         self.last_seg = -1
