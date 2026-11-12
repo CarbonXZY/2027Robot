@@ -23,7 +23,7 @@ public:
     Module::Chassis chassis_;
     Module::Telecontrol telecontrol_;
 
-    // 上位机链路存活，由 1000ms 窗口刷新
+    // 上位机链路存活，由 100ms 窗口刷新
     bool pc_is_alive_ = false;
 
     // 全车校准完成标志，1ms 周期刷新；未完成前不向上位机回传
@@ -43,8 +43,8 @@ public:
     // 100ms：电机自身掉线检测 + 遥控接收机掉线检测
     void Tim100msAlivePeriodElapsedCallback();
 
-    // 1000ms：上位机存活窗口
-    void Tim1000msAlivePeriodElapsedCallback();
+    // 100ms：上位机存活窗口
+    void Tim100msPcAlivePeriodElapsedCallback();
 
 private:
     uint32_t alive_flag_ = 0;

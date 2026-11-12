@@ -97,7 +97,7 @@ void Chariot::Tim100msAlivePeriodElapsedCallback()
     Device::g_motor.chassis_rear_right.Tim100msAlivePeriodElapsedCallback();
 }
 
-void Chariot::Tim1000msAlivePeriodElapsedCallback()
+void Chariot::Tim100msPcAlivePeriodElapsedCallback()
 {
     pc_is_alive_ = (alive_flag_ != pre_alive_flag_);
     pre_alive_flag_ = alive_flag_;

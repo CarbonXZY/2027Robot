@@ -8,9 +8,9 @@
  * TIM5 已经配成 1ms（PSC 240-1，ARR 1000-1，240MHz），所以 mod 就是乘数：
  *   1ms    控制 + CAN 发送 + USB 上行
  *   100ms  电机自身掉线检测 + 遥控接收机掉线检测
- *   1000ms 上位机存活窗口
- * 判活窗口取 1000ms 而不是贴着上位机的 100ms：上位机是 sleep_for(100ms)，
- * 窗口跟它一般大就会相位打拍，偶发一个窗口整好一个包都不落，误判掉线。
+ *   100ms  上位机存活窗口
+ * 判活窗口取 100ms 而不是贴着上位机的 10ms（100Hz）：窗口跟发送周期一般大
+ * 就会相位打拍，偶发一个窗口整好一个包都不落，误判掉线。
  */
 
 #include <cstddef>
@@ -139,10 +139,10 @@ void Tim1msCallback()
     {
         g_usb_send_mod = 0;
         // 校准完成前不上行: 腿反馈还没意义, 免得把一堆 0 发给上位机
-        if (g_chariot.calibration_finished_)
-        {
+        // if (g_chariot.calibration_finished_)
+        // {
             Middleware::g_usb_communication_interface.Send();
-        }
+        // }
     }
 
     // 推一下 USB 发送环形缓冲，把上行帧真正发出去
@@ -156,10 +156,10 @@ void Tim1msCallback()
         g_chariot.Tim100msAlivePeriodElapsedCallback();
     }
 
-    if (++g_mod_alive_pc >= 1000)
+    if (++g_mod_alive_pc >= 100)
     {
         g_mod_alive_pc = 0;
-        g_chariot.Tim1000msAlivePeriodElapsedCallback();
+        g_chariot.Tim100msPcAlivePeriodElapsedCallback();
     }
 }
 
