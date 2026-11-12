@@ -9,7 +9,7 @@
 
   <node pkg="controller_manager" exec="ros2_control_node" output="screen">
     <param name="robot_description" value="$(var robot_description)"/>
-    <param name="update_rate" value="10"/>
+    <param name="update_rate" value="100"/>
   </node>
 
   <node pkg="controller_manager" exec="spawner" output="screen"

@@ -190,7 +190,14 @@ void TaskLoop()
         return;
     }
 
-    AlivePeriodElapsedCallback();
+    // 下位机上行是 100Hz，判活窗口不能跟它同频（10ms）——同频会相位打拍，
+    // 偶发某个窗口一个包都不落就被误判掉线。每 10 拍（100ms）判一次，留 10 倍余量。
+    static uint32_t alive_check_mod = 0;
+    if (++alive_check_mod >= 10)
+    {
+        alive_check_mod = 0;
+        AlivePeriodElapsedCallback();
+    }
 
     // 没收到下位机回显之前一个字节都不发
     if (!g_mcu_alive)

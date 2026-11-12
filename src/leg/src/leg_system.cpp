@@ -444,7 +444,7 @@ void LegController::MonitorGoal(const std::shared_ptr<LiftGoalHandle> goal_handl
 }
 
 /**
- * @brief 状态机周期回调，节奏由 launch 的 update_rate 决定（10 Hz）
+ * @brief 状态机周期回调，节奏由 launch 的 update_rate 决定（100 Hz）
  */
 void LegFsm::TimStatusPeriodElapsedCallback()
 {

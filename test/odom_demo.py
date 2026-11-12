@@ -4,7 +4,7 @@
 打印位姿（x/y/yaw）和线速度。不用发任何速度指令，只要控制器 active 就会持续出数。
 
 话题：/mecanum_drive_controller/odometry  （nav_msgs/msg/Odometry）
-默认以 10Hz（ros2_control_node update_rate）发布。
+默认以 100Hz（ros2_control_node update_rate）发布。
 
 用法（先 source 工作空间，且底盘控制器已跑）：
     source install/setup.bash
