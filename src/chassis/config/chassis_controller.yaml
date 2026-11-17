@@ -21,8 +21,11 @@ mecanum_drive_controller:
         y: 0.0
         theta: 0.0
 
-    # 可选：速度限制、协方差、超时等（不写则用默认值）
-    # reference_timeout: 2.0
+    # 指令保持时间：最后一条 Twist 在收到后 0.5s 内持续生效，超时才发零停车。
+    # 必须 > 0：默认值 0 表示每条指令只在下一次 update（100Hz 下仅 10ms）有效，
+    # 发布频率低于 100Hz 时大部分控制周期会被夹成零，表现为走一下停一下、平均速度偏低。
+    reference_timeout: 0.5
+    # 可选：速度限制、协方差等（不写则用默认值）
     # linear.x.max_velocity: 1.0
     # linear.y.max_velocity: 1.0
     # angular.z.max_velocity: 3.0
