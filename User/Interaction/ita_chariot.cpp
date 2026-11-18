@@ -8,6 +8,7 @@
 #include "Communication_Interface.hpp"
 #include "drv_can.h"
 #include "dvc_motor_instances.h"
+#include "main.h"
 
 namespace
 {
@@ -24,6 +25,17 @@ constexpr Module::Leg::Homing kLegHoming = {
     .speed_threshold = 0.001f,
     .debounce_ms = 20,
 };
+
+// Earth Block 气动件引脚：沿用板载两路 DC24 输出（PC14/PC13）
+// 右吸盘暂不接线；气泵为高电平动作
+const Module::EarthBlock::HardwareConfig kEarthBlockHardware = {
+    .suction_0_port = Power_OUT1_EN_GPIO_Port,
+    .suction_0_pin = Power_OUT1_EN_Pin,
+    .suction_1_port = nullptr,
+    .suction_1_pin = 0,
+    .air_rail_port = Power_OUT2_EN_GPIO_Port,
+    .air_rail_pin = Power_OUT2_EN_Pin,
+};
 } // namespace
 
 Chariot::Chariot()
@@ -34,7 +46,8 @@ Chariot::Chariot()
           .rr = &Device::g_motor.leg_rear_right,
           }, kLegMechanical),
     // : leg_(&Module::g_legs),
-      chassis_({&Device::g_motor.chassis_front_left, &Device::g_motor.chassis_front_right, &Device::g_motor.chassis_rear_left, &Device::g_motor.chassis_rear_right})
+      chassis_({&Device::g_motor.chassis_front_left, &Device::g_motor.chassis_front_right, &Device::g_motor.chassis_rear_left, &Device::g_motor.chassis_rear_right}),
+      earth_block_(Device::g_motor.earth_block)
 {
 }
 
@@ -45,6 +58,9 @@ void Chariot::Init()
 
     // 电机控制模式与 PID 参数在设备层统一写入
     Device::g_motor.Init();
+
+    // Earth Block：绑定气动件引脚，并注册 id=2 的通信帧
+    earth_block_.Init(kEarthBlockHardware);
 
     // id=3 的腿帧在 leg_.Init() 里注册
     leg_.Init(0.1f, kLegHoming);
@@ -83,6 +99,9 @@ void Chariot::TimCalculatePeriodElapsedCallback()
     chassis_.TimCalculatePeriodElapsedCallback();
 
     telecontrol_.TimCalculatePeriodElapsedCallback();
+
+    // Earth Block：通信目标 → 状态机 → 上行反馈
+    earth_block_.TimCalculate1msCallback();
 }
 
 void Chariot::Tim100msAlivePeriodElapsedCallback()
@@ -90,6 +109,8 @@ void Chariot::Tim100msAlivePeriodElapsedCallback()
     telecontrol_.Tim100msAlivePeriodElapsedCallback();
 
     leg_.Tim100msAlivePeriodElapsedCallback();
+
+    earth_block_.TimAlive100msCallback();
 
     Device::g_motor.chassis_front_left.Tim100msAlivePeriodElapsedCallback();
     Device::g_motor.chassis_front_right.Tim100msAlivePeriodElapsedCallback();
@@ -113,4 +134,7 @@ void Chariot::Tim100msPcAlivePeriodElapsedCallback()
         leg_.SetState(Module::LegStatus::kDisable);
         chassis_.SetState(Module::ChassisStatus::kDisable);
     }
+
+    // Earth Block 不做掉线保护：上位机掉线后 tx_buffer_ 保持最后一帧目标，
+    // 电机继续跟随最后位置，吸盘/气动导轨保持最后状态，不主动停止。
 }

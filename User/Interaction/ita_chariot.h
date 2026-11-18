@@ -12,6 +12,7 @@
 
 #include "mod_chassis.h"
 #include "mod_leg.h"
+#include "mod_earth_block.h"
 #include "mod_telecontrol.h"
 
 class Chariot
@@ -22,6 +23,7 @@ public:
     Module::LegInteract leg_;
     Module::Chassis chassis_;
     Module::Telecontrol telecontrol_;
+    Module::EarthBlock earth_block_;
 
     // 上位机链路存活，由 100ms 窗口刷新
     bool pc_is_alive_ = false;

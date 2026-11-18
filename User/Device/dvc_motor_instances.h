@@ -33,6 +33,9 @@ struct MotorInstances
     // 夹爪（M2006），独立挂在 CAN2
     MotorDjiC610 clamp{&hfdcan2, MotorDjiId::kId0x201};
 
+    // Earth Block 导轨（M2006+C610），挂在 CAN2；CAN2 0x201 已被夹爪占用
+    MotorDjiC610 earth_block{&hfdcan2, MotorDjiId::kId0x202};
+
     void Init();
 };
 

@@ -113,6 +113,21 @@ void Fdcan1Callback(Driver::FdcanRxBuffer *FDCAN_RxMessage)
     }
 }
 
+// CAN2 上 Earth Block 的 C610 反馈帧：0x202
+void Fdcan2Callback(Driver::FdcanRxBuffer *FDCAN_RxMessage)
+{
+    switch (FDCAN_RxMessage->Header.Identifier)
+    {
+        case 0x202:
+        {
+            g_chariot.earth_block_.FdcanRxCpltCallback(FDCAN_RxMessage->Data);
+            break;
+        }
+        default:
+            break;
+    }
+}
+
 /**
  * @brief TIM2 1ms 回调
  * @note Leg 规划对时序十分敏感，单开一个定时器专门给leg
@@ -190,6 +205,7 @@ void TaskInit()
     // 电机对象先绑好再开 CAN 中断：反过来的话，FdcanInit 激活 RX 中断的瞬间
     // 电调正推反馈，回调里 manage_object 还是空指针
     Driver::FdcanInit(&hfdcan1, Task::Fdcan1Callback);
+    Driver::FdcanInit(&hfdcan2, Task::Fdcan2Callback);
 
     // 定时器初始化：TIM5 挂 1ms 调度回调
     Driver::TimInit(&htim5, Task::Tim1msCallback);

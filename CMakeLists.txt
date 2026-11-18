@@ -100,6 +100,7 @@ target_include_directories(${CMAKE_PROJECT_NAME} PRIVATE
     ${CMAKE_SOURCE_DIR}/User/Module/Leg
     ${CMAKE_SOURCE_DIR}/User/Module/Chassis
     ${CMAKE_SOURCE_DIR}/User/Module/Gripper
+    ${CMAKE_SOURCE_DIR}/User/Module/Earth_Block
     ${CMAKE_SOURCE_DIR}/User/Module/Telecontrol
     ${CMAKE_SOURCE_DIR}/User/Device
     ${CMAKE_SOURCE_DIR}/User/Driver
