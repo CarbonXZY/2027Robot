@@ -120,7 +120,22 @@ void Fdcan2Callback(Driver::FdcanRxBuffer *FDCAN_RxMessage)
     {
         case 0x202:
         {
-            g_chariot.earth_block_.FdcanRxCpltCallback(FDCAN_RxMessage->Data);
+            Device::g_motor.earth_block.FdcanRxCpltCallback(FDCAN_RxMessage->Data);
+            break;
+        }
+        case 0x203:
+        {
+            Device::g_motor.sky_block_big_arm.FdcanRxCpltCallback(FDCAN_RxMessage->Data);
+            break;
+        }
+        case 0x204:
+        {
+            Device::g_motor.sky_block_small_arm.FdcanRxCpltCallback(FDCAN_RxMessage->Data);
+            break;
+        }
+        case 0x205:
+        {
+            Device::g_motor.sky_block_gripper.FdcanRxCpltCallback(FDCAN_RxMessage->Data);
             break;
         }
         default:
@@ -153,11 +168,11 @@ void Tim1msCallback()
     if (++g_usb_send_mod >= 10)
     {
         g_usb_send_mod = 0;
-        // 校准完成前不上行: 腿反馈还没意义, 免得把一堆 0 发给上位机
-        // if (g_chariot.calibration_finished_)
-        // {
+        // 校准完成前不上行:  免得把一堆 0 发给上位机
+        if (g_chariot.calibration_finished_)
+        {
             Middleware::g_usb_communication_interface.Send();
-        // }
+        }
     }
 
     // 推一下 USB 发送环形缓冲，把上行帧真正发出去

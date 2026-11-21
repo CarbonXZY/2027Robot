@@ -17,12 +17,13 @@
 namespace Middleware
 {
 
-enum class CommFrameId : uint8_t
-{
-    kChassis     = 1,  // 底盘：下行目标轮速 16B / 上行轮反馈 32B，双向
-    kEarthBlock  = 2,  // Earth Block：下行目标位置+气泵目标 6B / 上行电机反馈+气泵状态 10B，双向
-    kLeg         = 3,  // 腿：  下行目标位置 16B / 上行关节反馈 32B，双向
-    kTelecontrol = 5,  // 遥控：仅上行，CRSF 摇杆/开关/链路状态
-};
+    enum class CommFrameId : uint8_t
+    {
+        kChassis = 1,     // 底盘：下行目标轮速 16B / 上行轮反馈 32B，双向
+        kEarthBlock = 2,  // Earth Block：下行目标位置+气泵目标 6B / 上行电机反馈+气泵状态 10B，双向
+        kLeg = 3,         // 腿：  下行目标位置 16B / 上行关节反馈 32B，双向
+        kSkyBlock = 4,    // Sky Block：四轴目标 16B / 三电机反馈 24B，双向
+        kTelecontrol = 5, // 遥控：仅上行，CRSF 摇杆/开关/链路状态
+    };
 
 } // namespace Middleware

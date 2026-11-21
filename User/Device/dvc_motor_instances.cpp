@@ -27,6 +27,24 @@ constexpr MotorDjiC610::Parameters kEarthBlockParameters
     .pid_position = {.k_p = 10.0f, .k_i = 0.0f, .k_d = 0.0f, .out_max = 20.0f},
     .pid_omega    = {.k_p = 3.5f, .k_i = 0.0f, .k_d = 0.0f, .out_max = 10.0f},
 };
+
+constexpr MotorDjiC610::Parameters kSkyBlockBigArmParameters
+{
+    .pid_position = {.k_p = 18.0f, .k_i = 0.0f, .k_d = 0.0f, .out_max = 20.0f},
+    .pid_omega    = {.k_p = 6.0f, .k_i = 0.0f, .k_d = 0.0f, .out_max = 10.0f},
+};
+
+constexpr MotorDjiC620::Parameters kSkyBlockSmallArmParameters
+{
+    .pid_position = {.k_p = 15.0f, .k_i = 0.0f, .k_d = 0.0f, .out_max = 20.0f},
+    .pid_omega    = {.k_p = 7.0f, .k_i = 0.0f, .k_d = 0.0f, .out_max = 20.0f},
+};
+
+constexpr MotorDjiC610::Parameters kSkyBlockGripperParameters
+{
+    .pid_position = {.k_p = 15.0f, .k_i = 0.0f, .k_d = 0.0f, .out_max = 15.0f},
+    .pid_omega    = {.k_p = 8.0f, .k_i = 0.0f, .k_d = 0.0f, .out_max = 8.0f},
+};
 } // namespace
 
 MotorInstances g_motor;
@@ -45,5 +63,9 @@ void MotorInstances::Init()
 
     // Earth Block 导轨: 先配置位置环参数, 接线后由 Module::EarthBlock 接管
     earth_block.Init(MotorControlMethod::kPosition, kEarthBlockParameters);
+
+    sky_block_big_arm.Init(MotorControlMethod::kPosition, kSkyBlockBigArmParameters);
+    sky_block_small_arm.Init(MotorControlMethod::kPosition, kSkyBlockSmallArmParameters);
+    sky_block_gripper.Init(MotorControlMethod::kPosition, kSkyBlockGripperParameters);
 }
 } // namespace Device
