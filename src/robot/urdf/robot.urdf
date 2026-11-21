@@ -176,6 +176,30 @@
     </joint>
   </ros2_control>
 
+  <!-- ========== 地块 Earth Block：1 个电机导轨 + 2 路气泵 ========== -->
+  <link name="earth_block_motor_rail"/>
+  <joint name="earth_block_motor_rail_joint" type="fixed">
+    <parent link="base_link"/>
+    <child link="earth_block_motor_rail"/>
+  </joint>
+
+  <ros2_control name="EarthBlockSystem" type="system">
+    <hardware>
+      <plugin>earth_block/EarthBlockSystem</plugin>
+    </hardware>
+
+    <!-- URDF 只声明一个电机 joint；两路气泵作为自定义接口挂在这个 joint 上 -->
+    <joint name="earth_block_motor_rail_joint">
+      <command_interface name="position"/>
+      <command_interface name="suction"/>
+      <command_interface name="air_rail"/>
+      <state_interface name="position"/>
+      <state_interface name="velocity"/>
+      <state_interface name="suction"/>
+      <state_interface name="air_rail"/>
+    </joint>
+  </ros2_control>
+
   <ros2_control name="TelecontrolSystem" type="sensor">
     <hardware>
       <plugin>telecontrol/TelecontrolSystem</plugin>

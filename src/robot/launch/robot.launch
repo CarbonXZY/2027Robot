@@ -22,6 +22,6 @@
         args="leg_controller --controller-type leg/LegController --param-file $(find-pkg-share leg)/config/leg_controller.yaml"/>
 
   <node pkg="controller_manager" exec="spawner" output="screen"
-        args="telecontrol_broadcaster --controller-type telecontrol/TelecontrolBroadcaster --param-file $(find-pkg-share telecontrol)/config/telecontrol_controller.yaml"/>
+        args="earth_block_controller --controller-type earth_block/EarthBlockController --param-file $(find-pkg-share earth_block)/config/earth_block_controller.yaml"/>
 
 </launch>

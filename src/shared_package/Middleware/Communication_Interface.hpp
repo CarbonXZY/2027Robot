@@ -39,7 +39,7 @@ public:
 
 private:
     static constexpr size_t kMaxFrames  = 8;
-    static constexpr size_t kBufferSize = 128;  // 发送打包缓冲
+    static constexpr size_t kBufferSize = 1024;  // 发送打包缓冲
 
     static constexpr size_t kIdSize        = 1;
     static constexpr size_t kCrcSize       = 2;

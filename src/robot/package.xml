@@ -15,6 +15,7 @@
   <exec_depend>mecanum_drive_controller</exec_depend>
   <exec_depend>chassis</exec_depend>
   <exec_depend>leg</exec_depend>
+  <exec_depend>earth_block</exec_depend>
   <exec_depend>telecontrol</exec_depend>
 
   <export>

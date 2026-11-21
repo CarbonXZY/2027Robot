@@ -28,6 +28,8 @@ R2 机器人的**上位机（PC 端）控制框架**，基于 ROS 2 Humble + `ro
 | `shared_package` | 与 ROS 解耦的公共层：通信中间件、USB-CDC 驱动、任务接线、算法、工具。**无 ROS 运行时依赖**，可单独编译测试 |
 | `chassis` | 麦克纳姆底盘 `ros2_control` 硬件接口（`SystemInterface`） |
 | `leg` | 四条腿硬件接口 + `LegController`（自定义控制器 + 状态机） |
+| `earth_block` | 地块硬件接口 + `EarthBlockController`（自定义控制器 + 状态机） |
+| `earth_block_msgs` | 地块动作定义 `Command.action` |
 | `Telecontrol` | 遥控链路：`SensorInterface`（收帧）+ Broadcaster（→ 话题） |
 | `telecontrol_msgs` | 遥控消息定义 `RcState.msg` |
 | `robot` | 整机 bringup：URDF、launch、人机交互仲裁节点 |
@@ -51,6 +53,7 @@ R2 机器人的**上位机（PC 端）控制框架**，基于 ROS 2 Humble + `ro
 | id | 方向 | 设备 | 载荷 | 大小 |
 |----|------|------|------|------|
 | 1 | 双向 | 底盘 | `ChassisTx` 4 轮目标速度 / `ChassisRx` 4 轮速度+位置 | tx 16 / rx 32 |
+| 2 | 双向 | 地块 | `EarthBlockTx` 导轨目标+气泵目标 / `EarthBlockRx` 电机反馈+气泵状态 | tx 6 / rx 10 |
 | 3 | 双向 | 腿 | `LegTx` 4 腿目标位置 / `LegRx` 4 腿速度+位置 | tx 16 / rx 32 |
 | 5 | 仅收 | 遥控 | `TelecontrolRx` 摇杆/开关/链路状态 | rx 29 |
 
@@ -80,9 +83,9 @@ ros2 launch robot robot.launch
 
 > USB 设备默认 `/dev/ttyACM0`。普通用户需加入 `dialout` 组才能访问，见 USB-CDC README。
 
-`robot.launch` 会拉起：`robot_state_publisher`、`ros2_control_node`（update_rate 10 Hz）、
+`robot.launch` 会拉起：`robot_state_publisher`、`ros2_control_node`（update_rate 100 Hz）、
 以及 `joint_state_broadcaster` / `mecanum_drive_controller` / `leg_controller` /
-`telecontrol_broadcaster` 四个 spawner。
+`earth_block_controller` 四个 spawner（遥控器节点当前不启动）。
 
 ## 主要话题
 
@@ -90,7 +93,7 @@ ros2 launch robot robot.launch
 | ---- | ---- | ---- |
 | `/mecanum_drive_controller/reference_unstamped` | `geometry_msgs/Twist` | 底盘速度指令（vx 前后 / vy 横移 / wz 自转），上位机直接发这里 |
 | `/mecanum_drive_controller/odometry` | `nav_msgs/Odometry` | 底盘里程计 |
-| `/telecontrol/rc_state` | `telecontrol_msgs/RcState` | 遥控器状态（摇杆、开关、链路质量、failsafe） |
+| `/telecontrol/rc_state` | `telecontrol_msgs/RcState` | 遥控器状态（摇杆、开关、链路质量、failsafe）；当前 launch 默认不启动该广播器 |
 
 手动下发底盘速度：
 

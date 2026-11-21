@@ -1,0 +1,18 @@
+<library path="earth_block_hardware">
+  <class name="earth_block/EarthBlockSystem"
+         type="earth_block::EarthBlockSystem"
+         base_class_type="hardware_interface::SystemInterface">
+    <description>
+      Earth block hardware interface (frame id=2, 1 rail motor + 2 air pumps).
+      Uses shared_package's Communication_Interface to read/write the MCU frame.
+    </description>
+  </class>
+
+  <class name="earth_block/EarthBlockController"
+         type="earth_block::EarthBlockController"
+         base_class_type="controller_interface::ControllerInterface">
+    <description>
+      Earth block controller with EarthBlockFsm (currently only kInit).
+    </description>
+  </class>
+</library>

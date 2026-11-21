@@ -1,0 +1,6 @@
+# EarthBlockController 配置（类型在 launch 里用 --controller-type 指定）
+earth_block_controller:
+  ros__parameters:
+    joint: earth_block_motor_rail_joint
+    action_name: /earth_block/command
+    command_timeout: 8.0
