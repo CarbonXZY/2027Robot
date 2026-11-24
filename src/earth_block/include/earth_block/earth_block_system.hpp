@@ -16,6 +16,7 @@
 #pragma once
 
 #include <atomic>
+#include <chrono>
 #include <cstddef>
 #include <cstdint>
 #include <memory>
@@ -175,6 +176,8 @@ public:
 class EarthBlockController : public controller_interface::ControllerInterface
 {
 public:
+    ~EarthBlockController() override;
+
     // ControllerInterfaceBase 的纯虚，必须实现
     controller_interface::CallbackReturn on_init() override;
     controller_interface::CallbackReturn on_configure(const rclcpp_lifecycle::State & previous_state) override;
@@ -191,21 +194,21 @@ private:
 
     // 每个状态的目标，按 EarthBlockStatus 索引；新增状态时同步补数组元素
     const double motor_rail_target_[kStatusCount] = {
-        0.0,  // kInit
-        0.0,  // kPick
-        0.0,  // kUp
-        0.0,  // kPlace
+        100.0,  // kInit
+        50.0,  // kPick
+        100.0,  // kUp
+        100.0,  // kPlace
     };
     const double suction_target_[kStatusCount] = {
         0.0,  // kInit
-        0.0,  // kPick
-        0.0,  // kUp
-        0.0,  // kPlace
+        1.0,  // kPick
+        1.0,  // kUp
+        1.0,  // kPlace
     };
     const double air_rail_target_[kStatusCount] = {
         0.0,  // kInit
         0.0,  // kPick
-        0.0,  // kUp
+        1.0,  // kUp
         0.0,  // kPlace
     };
 
@@ -225,6 +228,24 @@ private:
     double target_suction_ = 0.0;
     double target_air_rail_ = 0.0;
 
+    // 电机导轨到位误差阈值 (mm)
+    double motor_rail_error_threshold_mm_ = 2.0;
+    // 电机导轨到位速度阈值 (mm/s)
+    double motor_rail_speed_threshold_mmps_ = 0.2;
+
+    // 气泵到位延时阈值 (ms)
+    double pump_arrive_delay_ms_ = 200.0;
+
+    // 两路气泵各自的到位计时器
+    struct PumpArriveTimer
+    {
+        bool timing = false;
+        double last_target = -1.0;
+        std::chrono::steady_clock::time_point start{};
+    };
+    PumpArriveTimer suction_arrive_timer_;
+    PumpArriveTimer air_rail_arrive_timer_;
+
     EarthBlockFsm fsm_;
 
     // FSM 当前状态的原子镜像，供 HandleGoal() 在回调线程里做合法性检查
@@ -238,6 +259,8 @@ private:
     // 收到的 Action 只写进这里，后续状态切换/到位判断逻辑自己写
     // 初值取 kCount，表示当前没有待处理的 Action
     std::atomic<uint8_t> action_status_{static_cast<uint8_t>(EarthBlockAction::kCount)};
+    // kUp 下收到 PICKUP：标记为重新抓取，FSM 收到后回到 kPick 重走 Pickup
+    std::atomic<bool> pickup_retry_{false};
     // RT 线程置位：请求的状态已到位；监控线程取走后清零
     std::atomic<bool> command_done_{false};
     // 防重入：正在执行时拒绝新 goal
@@ -253,10 +276,11 @@ private:
     // 当前状态是否到位（目前只调三个空实现）
     bool IsActionFinished();
 
-    // 到位判断：先留空实现，后续补气泵 200ms 延时和导轨位置/速度阈值
+    // 到位判断：气泵比对反馈与目标并保持 pump_arrive_delay_ms_，导轨看位置/速度
     bool IsSuctionArrived();
     bool IsAirRailArrived();
     bool IsMotorRailArrived();
+    bool PumpArrived(double now_status, double target, PumpArriveTimer &timer);
 
     // goal 回调：校验 + 防重入 + 写 pending，立刻返回 ACCEPT/REJECT
     rclcpp_action::GoalResponse HandleGoal(const rclcpp_action::GoalUUID & uuid,

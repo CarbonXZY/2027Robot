@@ -10,6 +10,7 @@
 #include "earth_block/earth_block_system.hpp"
 
 #include <chrono>
+#include <cmath>
 #include <string>
 
 #include <hardware_interface/types/hardware_interface_type_values.hpp>
@@ -164,6 +165,21 @@ hardware_interface::return_type EarthBlockSystem::write(const rclcpp::Time &, co
 }
 
 // ---------------- EarthBlockController（控制层） ----------------
+
+/**
+ * @brief 析构：停掉监控线程，避免 std::thread 在 joinable 状态下析构触发 std::terminate
+ *
+ * ControllerManager 退出时可能直接销毁 controller 插件，不走 on_cleanup()；
+ * 只要发过 action，monitor_thread_ 就一直是 joinable 的，这里必须兜底 join。
+ */
+EarthBlockController::~EarthBlockController()
+{
+    shutdown_.store(true);
+    if (monitor_thread_.joinable())
+    {
+        monitor_thread_.join();
+    }
+}
 
 /**
  * @brief 读参数并初始化状态机
@@ -321,27 +337,63 @@ bool EarthBlockController::IsActionFinished()
 }
 
 /**
- * @brief 吸盘到位判断，空实现，后续补 200ms 延时判定
+ * @brief 气泵到位判断：反馈状态与目标对应状态一致，并持续 pump_arrive_delay_ms_
+ *
+ * 目标值：0=Close，1=Open；反馈值 PumpStatus：1=Open，2=Close。
+ * 反馈与目标不匹配时计时器清零，重新匹配后重新计 200ms。
+ */
+bool EarthBlockController::PumpArrived(double now_status, double target, PumpArriveTimer &timer)
+{
+    // 目标变化后重新计时
+    if (std::fabs(timer.last_target - target) > 0.5)
+    {
+        timer.last_target = target;
+        timer.timing = false;
+    }
+
+    const double expected = target > 0.5 ? static_cast<double>(PumpStatus::kOpen) : static_cast<double>(PumpStatus::kClose);
+
+    if (std::fabs(now_status - expected) >= 0.5)
+    {
+        timer.timing = false;
+        return false;
+    }
+
+    const auto now = std::chrono::steady_clock::now();
+    if (!timer.timing)
+    {
+        timer.timing = true;
+        timer.start = now;
+        return false;
+    }
+
+    return std::chrono::duration<double, std::milli>(now - timer.start).count() >= pump_arrive_delay_ms_;
+}
+
+/**
+ * @brief 吸盘到位判断
  */
 bool EarthBlockController::IsSuctionArrived()
 {
-    return true;
+    return PumpArrived(now_suction_, target_suction_, suction_arrive_timer_);
 }
 
 /**
- * @brief 气动导轨到位判断，空实现，后续补 200ms 延时判定
+ * @brief 气动导轨到位判断
  */
 bool EarthBlockController::IsAirRailArrived()
 {
-    return true;
+    return PumpArrived(now_air_rail_, target_air_rail_, air_rail_arrive_timer_);
 }
 
 /**
- * @brief 电机导轨到位判断，空实现，后续补位置/速度阈值判定
+ * @brief 电机导轨到位判断：位置误差在阈值内，且速度小于阈值
  */
 bool EarthBlockController::IsMotorRailArrived()
 {
-    return true;
+    return std::fabs(now_position_mm_ - target_position_mm_) <=
+               motor_rail_error_threshold_mm_ &&
+           std::fabs(now_velocity_mmps_) < motor_rail_speed_threshold_mmps_;
 }
 
 /**
@@ -357,12 +409,17 @@ rclcpp_action::GoalResponse EarthBlockController::HandleGoal(
         return rclcpp_action::GoalResponse::REJECT;
     }
 
-    // 只允许顺序动作：PICKUP 从 kInit 开始，PLACE 从 kUp 开始
+    // PICKUP 允许从 kInit 开始，也允许在 kUp 重新抓取；
+    // PLACE 只允许从 kUp 开始。
     const uint8_t now_status = current_status_.load();
-    if ((goal->status == static_cast<uint8_t>(EarthBlockAction::kPickup) &&
-         now_status != static_cast<uint8_t>(EarthBlockStatus::kInit)) ||
-        (goal->status == static_cast<uint8_t>(EarthBlockAction::kPlace) &&
-         now_status != static_cast<uint8_t>(EarthBlockStatus::kUp)))
+    const bool is_pickup = goal->status == static_cast<uint8_t>(EarthBlockAction::kPickup);
+    const bool is_place = goal->status == static_cast<uint8_t>(EarthBlockAction::kPlace);
+    const bool pickup_from_up = is_pickup && now_status == static_cast<uint8_t>(EarthBlockStatus::kUp);
+
+    if ((is_pickup &&
+         now_status != static_cast<uint8_t>(EarthBlockStatus::kInit) &&
+         now_status != static_cast<uint8_t>(EarthBlockStatus::kUp)) ||
+        (is_place && now_status != static_cast<uint8_t>(EarthBlockStatus::kUp)))
     {
         RCLCPP_WARN(rclcpp::get_logger("EarthBlockController"),
                     "地块 Action 与当前状态不匹配：action=%u, state=%u",
@@ -376,7 +433,8 @@ rclcpp_action::GoalResponse EarthBlockController::HandleGoal(
         return rclcpp_action::GoalResponse::REJECT;
     }
 
-    // 开始新动作：先记 Action，再清上次结果，避免中间被状态机误判成已完成
+    // 先记重试标记和 Action，再清上次结果，避免中间被状态机误判成已完成
+    pickup_retry_.store(pickup_from_up);
     action_status_.store(goal->status);
     command_done_.store(false);
 
@@ -492,6 +550,13 @@ void EarthBlockFsm::TimStatusPeriodElapsedCallback()
     }
     case EarthBlockStatus::kUp:
     {
+        // kUp 收到 PICKUP 重试：重新从 kPick 开始抓取
+        if (controller_->pickup_retry_.exchange(false))
+        {
+            SetStatus(static_cast<uint8_t>(EarthBlockStatus::kPick));
+            break;
+        }
+
         if (controller_->IsActionFinished())
         {
             const uint8_t action = controller_->action_status_.load();

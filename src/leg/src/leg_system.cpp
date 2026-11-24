@@ -186,6 +186,21 @@ hardware_interface::return_type LegSystem::write(const rclcpp::Time &, const rcl
 // ---------------- LegController ----------------
 
 /**
+ * @brief 析构：停掉监控线程，避免 std::thread 在 joinable 状态下析构触发 std::terminate
+ *
+ * ControllerManager 退出时可能直接销毁 controller 插件，不走 on_cleanup()；
+ * 只要发过 lift action，monitor_thread_ 就一直是 joinable 的，这里必须兜底 join。
+ */
+LegController::~LegController()
+{
+    shutdown_.store(true);
+    if (monitor_thread_.joinable())
+    {
+        monitor_thread_.join();
+    }
+}
+
+/**
  * @brief 读 `joints` 参数，开出各成员的槽位，初始化状态机
  *
  * @return controller_interface::CallbackReturn 结果
