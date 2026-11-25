@@ -11,6 +11,14 @@
  *   100ms  上位机存活窗口
  * 判活窗口取 100ms 而不是贴着上位机的 10ms（100Hz）：窗口跟发送周期一般大
  * 就会相位打拍，偶发一个窗口整好一个包都不落，误判掉线。
+ *
+ * 变更记录：
+ * 2026-11-25  CAN 重新分配：CAN1 底盘(0x205~0x208)、CAN2 地块+天块(0x201~0x204)、
+ *             CAN3 腿(0x201~0x204)；新增 Fdcan3Callback，TaskInit 绑定 CAN3，
+ *             Tim1msCanPeriodElapsedCallback 发送 CAN3 0x200 组帧；clamp 注释掉。
+ * 2026-11-24  取消整车上行总门控，Send() 按 100Hz 固定调用；地块/腿/天块在各自
+ *             校准完成前不填上行反馈，上位机读到 0；地块导轨目标改为每拍跟随
+ *             上位机下发值，修复上位机先启动时校准后目标不生效的问题。
  */
 
 #include <cstddef>
@@ -62,32 +70,12 @@ void CrsfUart7Callback(uint8_t *data, uint16_t length)
     g_chariot.CrsfRxCallback(data, length);
 }
 
-// CAN1 上 8 台 DJI 电机的反馈帧：0x201~0x204 腿关节，0x205~0x208 底盘轮
+// CAN1 上是底盘 4 轮：0x205~0x208
 void Fdcan1Callback(Driver::FdcanRxBuffer *FDCAN_RxMessage)
 {
     // 裸十六进制是真实 CAN 反馈 ID，与 MotorDjiId（1~8 的枚举）不是一回事
     switch (FDCAN_RxMessage->Header.Identifier)
     {
-        case 0x201:
-        {
-            Device::g_motor.leg_front_left.FdcanRxCpltCallback(FDCAN_RxMessage->Data);
-            break;
-        }
-        case 0x202:
-        {
-            Device::g_motor.leg_front_right.FdcanRxCpltCallback(FDCAN_RxMessage->Data);
-            break;
-        }
-        case 0x203:
-        {
-            Device::g_motor.leg_rear_left.FdcanRxCpltCallback(FDCAN_RxMessage->Data);
-            break;
-        }
-        case 0x204:
-        {
-            Device::g_motor.leg_rear_right.FdcanRxCpltCallback(FDCAN_RxMessage->Data);
-            break;
-        }
         case 0x205:
         {
             Device::g_motor.chassis_front_left.FdcanRxCpltCallback(FDCAN_RxMessage->Data);
@@ -113,29 +101,59 @@ void Fdcan1Callback(Driver::FdcanRxBuffer *FDCAN_RxMessage)
     }
 }
 
-// CAN2 上 Earth Block 的 C610 反馈帧：0x202
+// CAN2 上是 Earth Block + Sky Block：0x201~0x204
 void Fdcan2Callback(Driver::FdcanRxBuffer *FDCAN_RxMessage)
 {
     switch (FDCAN_RxMessage->Header.Identifier)
     {
-        case 0x202:
+        case 0x201:
         {
             Device::g_motor.earth_block.FdcanRxCpltCallback(FDCAN_RxMessage->Data);
             break;
         }
-        case 0x203:
+        case 0x202:
         {
             Device::g_motor.sky_block_big_arm.FdcanRxCpltCallback(FDCAN_RxMessage->Data);
             break;
         }
-        case 0x204:
+        case 0x203:
         {
             Device::g_motor.sky_block_small_arm.FdcanRxCpltCallback(FDCAN_RxMessage->Data);
             break;
         }
-        case 0x205:
+        case 0x204:
         {
             Device::g_motor.sky_block_gripper.FdcanRxCpltCallback(FDCAN_RxMessage->Data);
+            break;
+        }
+        default:
+            break;
+    }
+}
+
+// CAN3 上是腿 4 关节：0x201~0x204
+void Fdcan3Callback(Driver::FdcanRxBuffer *FDCAN_RxMessage)
+{
+    switch (FDCAN_RxMessage->Header.Identifier)
+    {
+        case 0x201:
+        {
+            Device::g_motor.leg_front_left.FdcanRxCpltCallback(FDCAN_RxMessage->Data);
+            break;
+        }
+        case 0x202:
+        {
+            Device::g_motor.leg_front_right.FdcanRxCpltCallback(FDCAN_RxMessage->Data);
+            break;
+        }
+        case 0x203:
+        {
+            Device::g_motor.leg_rear_left.FdcanRxCpltCallback(FDCAN_RxMessage->Data);
+            break;
+        }
+        case 0x204:
+        {
+            Device::g_motor.leg_rear_right.FdcanRxCpltCallback(FDCAN_RxMessage->Data);
             break;
         }
         default:
@@ -221,6 +239,7 @@ void TaskInit()
     // 电调正推反馈，回调里 manage_object 还是空指针
     Driver::FdcanInit(&hfdcan1, Task::Fdcan1Callback);
     Driver::FdcanInit(&hfdcan2, Task::Fdcan2Callback);
+    Driver::FdcanInit(&hfdcan3, Task::Fdcan3Callback);
 
     // 定时器初始化：TIM5 挂 1ms 调度回调
     Driver::TimInit(&htim5, Task::Tim1msCallback);

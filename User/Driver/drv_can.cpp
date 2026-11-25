@@ -256,22 +256,23 @@ void Tim1msCanPeriodElapsedCallback()
     //如需使用拓展ID，切记第四个参数设为FdcanIdType::kExtended
     //FdcanSendData(&hfdcan1, 0x1ff, g_fdcan1_0x1ff_tx_data, FdcanIdType::kExtended);
 
-    // CAN1电机
-    // 0x200 管 ID 0x201~0x204（腿 4 关节），0x1ff 管 ID 0x205~0x208（底盘 4 轮），
-    // 每台电机占两字节。C620 要求控制帧 ~1kHz 不能断，两帧都必须每毫秒都发，
-    // 哪怕内容是 0。
-    FdcanSendData(&hfdcan1, 0x200, g_fdcan1_0x200_tx_data);
+    // 当前分配：CAN1 底盘(0x205~0x208)、CAN2 地块+天块(0x201~0x204)、CAN3 腿(0x201~0x204)
+    // 每台电机占两字节，ID 0x201~0x204 在 0x200 组，0x205~0x208 在 0x1ff 组；
+    // C620/C610 要求控制帧 ~1kHz 不能断，含电机的组帧每毫秒都要发
+
+    // CAN1: 底盘
     FdcanSendData(&hfdcan1, 0x1ff, g_fdcan1_0x1ff_tx_data);
+    // FdcanSendData(&hfdcan1, 0x200, g_fdcan1_0x200_tx_data);
     // FdcanSendData(&hfdcan1, 0x2ff, g_fdcan1_0x2ff_tx_data);
 
-    // CAN2电机
-    FdcanSendData(&hfdcan2, 0x1ff, g_fdcan2_0x1ff_tx_data);
+    // CAN2: 地块 + 天块
     FdcanSendData(&hfdcan2, 0x200, g_fdcan2_0x200_tx_data);
+    // FdcanSendData(&hfdcan2, 0x1ff, g_fdcan2_0x1ff_tx_data);
     // FdcanSendData(&hfdcan2, 0x2ff, g_fdcan2_0x2ff_tx_data);
 
-    // CAN3电机
+    // CAN3: 腿
+    FdcanSendData(&hfdcan3, 0x200, g_fdcan3_0x200_tx_data);
     // FdcanSendData(&hfdcan3, 0x1ff, g_fdcan3_0x1ff_tx_data);
-    // FdcanSendData(&hfdcan3, 0x200, g_fdcan3_0x200_tx_data);
     // FdcanSendData(&hfdcan3, 0x2ff, g_fdcan3_0x2ff_tx_data);
 }
 } // namespace Driver
