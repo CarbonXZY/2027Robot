@@ -195,7 +195,7 @@ private:
     // 每个状态的目标，按 EarthBlockStatus 索引；新增状态时同步补数组元素
     const double motor_rail_target_[kStatusCount] = {
         100.0,  // kInit
-        50.0,  // kPick
+        20.0,  // kPick
         100.0,  // kUp
         100.0,  // kPlace
     };
