@@ -575,6 +575,13 @@ void LegInteract::UsbSetTarget()
 
 void LegInteract::UsbFeedback()
 {
+    // 校准完成前 offset_ 还是 0，算出来的是原始编码器角度，不是腿高；
+    // 先不填，上位机看到的就是 0。
+    if (GetStatus() != Leg::Status::kRunning)
+    {
+        return;
+    }
+
     // 上行: 回传腿高 (m) 与线速度 (m/s), 向上为正, 由通信中间件打包
     for (uint32_t i = 0; i < kMotorNum; i++)
     {

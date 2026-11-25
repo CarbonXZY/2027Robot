@@ -49,7 +49,6 @@ private:
     EarthBlock *earth_block_ = nullptr;
 
     uint8_t last_pump_target_[2] = {0, 0};
-    float last_motor_target_mm_ = 0.0f;
 
     void UsbRegister();
     void UsbSetTarget();

@@ -307,7 +307,6 @@ void EarthBlockInteract::Init(EarthBlock *earth_block)
     UsbRegister();
     last_pump_target_[0] = tx_buffer_.pump_target[0];
     last_pump_target_[1] = tx_buffer_.pump_target[1];
-    last_motor_target_mm_ = tx_buffer_.motor_position_mm;
 }
 
 void EarthBlockInteract::TimCalculate1msCallback()
@@ -356,20 +355,24 @@ void EarthBlockInteract::UsbSetTarget()
         }
     }
 
-    if (std::isfinite(tx_buffer_.motor_position_mm) &&
-        std::fabs(tx_buffer_.motor_position_mm - last_motor_target_mm_) > 0.1f)
+    // 导轨目标每拍直接跟随上位机最新值。
+    // 这里不能做成"与上次下发值比较"的死区：校准完成时内部目标会被清 0，
+    // 若上位机目标一直不变，死区判断会让这个目标永远不再下发。
+    if (std::isfinite(tx_buffer_.motor_position_mm))
     {
-        if (earth_block_->MoveMotorRailTo(tx_buffer_.motor_position_mm))
-        {
-            last_motor_target_mm_ = tx_buffer_.motor_position_mm;
-        }
+        earth_block_->MoveMotorRailTo(tx_buffer_.motor_position_mm);
     }
 }
 
 void EarthBlockInteract::UsbFeedback()
 {
-    rx_buffer_.motor.position = earth_block_->GetMotorRailPositionMm();
-    rx_buffer_.motor.velocity = earth_block_->GetMotorRailSpeedMmps();
+    // 导轨校准完成前，位置/速度是相对上电时随意读的编码器零点算出来的，没有物理意义；
+    // 这里不填，免得校准期间把假位置发给上位机。
+    if (earth_block_->IsMotorRailCalibrated())
+    {
+        rx_buffer_.motor.position = earth_block_->GetMotorRailPositionMm();
+        rx_buffer_.motor.velocity = earth_block_->GetMotorRailSpeedMmps();
+    }
     rx_buffer_.pump_status[0] =
         static_cast<uint8_t>(earth_block_->GetAllSuctionStatus());
     rx_buffer_.pump_status[1] =

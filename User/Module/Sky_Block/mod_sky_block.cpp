@@ -535,6 +535,12 @@ void SkyBlockInteract::UsbSetTarget()
 
 void SkyBlockInteract::UsbFeedback()
 {
+    // 校准完成前反馈零点还会被改写，位置没有意义；先不填，上位机看到的就是 0。
+    if (!sky_block_->Is_Calibrated())
+    {
+        return;
+    }
+
     rx_buffer_.big_arm.position = sky_block_->Get_BigArm_Position_Mm();
     rx_buffer_.big_arm.velocity = sky_block_->Get_BigArm_Speed_Mmps();
     rx_buffer_.small_arm.position = sky_block_->Get_SmallArm_Angle_Deg();

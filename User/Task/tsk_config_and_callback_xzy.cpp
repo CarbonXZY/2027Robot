@@ -169,10 +169,10 @@ void Tim1msCallback()
     {
         g_usb_send_mod = 0;
         // 校准完成前不上行:  免得把一堆 0 发给上位机
-        if (g_chariot.calibration_finished_)
-        {
+        // if (g_chariot.calibration_finished_)
+        // {
             Middleware::g_usb_communication_interface.Send();
-        }
+        // }
     }
 
     // 推一下 USB 发送环形缓冲，把上行帧真正发出去

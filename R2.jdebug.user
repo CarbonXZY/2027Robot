@@ -4,12 +4,12 @@ OpenDocument="startup_stm32h723xx.s", FilePath="/home/carbon/Electronic_Control/
 OpenDocument="dvc_motor_instances.cpp", FilePath="/home/carbon/Electronic_Control/R2_Embedded/2027Robot/User/Device/dvc_motor_instances.cpp", Line=0
 OpenDocument="main.c", FilePath="/home/carbon/Electronic_Control/R2_Embedded/2027Robot/Core/Src/main.c", Line=53
 OpenToolbar="Debug", Floating=0, x=0, y=0
-OpenWindow="Registers 1", DockArea=RIGHT, x=0, y=1, w=727, h=728, FilterBarShown=0, TotalValueBarShown=0, ToolBarShown=0, FilteredItems=[], RefreshRate=1
-OpenWindow="Source Files", DockArea=LEFT, x=0, y=1, w=1176, h=352, FilterBarShown=0, TotalValueBarShown=0, ToolBarShown=0
-OpenWindow="Disassembly", DockArea=RIGHT, x=0, y=0, w=727, h=398, FilterBarShown=0, TotalValueBarShown=0, ToolBarShown=0
+OpenWindow="Registers 1", DockArea=RIGHT, x=0, y=1, w=727, h=723, FilterBarShown=0, TotalValueBarShown=0, ToolBarShown=0, FilteredItems=[], RefreshRate=1
+OpenWindow="Source Files", DockArea=LEFT, x=0, y=1, w=1176, h=353, FilterBarShown=0, TotalValueBarShown=0, ToolBarShown=0
+OpenWindow="Disassembly", DockArea=RIGHT, x=0, y=0, w=727, h=403, FilterBarShown=0, TotalValueBarShown=0, ToolBarShown=0
 OpenWindow="Memory 1", DockArea=BOTTOM, x=1, y=0, w=1473, h=328, FilterBarShown=0, TotalValueBarShown=0, ToolBarShown=0, EditorAddress=0x200001E8
-OpenWindow="Watched Data 1", DockArea=LEFT, x=0, y=2, w=1176, h=489, FilterBarShown=0, TotalValueBarShown=0, ToolBarShown=0
-OpenWindow="Data Sampling", DockArea=LEFT, x=0, y=0, w=1176, h=279, FilterBarShown=0, TotalValueBarShown=0, ToolBarShown=0, VisibleTab=0, UniformSampleSpacing=0
+OpenWindow="Watched Data 1", DockArea=LEFT, x=0, y=2, w=1176, h=484, FilterBarShown=0, TotalValueBarShown=0, ToolBarShown=0
+OpenWindow="Data Sampling", DockArea=LEFT, x=0, y=0, w=1176, h=283, FilterBarShown=0, TotalValueBarShown=0, ToolBarShown=0, VisibleTab=0, UniformSampleSpacing=0
 OpenWindow="Console", DockArea=BOTTOM, x=0, y=0, w=1007, h=328, FilterBarShown=0, TotalValueBarShown=0, ToolBarShown=0
 SmartViewPlugin="", Page="", Toolbar="Hidden", Window="SmartView 1"
 TableHeader="Source Files", SortCol="File", SortOrder="ASCENDING", VisibleCols=["File";"Status";"Size";"#Insts";"Path"], ColWidths=[255;100;100;100;1022]
@@ -19,6 +19,5 @@ TableHeader="Power Sampling", SortCol="None", SortOrder="ASCENDING", VisibleCols
 TableHeader="Registers 1", SortCol="Name", SortOrder="ASCENDING", VisibleCols=["Name";"Value";"Description"], ColWidths=[100;144;483]
 TableHeader="Watched Data 1", SortCol="Expression", SortOrder="ASCENDING", VisibleCols=["Expression";"Value";"Location";"Refresh";"Access"], ColWidths=[478;275;478;100;100]
 TableHeader="RegisterSelectionDialog", SortCol="None", SortOrder="ASCENDING", VisibleCols=[], ColWidths=[]
-TableHeader="TargetExceptionDialog", SortCol="Name", SortOrder="ASCENDING", VisibleCols=["Name";"Value";"Address";"Description"], ColWidths=[26;26;26;26]
 WatchedExpression="g_chariot", RefreshRate=5, Window=Watched Data 1
 WatchedExpression="g_motor", RefreshRate=5, Window=Watched Data 1
